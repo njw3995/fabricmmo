@@ -1,0 +1,15 @@
+FabricMMO
+Copyright (C) 2026 Nick Wight and FabricMMO contributors
+
+FabricMMO is an independent Fabric-native port derived in part from mcMMO source and behavior.
+It is not an official mcMMO product and is not endorsed by the mcMMO project.
+
+Pinned upstream reference:
+  Project: mcMMO
+  Repository: https://github.com/mcMMO-Dev/mcMMO
+  Release: 2.3.000
+  Commit: 2b855372a2856f68630a4f36866f59de95539184
+  License: GNU General Public License version 3
+
+Fabric, Minecraft, and Cobblemon are separate projects and trademarks of their respective owners.
+Cobblemon 1.7.3 source and binary are used only as official API/reference material for the optional addon.

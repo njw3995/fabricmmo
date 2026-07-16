@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "id": "fabricmmo",
+  "version": "${version}",
+  "name": "FabricMMO",
+  "description": "Fabric-native upstream-tracking port of mcMMO.",
+  "authors": ["njw3995", "mcMMO contributors (upstream attribution)"],
+  "contact": {"sources": "https://github.com/njw3995/fabricmmo"},
+  "license": "GPL-3.0-only",
+  "environment": "*",
+  "entrypoints": {"main": ["io.github.njw3995.fabricmmo.core.fabric.FabricMmoMod"]},
+  "depends": {
+    "fabricloader": ">=0.18.4",
+    "minecraft": "1.21.1",
+    "java": ">=21",
+    "fabric-api": ">=0.116.13+1.21.1"
+  }
+}

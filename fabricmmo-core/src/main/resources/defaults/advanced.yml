@@ -1,0 +1,77 @@
+# Mining section ported from mcMMO 2.3.000 at commit
+# 2b855372a2856f68630a4f36866f59de95539184.
+Skills:
+  General:
+    StartingLevel: 0
+    Ability:
+      Length:
+        Standard:
+          CapLevel: 100
+          IncreaseLevel: 5
+        RetroMode:
+          CapLevel: 1000
+          IncreaseLevel: 50
+      EnchantBuff: 5
+  Mining:
+    MotherLode:
+      MaxBonusLevel:
+        Standard: 1000
+        RetroMode: 10000
+      ChanceMax: 50.0
+    SuperBreaker:
+      AllowTripleDrops: true
+    DoubleDrops:
+      SilkTouch: true
+      ChanceMax: 100.0
+      MaxBonusLevel:
+        Standard: 100
+        RetroMode: 1000
+    BlastMining:
+      RemoteDetonationDistance: 100
+      Bonus_Drops:
+        Enabled: true
+      BlastDamageDecrease:
+        Rank_1: 0.0
+        Rank_2: 0.0
+        Rank_3: 0.0
+        Rank_4: 25.0
+        Rank_5: 25.0
+        Rank_6: 50.0
+        Rank_7: 50.0
+        Rank_8: 100.0
+      OreBonus:
+        Rank_1: 35.0
+        Rank_2: 40.0
+        Rank_3: 45.0
+        Rank_4: 50.0
+        Rank_5: 55.0
+        Rank_6: 60.0
+        Rank_7: 65.0
+        Rank_8: 70.0
+      DebrisReduction:
+        Rank_1: 10.0
+        Rank_2: 20.0
+        Rank_3: 30.0
+        Rank_4: 30.0
+        Rank_5: 30.0
+        Rank_6: 30.0
+        Rank_7: 30.0
+        Rank_8: 30.0
+      DropMultiplier:
+        Rank_1: 1
+        Rank_2: 1
+        Rank_3: 1
+        Rank_4: 1
+        Rank_5: 2
+        Rank_6: 2
+        Rank_7: 3
+        Rank_8: 3
+      BlastRadiusModifier:
+        Rank_1: 1.0
+        Rank_2: 1.0
+        Rank_3: 2.0
+        Rank_4: 2.0
+        Rank_5: 3.0
+        Rank_6: 3.0
+        Rank_7: 4.0
+        Rank_8: 4.0
