@@ -52,7 +52,7 @@ public final class PropertiesProgressionStore implements ProgressionStore {
             String encodedId = key.substring("skill.".length(), key.length() - ".level".length());
             NamespacedId id = NamespacedId.parse(encodedId.replace('|', ':'));
             int level = Integer.parseInt(properties.getProperty(key));
-            int xp = Integer.parseInt(required(properties, "skill." + encodedId + ".xp", path));
+            double xp = Double.parseDouble(required(properties, "skill." + encodedId + ".xp", path));
             skills.put(id, new StoredSkillProgress(level, xp));
         }
         return new PlayerProgressionData(playerId, revision, skills);
@@ -71,7 +71,7 @@ public final class PropertiesProgressionStore implements ProgressionStore {
             properties.setProperty("skill." + encodedId + ".level",
                     Integer.toString(entry.getValue().level()));
             properties.setProperty("skill." + encodedId + ".xp",
-                    Integer.toString(entry.getValue().xp()));
+                    Double.toString(entry.getValue().xp()));
         }
         try (OutputStream output = Files.newOutputStream(temporary)) {
             properties.store(output, "FabricMMO player progression; modified format version 1");

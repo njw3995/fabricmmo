@@ -10,7 +10,7 @@ public final class BlastMiningDefaults {
     private static final double[] DAMAGE_DECREASE = {0, 0, 0, 0, 25, 25, 50, 50, 100};
     private static final double[] ORE_BONUS = {0, 35, 40, 45, 50, 55, 60, 65, 70};
     private static final double[] DEBRIS_REDUCTION = {0, 10, 20, 30, 30, 30, 30, 30, 30};
-    private static final int[] DROP_MULTIPLIER = {0, 1, 1, 1, 1, 2, 2, 3, 3};
+    private static final int[] DROP_MULTIPLIER = {0, 1, 1, 2, 2, 2, 2, 3, 3};
     private static final double[] RADIUS_MODIFIER = {0, 1, 1, 2, 2, 3, 3, 4, 4};
     private static final int[] UNLOCK_STANDARD = {0, 10, 25, 35, 50, 65, 75, 85, 100};
     private static final int[] UNLOCK_RETRO = {0, 100, 250, 350, 500, 650, 750, 850, 1000};

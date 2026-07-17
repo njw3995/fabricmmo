@@ -4,8 +4,10 @@ import io.github.njw3995.fabricmmo.api.NamespacedId;
 import io.github.njw3995.fabricmmo.api.registry.SkillRegistrar;
 import io.github.njw3995.fabricmmo.api.skill.SkillCategory;
 import io.github.njw3995.fabricmmo.api.skill.SkillDefinition;
+import io.github.njw3995.fabricmmo.core.progression.ProgressionSettings;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public final class CoreSkills {
     public static final NamespacedId ACROBATICS = id("acrobatics");
@@ -31,27 +33,31 @@ public final class CoreSkills {
     }
 
     public static void registerAll(SkillRegistrar registrar) {
-        register(registrar, ACROBATICS, SkillCategory.MOVEMENT);
-        register(registrar, ALCHEMY, SkillCategory.UTILITY);
-        register(registrar, ARCHERY, SkillCategory.COMBAT);
-        register(registrar, AXES, SkillCategory.COMBAT);
-        register(registrar, CROSSBOWS, SkillCategory.COMBAT);
-        register(registrar, EXCAVATION, SkillCategory.GATHERING);
-        register(registrar, FISHING, SkillCategory.GATHERING);
-        register(registrar, HERBALISM, SkillCategory.GATHERING);
-        register(registrar, MACES, SkillCategory.COMBAT);
-        register(registrar, MINING, SkillCategory.GATHERING);
-        register(registrar, REPAIR, SkillCategory.UTILITY);
-        register(registrar, SWORDS, SkillCategory.COMBAT);
-        register(registrar, TAMING, SkillCategory.COMBAT);
-        register(registrar, TRIDENTS, SkillCategory.COMBAT);
-        register(registrar, UNARMED, SkillCategory.COMBAT);
-        register(registrar, WOODCUTTING, SkillCategory.GATHERING);
+        registerAll(registrar, ProgressionSettings.upstreamDefaults());
+    }
+
+    public static void registerAll(SkillRegistrar registrar, ProgressionSettings settings) {
+        register(registrar, ACROBATICS, SkillCategory.MOVEMENT, settings);
+        register(registrar, ALCHEMY, SkillCategory.UTILITY, settings);
+        register(registrar, ARCHERY, SkillCategory.COMBAT, settings);
+        register(registrar, AXES, SkillCategory.COMBAT, settings);
+        register(registrar, CROSSBOWS, SkillCategory.COMBAT, settings);
+        register(registrar, EXCAVATION, SkillCategory.GATHERING, settings);
+        register(registrar, FISHING, SkillCategory.GATHERING, settings);
+        register(registrar, HERBALISM, SkillCategory.GATHERING, settings);
+        register(registrar, MACES, SkillCategory.COMBAT, settings);
+        register(registrar, MINING, SkillCategory.GATHERING, settings);
+        register(registrar, REPAIR, SkillCategory.UTILITY, settings);
+        register(registrar, SWORDS, SkillCategory.COMBAT, settings);
+        register(registrar, TAMING, SkillCategory.COMBAT, settings);
+        register(registrar, TRIDENTS, SkillCategory.COMBAT, settings);
+        register(registrar, UNARMED, SkillCategory.COMBAT, settings);
+        register(registrar, WOODCUTTING, SkillCategory.GATHERING, settings);
         registrar.registerSkill(new SkillDefinition(
                 SALVAGE,
                 SkillCategory.CHILD,
                 "skill.fabricmmo.salvage",
-                1000,
+                Integer.MAX_VALUE,
                 true,
                 List.of(REPAIR, FISHING),
                 Map.of("upstream", "PrimarySkillType.SALVAGE")));
@@ -59,18 +65,29 @@ public final class CoreSkills {
                 SMELTING,
                 SkillCategory.CHILD,
                 "skill.fabricmmo.smelting",
-                1000,
+                Integer.MAX_VALUE,
                 true,
                 List.of(MINING, REPAIR),
                 Map.of("upstream", "PrimarySkillType.SMELTING")));
     }
 
-    private static void register(SkillRegistrar registrar, NamespacedId id, SkillCategory category) {
+    public static Set<NamespacedId> primarySkillIds() {
+        return Set.of(
+                ACROBATICS, ALCHEMY, ARCHERY, AXES, CROSSBOWS, EXCAVATION, FISHING,
+                HERBALISM, MACES, MINING, REPAIR, SWORDS, TAMING, TRIDENTS, UNARMED,
+                WOODCUTTING);
+    }
+
+    private static void register(
+            SkillRegistrar registrar,
+            NamespacedId id,
+            SkillCategory category,
+            ProgressionSettings settings) {
         registrar.registerSkill(new SkillDefinition(
                 id,
                 category,
                 "skill.fabricmmo." + id.path(),
-                1000,
+                settings.levelCap(id),
                 true,
                 List.of(),
                 Map.of("upstream", "PrimarySkillType." + id.path().toUpperCase())));

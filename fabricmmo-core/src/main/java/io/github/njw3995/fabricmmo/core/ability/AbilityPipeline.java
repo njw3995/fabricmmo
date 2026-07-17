@@ -17,11 +17,22 @@ public final class AbilityPipeline implements AbilityStateView {
     private final FabricMmoEventBus eventBus;
     private final Clock clock;
     private final Map<Key, State> states = new ConcurrentHashMap<>();
+    private final Map<NamespacedId, AbilityStateView> delegatedViews = new ConcurrentHashMap<>();
 
     public AbilityPipeline(DefaultAbilityRegistry registry, FabricMmoEventBus eventBus, Clock clock) {
         this.registry = registry;
         this.eventBus = eventBus;
         this.clock = clock;
+    }
+
+
+    public void registerStateView(NamespacedId abilityId, AbilityStateView view) {
+        NamespacedId checkedId = java.util.Objects.requireNonNull(abilityId, "abilityId");
+        AbilityStateView checkedView = java.util.Objects.requireNonNull(view, "view");
+        AbilityStateView previous = delegatedViews.putIfAbsent(checkedId, checkedView);
+        if (previous != null && previous != checkedView) {
+            throw new IllegalStateException("Ability state view already registered: " + checkedId);
+        }
     }
 
     public boolean prepare(UUID playerId, NamespacedId abilityId, int skillLevel) {
@@ -74,17 +85,26 @@ public final class AbilityPipeline implements AbilityStateView {
 
     @Override
     public boolean isActive(UUID playerId, NamespacedId abilityId) {
-        return !activeRemaining(playerId, abilityId).isZero();
+        AbilityStateView delegated = delegatedViews.get(abilityId);
+        return delegated != null
+                ? delegated.isActive(playerId, abilityId)
+                : !activeRemaining(playerId, abilityId).isZero();
     }
 
     @Override
     public Duration activeRemaining(UUID playerId, NamespacedId abilityId) {
-        return remaining(states.get(new Key(playerId, abilityId)), true);
+        AbilityStateView delegated = delegatedViews.get(abilityId);
+        return delegated != null
+                ? delegated.activeRemaining(playerId, abilityId)
+                : remaining(states.get(new Key(playerId, abilityId)), true);
     }
 
     @Override
     public Duration cooldownRemaining(UUID playerId, NamespacedId abilityId) {
-        return remaining(states.get(new Key(playerId, abilityId)), false);
+        AbilityStateView delegated = delegatedViews.get(abilityId);
+        return delegated != null
+                ? delegated.cooldownRemaining(playerId, abilityId)
+                : remaining(states.get(new Key(playerId, abilityId)), false);
     }
 
     private Duration remaining(State state, boolean active) {

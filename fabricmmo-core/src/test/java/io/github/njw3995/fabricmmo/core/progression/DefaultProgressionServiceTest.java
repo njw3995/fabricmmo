@@ -8,7 +8,13 @@ import io.github.njw3995.fabricmmo.api.progression.XpAwardRequest;
 import io.github.njw3995.fabricmmo.api.progression.XpAwardResult;
 import io.github.njw3995.fabricmmo.core.bootstrap.FabricMmoBootstrap;
 import io.github.njw3995.fabricmmo.core.persistence.InMemoryProgressionStore;
+import io.github.njw3995.fabricmmo.core.persistence.PlayerProgressionData;
+import io.github.njw3995.fabricmmo.core.persistence.StoredSkillProgress;
+import io.github.njw3995.fabricmmo.core.protection.AllowAllProtectionService;
 import io.github.njw3995.fabricmmo.core.skill.CoreSkills;
+import java.time.Clock;
+import java.time.Duration;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -43,4 +49,93 @@ class DefaultProgressionServiceTest {
                 Map.of()));
         assertEquals(XpAwardResult.Status.REJECTED, result.status());
     }
+    @Test
+    void configuredSkillCapStopsProgressionAndClearsOverflow() {
+        InMemoryProgressionStore store = new InMemoryProgressionStore();
+        ProgressionSettings settings = settings(Map.of(CoreSkills.MINING, 1), Integer.MAX_VALUE, 1.0D);
+        var api = FabricMmoBootstrap.create(
+                store, allowAll(), Clock.systemUTC(), settings, ignored -> { });
+        UUID player = UUID.randomUUID();
+
+        XpAwardResult first = api.progression().award(new XpAwardRequest(
+                player, CoreSkills.MINING, CoreXpSources.MINING_BLOCK_BREAK, 5000, Map.of()));
+        XpAwardResult second = api.progression().award(new XpAwardRequest(
+                player, CoreSkills.MINING, CoreXpSources.MINING_BLOCK_BREAK, 100, Map.of()));
+
+        assertEquals(1, first.newLevel());
+        assertEquals(0, api.progression().query(player, CoreSkills.MINING).xp());
+        assertEquals(XpAwardResult.Status.REJECTED, second.status());
+    }
+
+    @Test
+    void normalXpUsesConfiguredMultipliersWhileCommandXpBypassesThem() {
+        ProgressionSettings settings = settings(Map.of(), Integer.MAX_VALUE, 2.0D);
+        UUID normalPlayer = UUID.randomUUID();
+        UUID commandPlayer = UUID.randomUUID();
+        var api = FabricMmoBootstrap.create(
+                new InMemoryProgressionStore(), allowAll(), Clock.systemUTC(), settings,
+                ignored -> { });
+
+        api.progression().award(new XpAwardRequest(
+                normalPlayer, CoreSkills.MINING, CoreXpSources.MINING_BLOCK_BREAK, 500, Map.of()));
+        api.progression().award(new XpAwardRequest(
+                commandPlayer, CoreSkills.MINING,
+                CoreXpSources.commandSourceId(CoreSkills.MINING), 1020, Map.of()));
+
+        assertEquals(1, api.progression().query(normalPlayer, CoreSkills.MINING).level());
+        assertEquals(31, api.progression().query(normalPlayer, CoreSkills.MINING).xp());
+        assertEquals(1, api.progression().query(commandPlayer, CoreSkills.MINING).level());
+        assertEquals(0, api.progression().query(commandPlayer, CoreSkills.MINING).xp());
+    }
+
+    @Test
+    void powerCapUsesPermissionAwarePowerAfterFastUpperBoundCheck() {
+        InMemoryProgressionStore store = new InMemoryProgressionStore();
+        UUID player = UUID.randomUUID();
+        store.save(new PlayerProgressionData(player, 1, Map.of(
+                CoreSkills.MINING, new StoredSkillProgress(1, 0),
+                CoreSkills.WOODCUTTING, new StoredSkillProgress(1, 0))));
+        ProgressionSettings settings = settings(Map.of(), 2, 1.0D);
+        var api = FabricMmoBootstrap.create(
+                store, allowAll(), Clock.systemUTC(), settings, ignored -> { });
+
+        XpAwardResult permittedSubset = api.progression().award(new XpAwardRequest(
+                player, CoreSkills.MINING, CoreXpSources.MINING_BLOCK_BREAK, 1040,
+                Map.of("powerLevelSkills", CoreSkills.MINING.toString())));
+
+        assertEquals(XpAwardResult.Status.APPLIED, permittedSubset.status());
+        assertEquals(2, permittedSubset.newLevel());
+    }
+
+    private static ProgressionSettings settings(
+            Map<NamespacedId, Integer> capOverrides,
+            int powerLevelCap,
+            double miningMultiplier) {
+        ProgressionSettings defaults = ProgressionSettings.upstreamDefaults();
+        Map<NamespacedId, Integer> caps = new HashMap<>(defaults.levelCaps());
+        caps.putAll(capOverrides);
+        Map<NamespacedId, Double> multipliers = new HashMap<>(defaults.skillXpMultipliers());
+        multipliers.put(CoreSkills.MINING, miningMultiplier);
+        return new ProgressionSettings(
+                defaults.mode(),
+                defaults.formulaType(),
+                defaults.curve(),
+                defaults.cumulativeCurve(),
+                defaults.globalXpMultiplier(),
+                multipliers,
+                caps,
+                powerLevelCap,
+                defaults.truncateSkills(),
+                defaults.earlyGameBoostEnabled(),
+                defaults.customXpPerkBoost(),
+                defaults.diminishedReturnsEnabled(),
+                defaults.diminishedReturnsMinimumFraction(),
+                defaults.diminishedReturnsThresholds(),
+                Duration.ofMinutes(10));
+    }
+
+    private static AllowAllProtectionService allowAll() {
+        return new AllowAllProtectionService();
+    }
+
 }

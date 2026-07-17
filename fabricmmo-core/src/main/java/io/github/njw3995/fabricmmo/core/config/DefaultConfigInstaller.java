@@ -18,7 +18,9 @@ public final class DefaultConfigInstaller {
             "salvage.vanilla.yml",
             "sounds.yml",
             "potions.yml",
-            "level_up_commands.yml");
+            "level_up_commands.yml",
+            "persistent_data.yml",
+            "world_blacklist.txt");
     public static final List<String> FABRIC_ONLY_FILES = List.of("fabric.yml", "addons.yml");
 
     private DefaultConfigInstaller() {

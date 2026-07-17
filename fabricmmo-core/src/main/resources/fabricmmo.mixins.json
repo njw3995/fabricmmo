@@ -4,7 +4,24 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "BlockDropStacksMixin",
-    "BlockItemMixin"
+    "BlockDropSuppressionMixin",
+    "BlockItemMixin",
+    "ExplosionMixin",
+    "LavaFluidMixin",
+    "LivingEntityMixin",
+    "PistonHandlerMixin",
+    "PlayerEntityMixin",
+    "ServerPlayerInteractionManagerMixin",
+    "TntEntityMixin",
+    "WorldChunkMixin",
+    "FluidBlockMixin",
+    "EndermanEntityMixin",
+    "EndermanPickUpBlockGoalMixin",
+    "EndermanPlaceBlockGoalMixin",
+    "FallingBlockEntityMixin",
+    "AbstractBlockStateMixin",
+    "BoneMealItemMixin",
+    "WorldNaturalGrowthMixin"
   ],
   "injectors": {
     "defaultRequire": 1

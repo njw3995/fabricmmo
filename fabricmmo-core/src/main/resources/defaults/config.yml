@@ -2,6 +2,8 @@ General:
   RetroMode:
     Enabled: true
   Locale: en_US
+  Power_Level_Cap: 0
+  TruncateSkills: true
 Abilities:
   Enabled: true
   Messages: true
@@ -16,9 +18,43 @@ Abilities:
   Tools:
     Durability_Loss: 1
 Skills:
+  Acrobatics:
+    Level_Cap: 0
+  Alchemy:
+    Level_Cap: 0
+  Archery:
+    Level_Cap: 0
+  Axes:
+    Level_Cap: 0
+  Crossbows:
+    Level_Cap: 0
+  Excavation:
+    Level_Cap: 0
+  Fishing:
+    Level_Cap: 0
+  Herbalism:
+    Level_Cap: 0
+  Maces:
+    Level_Cap: 0
   Mining:
     Level_Cap: 0
     Detonator_Name: FLINT_AND_STEEL
+  Repair:
+    Level_Cap: 0
+  Salvage:
+    Level_Cap: 0
+  Smelting:
+    Level_Cap: 0
+  Swords:
+    Level_Cap: 0
+  Taming:
+    Level_Cap: 0
+  Tridents:
+    Level_Cap: 0
+  Unarmed:
+    Level_Cap: 0
+  Woodcutting:
+    Level_Cap: 0
 Bonus_Drops:
   Mining:
     Tuff: true

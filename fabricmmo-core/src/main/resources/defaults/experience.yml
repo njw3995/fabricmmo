@@ -1,5 +1,10 @@
 # FabricMMO defaults derived from mcMMO 2.3.000 at commit
 # 2b855372a2856f68630a4f36866f59de95539184.
+EarlyGameBoost:
+  Enabled: true
+ExploitFix:
+  LavaStoneAndCobbleFarming: true
+  PistonCheating: true
 Experience_Formula:
   Curve: LINEAR
   Linear_Values:
@@ -10,11 +15,51 @@ Experience_Formula:
     exponent: 1.80
     base: 2000
   Cumulative_Curve: false
+  Skill_Multiplier:
+    Acrobatics: 1.0
+    Alchemy: 1.0
+    Archery: 1.0
+    Axes: 1.0
+    Crossbows: 1.0
+    Excavation: 1.0
+    Fishing: 1.0
+    Herbalism: 1.0
+    Maces: 1.0
+    Mining: 1.0
+    Repair: 1.0
+    Swords: 1.0
+    Taming: 1.0
+    Tridents: 1.0
+    Unarmed: 1.0
+    Woodcutting: 1.0
+  Custom_XP_Perk:
+    Boost: 1.25
   Multiplier:
     Global: 1.0
     PVP: 1.0
+Diminished_Returns:
+  Guaranteed_Minimum_Percentage: 0.05
+  Enabled: false
+  Threshold:
+    Acrobatics: 20000
+    Alchemy: 20000
+    Archery: 20000
+    Axes: 20000
+    Crossbows: 20000
+    Excavation: 20000
+    Fishing: 20000
+    Herbalism: 20000
+    Maces: 20000
+    Mining: 20000
+    Repair: 20000
+    Swords: 20000
+    Taming: 20000
+    Tridents: 20000
+    Unarmed: 20000
+    Woodcutting: 20000
+  Time_Interval: 10
 Experience_Values:
-  # Entries unavailable in Minecraft 1.21.1 are omitted.
+  # Minecraft 1.21.1-applicable Mining values. Later Cinnabar/Sulfur content is excluded.
   Mining:
     Sculk: 4
     Sculk_Vein: 3

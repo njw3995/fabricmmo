@@ -9,6 +9,7 @@ import java.util.Map;
 
 public final class CoreXpSources {
     public static final NamespacedId MINING_BLOCK_BREAK = NamespacedId.parse("fabricmmo:mining_block_break");
+    public static final NamespacedId MINING_BLAST = NamespacedId.parse("fabricmmo:mining_blast");
 
     private CoreXpSources() {
     }
@@ -18,6 +19,10 @@ public final class CoreXpSources {
                 MINING_BLOCK_BREAK,
                 CoreSkills.MINING,
                 Map.of("upstream", "MiningManager#miningBlockCheck")));
+        registrar.registerXpSource(new XpSourceDefinition(
+                MINING_BLAST,
+                CoreSkills.MINING,
+                Map.of("upstream", "MiningManager#blastMiningDropProcessing")));
     }
 
     public static void registerCommandSources(

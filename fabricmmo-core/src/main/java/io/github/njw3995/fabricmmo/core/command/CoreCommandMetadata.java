@@ -22,6 +22,11 @@ public final class CoreCommandMetadata {
                 List.of("stats"),
                 PermissionNodes.MCSTATS));
         registrar.registerCommandMetadata(new CommandMetadata(
+                NamespacedId.parse("fabricmmo:mining"),
+                "mining",
+                List.of(),
+                PermissionNodes.MINING_COMMAND));
+        registrar.registerCommandMetadata(new CommandMetadata(
                 NamespacedId.parse("fabricmmo:addxp"),
                 "addxp",
                 List.of(),

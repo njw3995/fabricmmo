@@ -9,6 +9,7 @@ import io.github.njw3995.fabricmmo.core.fabric.FabricMmoFabricRuntime;
 import io.github.njw3995.fabricmmo.core.permission.FabricCommandPermissionService;
 import io.github.njw3995.fabricmmo.core.permission.PermissionNodes;
 import io.github.njw3995.fabricmmo.core.progression.CoreXpSources;
+import io.github.njw3995.fabricmmo.core.progression.PlayerProgressionContext;
 import io.github.njw3995.fabricmmo.core.skill.CoreSkills;
 import java.util.HashSet;
 import java.util.Map;
@@ -32,7 +33,7 @@ public final class MiningBlockBreakHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger("FabricMMO/Mining");
     private static final FabricCommandPermissionService PERMISSIONS =
             new FabricCommandPermissionService();
-    private static final ThreadLocal<Set<BreakKey>> EARLY_AWARDS =
+    private static final ThreadLocal<Set<BreakKey>> ACTIVE_BREAKS =
             ThreadLocal.withInitial(HashSet::new);
 
     private MiningBlockBreakHandler() {
@@ -54,27 +55,23 @@ public final class MiningBlockBreakHandler {
             return;
         }
 
+        if (FabricMmoFabricRuntime.isWorldBlacklisted(serverWorld)) {
+            return;
+        }
+
         String worldId = serverWorld.getRegistryKey().getValue().toString();
         BlockLocation location = new BlockLocation(worldId, pos.getX(), pos.getY(), pos.getZ());
         boolean playerPlaced = FabricMmoFabricRuntime.isPlayerPlaced(location);
         BreakKey breakKey = new BreakKey(serverPlayer.getUuid(), location);
-        try {
-            if (!EARLY_AWARDS.get().remove(breakKey)) {
-                awardMiningXp(
-                        serverWorld,
-                        serverPlayer,
-                        pos,
-                        state,
-                        worldId,
-                        playerPlaced,
-                        serverPlayer.getMainHandStack());
-            }
-        } finally {
-            // Upstream clears the ineligible marker after a successful block break.
-            FabricMmoFabricRuntime.clearPlayerPlaced(location);
-            if (EARLY_AWARDS.get().isEmpty()) {
-                EARLY_AWARDS.remove();
-            }
+        if (ACTIVE_BREAKS.get().add(breakKey)) {
+            awardMiningXp(
+                    serverWorld,
+                    serverPlayer,
+                    pos,
+                    state,
+                    worldId,
+                    playerPlaced,
+                    serverPlayer.getMainHandStack());
         }
     }
 
@@ -84,10 +81,13 @@ public final class MiningBlockBreakHandler {
             BlockPos pos,
             BlockState state,
             ItemStack tool) {
+        if (FabricMmoFabricRuntime.isWorldBlacklisted(world)) {
+            return;
+        }
         String worldId = world.getRegistryKey().getValue().toString();
         BlockLocation location = new BlockLocation(worldId, pos.getX(), pos.getY(), pos.getZ());
         BreakKey breakKey = new BreakKey(player.getUuid(), location);
-        if (!EARLY_AWARDS.get().add(breakKey)) {
+        if (!ACTIVE_BREAKS.get().add(breakKey)) {
             return;
         }
         awardMiningXp(
@@ -98,6 +98,30 @@ public final class MiningBlockBreakHandler {
                 worldId,
                 FabricMmoFabricRuntime.isPlayerPlaced(location),
                 tool);
+    }
+
+    public static void finishBlockBreak(
+            ServerWorld world,
+            ServerPlayerEntity player,
+            BlockPos pos) {
+        String worldId = world.getRegistryKey().getValue().toString();
+        BlockLocation location = new BlockLocation(worldId, pos.getX(), pos.getY(), pos.getZ());
+        BreakKey breakKey = new BreakKey(player.getUuid(), location);
+        Set<BreakKey> activeBreaks = ACTIVE_BREAKS.get();
+        activeBreaks.remove(breakKey);
+        try {
+            // Fabric's AFTER event runs before Block.afterBreak and its drop calculation. Keep
+            // the ineligible marker until tryBreakBlock has fully returned so both Mining XP and
+            // bonus-drop processing see the same placed/piston-moved status. Upstream also clears
+            // tracker metadata after successful breaks in blacklisted worlds.
+            if (FabricMmoFabricRuntime.running()) {
+                FabricMmoFabricRuntime.clearPlayerPlaced(location);
+            }
+        } finally {
+            if (activeBreaks.isEmpty()) {
+                ACTIVE_BREAKS.remove();
+            }
+        }
     }
 
     private static void awardMiningXp(
@@ -136,19 +160,35 @@ public final class MiningBlockBreakHandler {
                 CoreSkills.MINING,
                 CoreXpSources.MINING_BLOCK_BREAK,
                 decision.xp(),
-                Map.of(
-                        "block", blockId.toString(),
-                        "tool", toolId.toString(),
-                        "world", worldId,
-                        "x", Integer.toString(pos.getX()),
-                        "y", Integer.toString(pos.getY()),
-                        "z", Integer.toString(pos.getZ()),
-                        "upstreamReason", "PVE",
-                        "upstreamSource", "SELF")));
+                PlayerProgressionContext.enrich(
+                        player,
+                        Map.of(
+                                "block", blockId.toString(),
+                                "tool", toolId.toString(),
+                                "world", worldId,
+                                "x", Integer.toString(pos.getX()),
+                                "y", Integer.toString(pos.getY()),
+                                "z", Integer.toString(pos.getZ()),
+                                "upstreamReason", "PVE",
+                                "upstreamSource", "SELF"),
+                        FabricMmoFabricRuntime.progressionSettings(),
+                        CoreSkills.MINING)));
         if (result.status() != XpAwardResult.Status.APPLIED) {
             LOGGER.warn("Mining XP award for {} was not applied: {}", player.getName().getString(),
                     result.detail());
+            return;
         }
+        if (result.newLevel() > result.oldLevel()) {
+            player.sendMessage(MiningMessages.levelUp(result.newLevel()), false);
+            player.getWorld().playSound(
+                    null,
+                    player.getBlockPos(),
+                    net.minecraft.sound.SoundEvents.ENTITY_PLAYER_LEVELUP,
+                    net.minecraft.sound.SoundCategory.PLAYERS,
+                    1.0F,
+                    1.0F);
+        }
+        MiningAbilityHandler.applyToolDamage(player);
     }
 
     private record BreakKey(UUID playerId, BlockLocation location) {

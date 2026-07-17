@@ -28,4 +28,17 @@ class CoreXpSourcesTest {
         assertTrue(sources.find(CoreXpSources.commandSourceId(addonSkill)).isPresent());
         assertEquals(17, sources.sources().size());
     }
+    @Test
+    void registersSeparateMiningBlockAndBlastSources() {
+        DefaultSkillRegistry skills = new DefaultSkillRegistry();
+        CoreSkills.registerAll(skills);
+        DefaultXpSourceRegistry sources = new DefaultXpSourceRegistry(skills);
+
+        CoreXpSources.registerDefaults(sources);
+
+        assertTrue(sources.find(CoreXpSources.MINING_BLOCK_BREAK).isPresent());
+        assertTrue(sources.find(CoreXpSources.MINING_BLAST).isPresent());
+        assertEquals(2, sources.sources().size());
+    }
+
 }

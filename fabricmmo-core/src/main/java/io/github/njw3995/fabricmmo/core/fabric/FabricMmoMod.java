@@ -3,13 +3,17 @@ package io.github.njw3995.fabricmmo.core.fabric;
 import io.github.njw3995.fabricmmo.core.command.FabricMmoCommands;
 import io.github.njw3995.fabricmmo.core.config.DefaultConfigInstaller;
 import io.github.njw3995.fabricmmo.core.permission.FabricCommandPermissionService;
+import io.github.njw3995.fabricmmo.core.skill.mining.MiningAbilityHandler;
+import io.github.njw3995.fabricmmo.core.skill.mining.MiningBlastHandler;
 import io.github.njw3995.fabricmmo.core.skill.mining.MiningBlockBreakHandler;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Path;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.fabricmc.loader.api.FabricLoader;
 
 public final class FabricMmoMod implements ModInitializer {
@@ -18,9 +22,17 @@ public final class FabricMmoMod implements ModInitializer {
         installDefaultConfigs();
         FabricCommandPermissionService permissions = new FabricCommandPermissionService();
         MiningBlockBreakHandler.register();
+        MiningBlastHandler.register();
+        MiningAbilityHandler.register();
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) ->
                 FabricMmoCommands.register(dispatcher, registryAccess, environment, permissions));
         ServerLifecycleEvents.SERVER_STARTING.register(FabricMmoFabricRuntime::start);
+        ServerWorldEvents.LOAD.register((server, world) -> FabricMmoFabricRuntime.worldLoaded(world));
+        ServerChunkEvents.CHUNK_UNLOAD.register((world, chunk) ->
+                FabricMmoFabricRuntime.chunkUnloaded(
+                        world, chunk.getPos().x, chunk.getPos().z));
+        ServerWorldEvents.UNLOAD.register((server, world) ->
+                FabricMmoFabricRuntime.worldUnloaded(world));
         ServerLifecycleEvents.SERVER_STOPPED.register(ignored -> FabricMmoFabricRuntime.stop());
     }
 

@@ -1,8 +1,5 @@
 package io.github.njw3995.fabricmmo.core.bootstrap;
 
-import io.github.njw3995.fabricmmo.api.progression.FormulaType;
-import io.github.njw3995.fabricmmo.api.progression.ProgressionMode;
-import io.github.njw3995.fabricmmo.api.progression.XpCurve;
 import io.github.njw3995.fabricmmo.api.protection.ProtectionService;
 import io.github.njw3995.fabricmmo.core.ability.AbilityPipeline;
 import io.github.njw3995.fabricmmo.core.ability.DefaultAbilityRegistry;
@@ -15,9 +12,11 @@ import io.github.njw3995.fabricmmo.core.progression.CoreXpSources;
 import io.github.njw3995.fabricmmo.core.progression.DefaultProgressionService;
 import io.github.njw3995.fabricmmo.core.progression.DefaultXpSourceRegistry;
 import io.github.njw3995.fabricmmo.core.progression.ProgressionFormula;
+import io.github.njw3995.fabricmmo.core.progression.ProgressionSettings;
 import io.github.njw3995.fabricmmo.core.protection.AllowAllProtectionService;
 import io.github.njw3995.fabricmmo.core.registry.DefaultSkillRegistry;
 import io.github.njw3995.fabricmmo.core.skill.CoreSkills;
+import io.github.njw3995.fabricmmo.core.skill.mining.CoreMiningAbilities;
 import io.github.njw3995.fabricmmo.core.ui.DefaultUiMetadataRegistry;
 import java.time.Clock;
 import java.util.Objects;
@@ -30,7 +29,8 @@ public final class FabricMmoBootstrap {
     public static DefaultFabricMmoApi create(
             ProgressionStore store,
             Consumer<DefaultFabricMmoApi> addonRegistration) {
-        return create(store, new AllowAllProtectionService(), Clock.systemUTC(), addonRegistration);
+        return create(store, new AllowAllProtectionService(), Clock.systemUTC(),
+                ProgressionSettings.upstreamDefaults(), addonRegistration);
     }
 
     public static DefaultFabricMmoApi create(
@@ -38,17 +38,29 @@ public final class FabricMmoBootstrap {
             ProtectionService protection,
             Clock clock,
             Consumer<DefaultFabricMmoApi> addonRegistration) {
+        return create(store, protection, clock, ProgressionSettings.upstreamDefaults(),
+                addonRegistration);
+    }
+
+    public static DefaultFabricMmoApi create(
+            ProgressionStore store,
+            ProtectionService protection,
+            Clock clock,
+            ProgressionSettings progressionSettings,
+            Consumer<DefaultFabricMmoApi> addonRegistration) {
         Objects.requireNonNull(store, "store");
         Objects.requireNonNull(protection, "protection");
         Objects.requireNonNull(clock, "clock");
+        Objects.requireNonNull(progressionSettings, "progressionSettings");
         Objects.requireNonNull(addonRegistration, "addonRegistration");
 
         DefaultSkillRegistry skills = new DefaultSkillRegistry();
-        CoreSkills.registerAll(skills);
+        CoreSkills.registerAll(skills, progressionSettings);
         SimpleEventBus events = new SimpleEventBus();
         DefaultXpSourceRegistry xpSources = new DefaultXpSourceRegistry(skills);
         CoreXpSources.registerDefaults(xpSources);
         DefaultAbilityRegistry abilities = new DefaultAbilityRegistry(skills);
+        CoreMiningAbilities.registerAll(abilities);
         AbilityPipeline abilityPipeline = new AbilityPipeline(abilities, events, clock);
         DefaultConfigRegistry configs = new DefaultConfigRegistry();
         DefaultCommandMetadataRegistry commands = new DefaultCommandMetadataRegistry();
@@ -57,11 +69,11 @@ public final class FabricMmoBootstrap {
         DefaultProgressionService progression = new DefaultProgressionService(
                 skills,
                 store,
-                new ProgressionFormula(XpCurve.upstreamDefaults()),
+                new ProgressionFormula(progressionSettings.curve()),
                 xpSources,
                 events,
-                ProgressionMode.RETRO,
-                FormulaType.LINEAR);
+                progressionSettings,
+                clock);
         DefaultFabricMmoApi api = new DefaultFabricMmoApi(
                 skills,
                 xpSources,

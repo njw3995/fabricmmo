@@ -1,3 +1,7 @@
+Feedback:
+  Events:
+    AbilityActivation:
+      SendNotificationToOtherPlayers: true
 # Mining section ported from mcMMO 2.3.000 at commit
 # 2b855372a2856f68630a4f36866f59de95539184.
 Skills:

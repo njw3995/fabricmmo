@@ -4,6 +4,7 @@ import io.github.njw3995.fabricmmo.core.bootstrap.DefaultFabricMmoApi;
 import io.github.njw3995.fabricmmo.core.bootstrap.FabricMmoBootstrap;
 import io.github.njw3995.fabricmmo.core.persistence.ProgressionStore;
 import io.github.njw3995.fabricmmo.core.persistence.PropertiesProgressionStore;
+import io.github.njw3995.fabricmmo.core.progression.ProgressionSettings;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Objects;
@@ -25,12 +26,25 @@ public final class FabricMmoServerRuntime implements AutoCloseable {
     public static FabricMmoServerRuntime start(
             Path playerDataDirectory,
             Consumer<DefaultFabricMmoApi> addonRegistration) throws IOException {
+        return start(playerDataDirectory, ProgressionSettings.upstreamDefaults(), addonRegistration);
+    }
+
+    public static FabricMmoServerRuntime start(
+            Path playerDataDirectory,
+            ProgressionSettings progressionSettings,
+            Consumer<DefaultFabricMmoApi> addonRegistration) throws IOException {
         Objects.requireNonNull(playerDataDirectory, "playerDataDirectory");
+        Objects.requireNonNull(progressionSettings, "progressionSettings");
         Objects.requireNonNull(addonRegistration, "addonRegistration");
 
         ProgressionStore store = new PropertiesProgressionStore(playerDataDirectory);
         try {
-            DefaultFabricMmoApi api = FabricMmoBootstrap.create(store, addonRegistration);
+            DefaultFabricMmoApi api = FabricMmoBootstrap.create(
+                    store,
+                    new io.github.njw3995.fabricmmo.core.protection.AllowAllProtectionService(),
+                    java.time.Clock.systemUTC(),
+                    progressionSettings,
+                    addonRegistration);
             return new FabricMmoServerRuntime(store, api);
         } catch (RuntimeException | Error exception) {
             try {

@@ -2,6 +2,7 @@ package io.github.njw3995.fabricmmo.core.command;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
@@ -16,6 +17,15 @@ import io.github.njw3995.fabricmmo.core.fabric.FabricMmoFabricRuntime;
 import io.github.njw3995.fabricmmo.core.permission.CommandPermissionService;
 import io.github.njw3995.fabricmmo.core.progression.CoreXpSources;
 import io.github.njw3995.fabricmmo.core.permission.PermissionNodes;
+import io.github.njw3995.fabricmmo.core.skill.CoreSkills;
+import io.github.njw3995.fabricmmo.core.skill.mining.MiningCommandFormatter;
+import io.github.njw3995.fabricmmo.core.skill.mining.MiningCommandSnapshot;
+import io.github.njw3995.fabricmmo.core.skill.mining.MiningDropSettings;
+import io.github.njw3995.fabricmmo.core.skill.mining.MiningProbability;
+import io.github.njw3995.fabricmmo.core.skill.mining.MiningPerks;
+import io.github.njw3995.fabricmmo.core.skill.mining.MiningSettings;
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -45,6 +55,7 @@ public final class FabricMmoCommands {
             CommandPermissionService permissions) {
         registerMcmmo(dispatcher, permissions);
         registerMcstats(dispatcher, permissions);
+        registerMining(dispatcher, permissions);
         registerAddXp(dispatcher, permissions);
     }
 
@@ -81,6 +92,29 @@ public final class FabricMmoCommands {
                 .redirect(node));
     }
 
+
+    private static void registerMining(
+            CommandDispatcher<ServerCommandSource> dispatcher,
+            CommandPermissionService permissions) {
+        Predicate<ServerCommandSource> miningPermission = source -> permissions.hasPermission(
+                source, PermissionNodes.MINING_COMMAND, true);
+        dispatcher.register(CommandManager.literal("mining")
+                .requires(miningPermission)
+                .executes(FabricMmoCommands::showMining)
+                .then(CommandManager.literal("?")
+                        .executes(context -> showMiningGuide(context, 1))
+                        .then(CommandManager.argument("page", IntegerArgumentType.integer(1))
+                                .executes(context -> showMiningGuide(
+                                        context,
+                                        IntegerArgumentType.getInteger(context, "page")))))
+                .then(CommandManager.literal("help")
+                        .executes(context -> showMiningGuide(context, 1))
+                        .then(CommandManager.argument("page", IntegerArgumentType.integer(1))
+                                .executes(context -> showMiningGuide(
+                                        context,
+                                        IntegerArgumentType.getInteger(context, "page"))))));
+    }
+
     private static void registerAddXp(
             CommandDispatcher<ServerCommandSource> dispatcher,
             CommandPermissionService permissions) {
@@ -115,6 +149,7 @@ public final class FabricMmoCommands {
     private static int showHelp(ServerCommandSource source) {
         source.sendMessage(Text.literal("---- mcMMO Commands ----"));
         source.sendMessage(Text.literal("/mcstats - Show your skill levels and XP"));
+        source.sendMessage(Text.literal("/mining - Show Mining stats and ability details"));
         source.sendMessage(Text.literal("/addxp [player] <skill|all> <amount> - Award skill XP"));
         source.sendMessage(Text.literal("Additional upstream commands are not implemented yet."));
         return Command.SINGLE_SUCCESS;
@@ -128,6 +163,128 @@ public final class FabricMmoCommands {
                 api.skillRegistry(), api.progression().queryAll(player.getUuid()));
         lines.forEach(context.getSource()::sendMessage);
         return Command.SINGLE_SUCCESS;
+    }
+
+
+    private static int showMining(CommandContext<ServerCommandSource> context)
+            throws CommandSyntaxException {
+        ServerPlayerEntity player = context.getSource().getPlayerOrThrow();
+        var progress = FabricMmoFabricRuntime.requireApi().progression()
+                .query(player.getUuid(), CoreSkills.MINING);
+        MiningSettings settings = FabricMmoFabricRuntime.miningSettings();
+        MiningDropSettings drops = FabricMmoFabricRuntime.miningDropSettings();
+        var permissionService = new io.github.njw3995.fabricmmo.core.permission.FabricCommandPermissionService();
+        boolean lucky = permissionService.hasPermission(
+                player.getCommandSource(), PermissionNodes.MINING_LUCKY, false);
+        int level = progress.level();
+        int rank = settings.blastRank(level);
+        boolean showDoubleDrops = drops.doubleDropsUnlocked(level, settings.progressionMode())
+                && permissionService.hasPermission(
+                        player.getCommandSource(), PermissionNodes.MINING_DOUBLE_DROPS, true);
+        boolean showMotherLode = drops.motherLodeUnlocked(level, settings.progressionMode())
+                && permissionService.hasPermission(
+                        player.getCommandSource(), PermissionNodes.MINING_MOTHER_LODE, true);
+        boolean showSuperBreaker = level >= settings.superBreakerUnlockLevel()
+                && permissionService.hasPermission(
+                        player.getCommandSource(), PermissionNodes.MINING_SUPER_BREAKER, true);
+        boolean showBlastMining = rank > 0
+                && permissionService.hasPermission(
+                        player.getCommandSource(), PermissionNodes.MINING_BLAST_MINING, true);
+        boolean showBiggerBombs = level >= settings.biggerBombsUnlockLevel()
+                && permissionService.hasPermission(
+                        player.getCommandSource(), PermissionNodes.MINING_BIGGER_BOMBS, true);
+        boolean showDemolitionsExpertise = level >= settings.demolitionsExpertiseUnlockLevel()
+                && permissionService.hasPermission(
+                        player.getCommandSource(), PermissionNodes.MINING_DEMOLITIONS_EXPERTISE, true);
+        int superBreakerCooldown = MiningPerks.cooldownSeconds(
+                settings.superBreakerCooldownSeconds(), player.getCommandSource(), permissionService);
+        int blastCooldown = MiningPerks.cooldownSeconds(
+                settings.blastMiningCooldownSeconds(), player.getCommandSource(), permissionService);
+        int activationBonus = MiningPerks.activationBonusSeconds(
+                player.getCommandSource(), permissionService);
+        try {
+            MiningCommandSnapshot snapshot = new MiningCommandSnapshot(
+                    level,
+                    progress.xp(),
+                    progress.xpToNextLevel(),
+                    drops.doubleDropsUnlocked(level, settings.progressionMode())
+                            ? MiningProbability.chance(
+                                    level,
+                                    drops.doubleDropsMaxLevel(settings.progressionMode()),
+                                    drops.doubleDropsChanceMaxPercent(),
+                                    lucky) * 100.0D
+                            : 0.0D,
+                    drops.motherLodeUnlocked(level, settings.progressionMode())
+                            ? MiningProbability.chance(
+                                    level,
+                                    drops.motherLodeMaxLevel(settings.progressionMode()),
+                                    drops.motherLodeChanceMaxPercent(),
+                                    lucky) * 100.0D
+                            : 0.0D,
+                    settings.superBreakerDurationSeconds(level) + activationBonus,
+                    FabricMmoFabricRuntime.miningAbilities()
+                            .superBreakerCooldownRemaining(player.getUuid(), superBreakerCooldown),
+                    FabricMmoFabricRuntime.miningAbilities()
+                            .isSuperBreakerActive(player.getUuid()),
+                    FabricMmoFabricRuntime.miningAbilities()
+                            .superBreakerSecondsRemaining(player.getUuid()),
+                    rank,
+                    MiningSettings.BLAST_RANKS,
+                    settings.oreBonusFraction(rank) * 100.0D,
+                    settings.dropMultiplier(rank),
+                    settings.blastRadiusModifier(rank),
+                    settings.blastDamageDecreasePercent(rank),
+                    FabricMmoFabricRuntime.miningAbilities()
+                            .blastCooldownRemaining(player.getUuid(), blastCooldown),
+                    showDoubleDrops,
+                    showMotherLode,
+                    showSuperBreaker,
+                    showBlastMining,
+                    showBiggerBombs,
+                    showDemolitionsExpertise);
+            context.getSource().sendMessage(
+                    io.github.njw3995.fabricmmo.core.skill.mining.MiningMessages.header("MINING"));
+            MiningCommandFormatter.format(snapshot).forEach(line ->
+                    context.getSource().sendMessage(styledMiningLine(line)));
+            return Command.SINGLE_SUCCESS;
+        } catch (IOException exception) {
+            throw new UncheckedIOException("Unable to read Mining ability state", exception);
+        }
+    }
+
+    private static int showMiningGuide(
+            CommandContext<ServerCommandSource> context,
+            int page) {
+        java.util.List<String> guide = MiningCommandFormatter.guide();
+        int pageSize = 8;
+        int totalPages = Math.max(1, (guide.size() + pageSize - 1) / pageSize);
+        if (page > totalPages) {
+            context.getSource().sendError(Text.literal(
+                    "That page does not exist. There are " + totalPages + " pages."));
+            return 0;
+        }
+        context.getSource().sendMessage(
+                io.github.njw3995.fabricmmo.core.skill.mining.MiningMessages.header("MINING GUIDE"));
+        int start = (page - 1) * pageSize;
+        int end = Math.min(start + pageSize, guide.size());
+        guide.subList(start, end).forEach(line ->
+                context.getSource().sendMessage(Text.literal(line)
+                        .formatted(net.minecraft.util.Formatting.GRAY)));
+        context.getSource().sendMessage(Text.literal("Page " + page + " of " + totalPages)
+                .formatted(net.minecraft.util.Formatting.GOLD));
+        return Command.SINGLE_SUCCESS;
+    }
+
+
+    private static Text styledMiningLine(String line) {
+        int separator = line.indexOf(':');
+        if (separator < 0) {
+            return Text.literal(line).formatted(net.minecraft.util.Formatting.GREEN);
+        }
+        return Text.literal(line.substring(0, separator + 1) + " ")
+                .formatted(net.minecraft.util.Formatting.DARK_AQUA)
+                .append(Text.literal(line.substring(separator + 1).trim())
+                        .formatted(net.minecraft.util.Formatting.GREEN));
     }
 
     private static int addXpSelf(

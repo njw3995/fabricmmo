@@ -2,7 +2,6 @@ package io.github.njw3995.fabricmmo.core.skill.mining;
 
 import io.github.njw3995.fabricmmo.api.FabricMmoApi;
 import io.github.njw3995.fabricmmo.api.NamespacedId;
-import io.github.njw3995.fabricmmo.api.progression.ProgressionMode;
 import io.github.njw3995.fabricmmo.core.block.BlockLocation;
 import io.github.njw3995.fabricmmo.core.fabric.FabricMmoFabricRuntime;
 import io.github.njw3995.fabricmmo.core.permission.FabricCommandPermissionService;
@@ -44,6 +43,10 @@ public final class MiningBonusDropHandler {
             return vanillaDrops;
         }
 
+        if (FabricMmoFabricRuntime.isWorldBlacklisted(world)) {
+            return vanillaDrops;
+        }
+
         // Upstream awards Mining XP before rolling Double Drops and Mother Lode, so a level
         // reached by this block affects this block's bonus-drop chance. The AFTER event remains
         // as a fallback for successful breaks whose block implementation does not spawn drops.
@@ -78,7 +81,7 @@ public final class MiningBonusDropHandler {
 
         MiningBonusDropDecision decision = MiningBonusDropDecision.evaluate(
                 skillLevel,
-                ProgressionMode.RETRO,
+                FabricMmoFabricRuntime.miningSettings().progressionMode(),
                 settings,
                 player.isCreative(),
                 validTool,
@@ -89,7 +92,7 @@ public final class MiningBonusDropHandler {
                 silkTouch,
                 doubleDropsPermission,
                 motherLodePermission,
-                false,
+                FabricMmoFabricRuntime.isSuperBreakerActive(player.getUuid()),
                 lucky);
         if (!decision.eligible()) {
             return vanillaDrops;

@@ -1,0 +1,4 @@
+# mcMMO-compatible placed-block persistence control.
+# Disabling this makes all blocks eligible for skill rewards and re-enables placement exploits.
+mcMMO_Region_System:
+  Enabled: true
