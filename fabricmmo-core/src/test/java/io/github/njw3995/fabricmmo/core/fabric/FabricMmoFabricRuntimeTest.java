@@ -8,13 +8,19 @@ import org.junit.jupiter.api.Test;
 
 class FabricMmoFabricRuntimeTest {
     @Test
-    void normalizesPlayerDataDirectory() {
-        Path resolved = FabricMmoFabricRuntime.resolvePlayerDataDirectory(
-                Path.of("world").resolve("."));
+    void normalizesWorldScopedDataDirectories() {
+        Path worldRoot = Path.of("world").resolve(".");
 
-        assertTrue(resolved.isAbsolute());
+        Path players = FabricMmoFabricRuntime.resolvePlayerDataDirectory(worldRoot);
+        Path placedBlocks = FabricMmoFabricRuntime.resolvePlacedBlockDirectory(worldRoot);
+
+        assertTrue(players.isAbsolute());
+        assertTrue(placedBlocks.isAbsolute());
         assertEquals(
                 Path.of("world", "fabricmmo", "players").toAbsolutePath().normalize(),
-                resolved);
+                players);
+        assertEquals(
+                Path.of("world", "fabricmmo", "placed-blocks").toAbsolutePath().normalize(),
+                placedBlocks);
     }
 }

@@ -3,6 +3,7 @@ package io.github.njw3995.fabricmmo.core.fabric;
 import io.github.njw3995.fabricmmo.core.command.FabricMmoCommands;
 import io.github.njw3995.fabricmmo.core.config.DefaultConfigInstaller;
 import io.github.njw3995.fabricmmo.core.permission.FabricCommandPermissionService;
+import io.github.njw3995.fabricmmo.core.skill.mining.MiningBlockBreakHandler;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Path;
@@ -16,6 +17,7 @@ public final class FabricMmoMod implements ModInitializer {
     public void onInitialize() {
         installDefaultConfigs();
         FabricCommandPermissionService permissions = new FabricCommandPermissionService();
+        MiningBlockBreakHandler.register();
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) ->
                 FabricMmoCommands.register(dispatcher, registryAccess, environment, permissions));
         ServerLifecycleEvents.SERVER_STARTING.register(FabricMmoFabricRuntime::start);
