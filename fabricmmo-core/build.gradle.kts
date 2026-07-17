@@ -12,6 +12,10 @@ dependencies {
     modImplementation("net.fabricmc:fabric-loader:${providers.gradleProperty("loader_version").get()}")
     modImplementation("net.fabricmc.fabric-api:fabric-api:${providers.gradleProperty("fabric_api_version").get()}")
 
+    val permissionsApi = "me.lucko:fabric-permissions-api:${providers.gradleProperty("fabric_permissions_api_version").get()}"
+    modImplementation(permissionsApi)
+    include(permissionsApi)
+
     testImplementation(platform("org.junit:junit-bom:5.11.4"))
     testImplementation("org.junit.jupiter:junit-jupiter")
 }

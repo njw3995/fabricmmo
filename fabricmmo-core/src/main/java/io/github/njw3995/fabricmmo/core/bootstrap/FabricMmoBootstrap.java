@@ -6,6 +6,7 @@ import io.github.njw3995.fabricmmo.api.progression.XpCurve;
 import io.github.njw3995.fabricmmo.api.protection.ProtectionService;
 import io.github.njw3995.fabricmmo.core.ability.AbilityPipeline;
 import io.github.njw3995.fabricmmo.core.ability.DefaultAbilityRegistry;
+import io.github.njw3995.fabricmmo.core.command.CoreCommandMetadata;
 import io.github.njw3995.fabricmmo.core.command.DefaultCommandMetadataRegistry;
 import io.github.njw3995.fabricmmo.core.config.DefaultConfigRegistry;
 import io.github.njw3995.fabricmmo.core.event.SimpleEventBus;
@@ -51,6 +52,7 @@ public final class FabricMmoBootstrap {
         AbilityPipeline abilityPipeline = new AbilityPipeline(abilities, events, clock);
         DefaultConfigRegistry configs = new DefaultConfigRegistry();
         DefaultCommandMetadataRegistry commands = new DefaultCommandMetadataRegistry();
+        CoreCommandMetadata.registerDefaults(commands);
         DefaultUiMetadataRegistry ui = new DefaultUiMetadataRegistry(skills);
         DefaultProgressionService progression = new DefaultProgressionService(
                 skills,
@@ -73,6 +75,7 @@ public final class FabricMmoBootstrap {
                 protection);
 
         addonRegistration.accept(api);
+        CoreXpSources.registerCommandSources(skills.skills(), xpSources);
 
         skills.freeze();
         xpSources.freeze();

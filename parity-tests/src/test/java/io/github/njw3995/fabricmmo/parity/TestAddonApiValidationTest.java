@@ -22,7 +22,10 @@ class TestAddonApiValidationTest {
         assertEquals(1, api.skillRegistry().extensions(NamespacedId.parse("fabricmmo:mining")).size());
         assertTrue(api.xpSources().find(TestAddonRegistration.TEST_SOURCE).isPresent());
         assertEquals(1, api.configRegistry().contributions().size());
-        assertEquals("engineering", api.commandMetadata().commands().getFirst().literal());
+        assertEquals("engineering", api.commandMetadata()
+                .find(NamespacedId.parse("fabricmmo_test_addon:engineering_command"))
+                .orElseThrow()
+                .literal());
         assertEquals("minecraft:redstone",
                 api.uiMetadata().findForSkill(TestAddonRegistration.ENGINEERING).orElseThrow().iconId());
         assertTrue(api.skillRegistry().frozen());

@@ -3,6 +3,7 @@ package io.github.njw3995.fabricmmo.core.progression;
 import io.github.njw3995.fabricmmo.api.NamespacedId;
 import io.github.njw3995.fabricmmo.api.progression.XpSourceDefinition;
 import io.github.njw3995.fabricmmo.api.progression.XpSourceRegistrar;
+import io.github.njw3995.fabricmmo.api.skill.SkillDefinition;
 import io.github.njw3995.fabricmmo.core.skill.CoreSkills;
 import java.util.Map;
 
@@ -17,5 +18,25 @@ public final class CoreXpSources {
                 MINING_BLOCK_BREAK,
                 CoreSkills.MINING,
                 Map.of("upstream", "MiningManager#miningBlockCheck")));
+    }
+
+    public static void registerCommandSources(
+            Iterable<SkillDefinition> skills,
+            XpSourceRegistrar registrar) {
+        for (SkillDefinition skill : skills) {
+            if (skill.childSkill()) {
+                continue;
+            }
+            registrar.registerXpSource(new XpSourceDefinition(
+                    commandSourceId(skill.id()),
+                    skill.id(),
+                    Map.of(
+                            "upstreamReason", "XPGainReason.COMMAND",
+                            "upstreamSource", "XPGainSource.COMMAND")));
+        }
+    }
+
+    public static NamespacedId commandSourceId(NamespacedId skillId) {
+        return new NamespacedId("fabricmmo", "command/" + skillId.namespace() + '/' + skillId.path());
     }
 }

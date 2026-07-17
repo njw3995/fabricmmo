@@ -11,16 +11,15 @@ dependencies {
     mappings("net.fabricmc:yarn:${providers.gradleProperty("yarn_mappings").get()}:v2")
     modImplementation("net.fabricmc:fabric-loader:${providers.gradleProperty("loader_version").get()}")
     modImplementation("net.fabricmc.fabric-api:fabric-api:${providers.gradleProperty("fabric_api_version").get()}")
+    modRuntimeOnly("me.lucko:fabric-permissions-api:${providers.gradleProperty("fabric_permissions_api_version").get()}")
 
     testImplementation(platform("org.junit:junit-bom:5.11.4"))
     testImplementation("org.junit.jupiter:junit-jupiter")
 }
 
-val modVersion = providers.gradleProperty("fabricmmo_version").get()
-
 tasks.processResources {
-    inputs.property("version", modVersion)
+    inputs.property("version", project.version)
     filesMatching("fabric.mod.json") {
-        expand("version" to modVersion)
+        expand("version" to project.version)
     }
 }
