@@ -10,7 +10,10 @@ import io.github.njw3995.fabricmmo.core.permission.FabricCommandPermissionServic
 import io.github.njw3995.fabricmmo.core.permission.PermissionNodes;
 import io.github.njw3995.fabricmmo.core.progression.CoreXpSources;
 import io.github.njw3995.fabricmmo.core.skill.CoreSkills;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -29,6 +32,8 @@ public final class MiningBlockBreakHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger("FabricMMO/Mining");
     private static final FabricCommandPermissionService PERMISSIONS =
             new FabricCommandPermissionService();
+    private static final ThreadLocal<Set<BreakKey>> EARLY_AWARDS =
+            ThreadLocal.withInitial(HashSet::new);
 
     private MiningBlockBreakHandler() {
     }
@@ -52,12 +57,47 @@ public final class MiningBlockBreakHandler {
         String worldId = serverWorld.getRegistryKey().getValue().toString();
         BlockLocation location = new BlockLocation(worldId, pos.getX(), pos.getY(), pos.getZ());
         boolean playerPlaced = FabricMmoFabricRuntime.isPlayerPlaced(location);
+        BreakKey breakKey = new BreakKey(serverPlayer.getUuid(), location);
         try {
-            awardMiningXp(serverWorld, serverPlayer, pos, state, worldId, playerPlaced);
+            if (!EARLY_AWARDS.get().remove(breakKey)) {
+                awardMiningXp(
+                        serverWorld,
+                        serverPlayer,
+                        pos,
+                        state,
+                        worldId,
+                        playerPlaced,
+                        serverPlayer.getMainHandStack());
+            }
         } finally {
             // Upstream clears the ineligible marker after a successful block break.
             FabricMmoFabricRuntime.clearPlayerPlaced(location);
+            if (EARLY_AWARDS.get().isEmpty()) {
+                EARLY_AWARDS.remove();
+            }
         }
+    }
+
+    static void awardBeforeDrops(
+            ServerWorld world,
+            ServerPlayerEntity player,
+            BlockPos pos,
+            BlockState state,
+            ItemStack tool) {
+        String worldId = world.getRegistryKey().getValue().toString();
+        BlockLocation location = new BlockLocation(worldId, pos.getX(), pos.getY(), pos.getZ());
+        BreakKey breakKey = new BreakKey(player.getUuid(), location);
+        if (!EARLY_AWARDS.get().add(breakKey)) {
+            return;
+        }
+        awardMiningXp(
+                world,
+                player,
+                pos,
+                state,
+                worldId,
+                FabricMmoFabricRuntime.isPlayerPlaced(location),
+                tool);
     }
 
     private static void awardMiningXp(
@@ -66,11 +106,11 @@ public final class MiningBlockBreakHandler {
             BlockPos pos,
             BlockState state,
             String worldId,
-            boolean playerPlaced) {
+            boolean playerPlaced,
+            ItemStack heldItem) {
         NamespacedId blockId = NamespacedId.parse(
                 Registries.BLOCK.getId(state.getBlock()).toString());
         int configuredXp = FabricMmoFabricRuntime.miningXpFor(blockId);
-        ItemStack heldItem = player.getMainHandStack();
         boolean validTool = heldItem.isIn(ItemTags.PICKAXES) || heldItem.isIn(ItemTags.HOES);
         boolean hasPermission = PERMISSIONS.hasPermission(
                 player.getCommandSource(), PermissionNodes.MINING, true);
@@ -110,4 +150,8 @@ public final class MiningBlockBreakHandler {
                     result.detail());
         }
     }
+
+    private record BreakKey(UUID playerId, BlockLocation location) {
+    }
+
 }

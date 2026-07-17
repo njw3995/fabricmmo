@@ -5,13 +5,13 @@ public enum MiningDropOutcome {
     DOUBLE(1),
     TRIPLE(2);
 
-    private final int bonusCopies;
+    private final int bonusItemsToAdd;
 
-    MiningDropOutcome(int bonusCopies) {
-        this.bonusCopies = bonusCopies;
+    MiningDropOutcome(int bonusItemsToAdd) {
+        this.bonusItemsToAdd = bonusItemsToAdd;
     }
 
-    public int bonusCopies() {
-        return bonusCopies;
+    public int bonusItemsToAdd() {
+        return bonusItemsToAdd;
     }
 }

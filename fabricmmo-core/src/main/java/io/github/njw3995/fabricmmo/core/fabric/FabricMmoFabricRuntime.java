@@ -7,6 +7,7 @@ import io.github.njw3995.fabricmmo.core.block.BlockLocation;
 import io.github.njw3995.fabricmmo.core.block.ChunkPlacedBlockTracker;
 import io.github.njw3995.fabricmmo.core.block.PlacedBlockTracker;
 import io.github.njw3995.fabricmmo.core.runtime.FabricMmoServerRuntime;
+import io.github.njw3995.fabricmmo.core.skill.mining.MiningDropSettings;
 import io.github.njw3995.fabricmmo.core.skill.mining.MiningXpTable;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -22,6 +23,7 @@ public final class FabricMmoFabricRuntime {
     private static final Logger LOGGER = LoggerFactory.getLogger("FabricMMO");
     private static FabricMmoServerRuntime runtime;
     private static MiningXpTable miningXpTable;
+    private static MiningDropSettings miningDropSettings;
     private static PlacedBlockTracker placedBlockTracker;
 
     private FabricMmoFabricRuntime() {
@@ -35,13 +37,17 @@ public final class FabricMmoFabricRuntime {
         Path worldRoot = server.getSavePath(WorldSavePath.ROOT).toAbsolutePath().normalize();
         Path playerDataDirectory = resolvePlayerDataDirectory(worldRoot);
         Path placedBlockDirectory = resolvePlacedBlockDirectory(worldRoot);
-        Path experienceFile = FabricLoader.getInstance().getConfigDir()
-                .resolve("fabricmmo")
-                .resolve("experience.yml");
+        Path configDirectory = FabricLoader.getInstance().getConfigDir().resolve("fabricmmo");
+        Path experienceFile = configDirectory.resolve("experience.yml");
+        Path configFile = configDirectory.resolve("config.yml");
+        Path advancedFile = configDirectory.resolve("advanced.yml");
+        Path skillRanksFile = configDirectory.resolve("skillranks.yml");
 
         PlacedBlockTracker newTracker = null;
         try {
             MiningXpTable newXpTable = MiningXpTable.loadConfigured(experienceFile);
+            MiningDropSettings newDropSettings = MiningDropSettings.load(
+                    configFile, advancedFile, skillRanksFile);
             newTracker = new ChunkPlacedBlockTracker(placedBlockDirectory);
             FabricMmoServerRuntime newRuntime = FabricMmoServerRuntime.start(
                     playerDataDirectory,
@@ -51,6 +57,7 @@ public final class FabricMmoFabricRuntime {
                             entrypoint -> entrypoint.register(api)));
             runtime = newRuntime;
             miningXpTable = newXpTable;
+            miningDropSettings = newDropSettings;
             placedBlockTracker = newTracker;
             LOGGER.info(
                     "Started with {} registered skills; player data directory: {}; placed-block directory: {}",
@@ -87,6 +94,13 @@ public final class FabricMmoFabricRuntime {
             throw new IllegalStateException("FabricMMO server runtime is not active");
         }
         return runtime.api();
+    }
+
+    public static synchronized MiningDropSettings miningDropSettings() {
+        if (miningDropSettings == null) {
+            throw new IllegalStateException("FabricMMO Mining drop configuration is not active");
+        }
+        return miningDropSettings;
     }
 
     public static synchronized int miningXpFor(NamespacedId blockId) {
@@ -126,6 +140,7 @@ public final class FabricMmoFabricRuntime {
         PlacedBlockTracker activeTracker = placedBlockTracker;
         runtime = null;
         miningXpTable = null;
+        miningDropSettings = null;
         placedBlockTracker = null;
 
         IOException failure = null;
