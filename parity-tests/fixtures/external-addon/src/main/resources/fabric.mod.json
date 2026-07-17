@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "id": "fabricmmo_test_addon",
+  "version": "1.0.0",
+  "name": "FabricMMO API Test Addon",
+  "environment": "*",
+  "entrypoints": {
+    "fabricmmo": [
+      "io.github.njw3995.fabricmmo.testaddon.TestAddonRegistration"
+    ]
+  },
+  "depends": {
+    "fabricmmo": "*"
+  }
+}

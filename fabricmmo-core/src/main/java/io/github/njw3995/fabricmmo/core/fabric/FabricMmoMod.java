@@ -1,12 +1,27 @@
 package io.github.njw3995.fabricmmo.core.fabric;
 
-import io.github.njw3995.fabricmmo.core.bootstrap.FabricMmoBootstrap;
-import io.github.njw3995.fabricmmo.core.persistence.InMemoryProgressionStore;
+import io.github.njw3995.fabricmmo.core.config.DefaultConfigInstaller;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Path;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.loader.api.FabricLoader;
 
 public final class FabricMmoMod implements ModInitializer {
     @Override
     public void onInitialize() {
-        FabricMmoBootstrap.create(new InMemoryProgressionStore(), ignored -> { });
+        installDefaultConfigs();
+        ServerLifecycleEvents.SERVER_STARTING.register(FabricMmoFabricRuntime::start);
+        ServerLifecycleEvents.SERVER_STOPPED.register(ignored -> FabricMmoFabricRuntime.stop());
+    }
+
+    private static void installDefaultConfigs() {
+        Path configDirectory = FabricLoader.getInstance().getConfigDir().resolve("fabricmmo");
+        try {
+            DefaultConfigInstaller.installMissingDefaults(configDirectory);
+        } catch (IOException exception) {
+            throw new UncheckedIOException("Unable to install FabricMMO configuration", exception);
+        }
     }
 }

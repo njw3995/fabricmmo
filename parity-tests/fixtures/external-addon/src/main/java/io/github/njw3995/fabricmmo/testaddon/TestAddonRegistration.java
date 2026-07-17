@@ -6,6 +6,7 @@ import io.github.njw3995.fabricmmo.api.ability.ActiveAbilityDefinition;
 import io.github.njw3995.fabricmmo.api.ability.PassiveDefinition;
 import io.github.njw3995.fabricmmo.api.command.CommandMetadata;
 import io.github.njw3995.fabricmmo.api.config.ConfigContribution;
+import io.github.njw3995.fabricmmo.api.entrypoint.FabricMmoEntrypoint;
 import io.github.njw3995.fabricmmo.api.event.LevelChangedEvent;
 import io.github.njw3995.fabricmmo.api.progression.XpSourceDefinition;
 import io.github.njw3995.fabricmmo.api.skill.SkillCategory;
@@ -17,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public final class TestAddonRegistration {
+public final class TestAddonRegistration implements FabricMmoEntrypoint {
     public static final NamespacedId ENGINEERING = NamespacedId.parse("fabricmmo_test_addon:engineering");
     public static final NamespacedId MINING_EXTENSION = NamespacedId.parse("fabricmmo_test_addon:mining_extension");
     public static final NamespacedId TEST_SOURCE = NamespacedId.parse("fabricmmo_test_addon:test_source");
@@ -25,6 +26,7 @@ public final class TestAddonRegistration {
     private static final NamespacedId OWNER = NamespacedId.parse("fabricmmo_test_addon:registration");
     private final AtomicInteger observedLevelEvents = new AtomicInteger();
 
+    @Override
     public void register(FabricMmoApi api) {
         api.skillRegistrar().registerSkill(new SkillDefinition(
                 ENGINEERING,

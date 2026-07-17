@@ -51,3 +51,22 @@ Run the diff utility with two mcMMO revisions:
 ## License
 
 FabricMMO is licensed under GPL-3.0. It is not affiliated with or endorsed by the mcMMO project.
+
+## Addon registration
+
+FabricMMO addons register through the `fabricmmo` Fabric Loader entrypoint. The entrypoint class implements `FabricMmoEntrypoint`; FabricMMO invokes it before skill, XP source, ability, configuration, command metadata, and UI registries are frozen.
+
+```json
+"entrypoints": {
+  "fabricmmo": ["com.example.ExampleFabricMmoEntrypoint"]
+}
+```
+
+```java
+public final class ExampleFabricMmoEntrypoint implements FabricMmoEntrypoint {
+    @Override
+    public void register(FabricMmoApi api) {
+        ExampleSkills.register(api);
+    }
+}
+```
