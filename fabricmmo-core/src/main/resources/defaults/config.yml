@@ -4,6 +4,8 @@ General:
   Locale: en_US
   Power_Level_Cap: 0
   TruncateSkills: true
+  LevelUp_Sounds: true
+  Verbose_Logging: false
 Abilities:
   Enabled: true
   Messages: true
@@ -126,3 +128,101 @@ Bonus_Drops:
     Raw_Copper: true
     Raw_Iron: true
     Raw_Gold: true
+
+# Shared mcMMO 2.3.000 command, party, scoreboard, and storage defaults.
+Party:
+  FriendlyFire: false
+  MaxSize: -1
+  AutoKick_Interval: 12
+  Old_Party_Member_Cutoff: 7
+  Sharing:
+    ExpShare_bonus_base: 1.1
+    ExpShare_bonus_increase: 1.05
+    ExpShare_bonus_cap: 1.5
+    Range: 75.0
+  Leveling:
+    Level_Cap: 10
+    Xp_Curve_Modifier: 3
+    Near_Members_Needed: false
+    Inform_All_Party_Members_On_LevelUp: false
+    Chat_UnlockLevel: 1
+    Teleport_UnlockLevel: 2
+    Alliance_UnlockLevel: 5
+    ItemShare_UnlockLevel: 8
+    XpShare_UnlockLevel: 10
+
+Commands:
+  Skills:
+    URL_Links: true
+  Generic:
+    Match_OfflinePlayers: false
+  Database:
+    Player_Cooldown: 1750
+  inspect:
+    Max_Distance: 30.0
+  ptp:
+    Cooldown: 120
+    Warmup: 5
+    RecentlyHurt_Cooldown: 60
+    Accept_Required: true
+    Request_Timeout: 300
+    World_Based_Permissions: false
+
+Scoreboard:
+  UseScoreboards: false
+  Power_Level_Tags: false
+  Allow_Keep: true
+  Show_Stats_After_Login: false
+  Tips_Amount: 5
+  Rainbows: false
+  Ability_Names: true
+  Types:
+    Rank:
+      Print: false
+      Board: true
+      Display_Time: 15
+    Top:
+      Print: true
+      Board: true
+      Display_Time: 15
+    Stats:
+      Print: false
+      Board: true
+      Display_Time: 15
+    Inspect:
+      Print: false
+      Board: true
+      Display_Time: 20
+    Cooldown:
+      Print: true
+      Board: true
+      Display_Time: 41
+    Skill:
+      Board: true
+      Display_Time: 30
+
+Database_Purging:
+  Purge_Interval: -1
+  Old_User_Cutoff: 6
+
+MySQL:
+  Enabled: false
+  Debug: false
+  Database:
+    User_Name: UserName
+    User_Password: UserPassword
+    Name: DataBaseName
+    TablePrefix: mcmmo_
+    MaxConnections:
+      Misc: 30
+      Load: 30
+      Save: 30
+    MaxPoolSize:
+      Misc: 10
+      Load: 20
+      Save: 20
+  Server:
+    SSL: true
+    Port: 3306
+    Address: localhost
+    allowPublicKeyRetrieval: true

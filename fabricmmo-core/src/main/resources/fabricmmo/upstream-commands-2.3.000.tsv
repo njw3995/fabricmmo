@@ -1,0 +1,51 @@
+# mcMMO 2.3.000 command declarations from plugin.yml at 2b855372a2856f68630a4f36866f59de95539184
+mmoxpbar	xpbarsettings	
+mmodebug	mcmmodebugmode	
+mmoinfo	mcinfo	mcmmo.commands.mmoinfo
+xprate	mcxprate	mcmmo.commands.xprate
+mcmmo		mcmmo.commands.mcmmo
+mctop		mcmmo.commands.mctop
+mcrank		mcmmo.commands.mcrank
+addxp		mcmmo.commands.addxp
+addlevels		mcmmo.commands.addlevels
+mcability		mcmmo.commands.mcability
+mcrefresh		mcmmo.commands.mcrefresh
+mccooldown	mccooldowns	mcmmo.commands.mccooldown
+mcchatspy		mcmmo.commands.mcchatspy
+mcgod		mcmmo.commands.mcgod
+mcstats	stats	mcmmo.commands.mcstats
+mcremove		mcmmo.commands.mcremove
+mmoedit		mcmmo.commands.mmoedit
+ptp		mcmmo.commands.ptp
+party		mcmmo.commands.party
+inspect	mcinspect,mmoinspect	mcmmo.commands.inspect
+mmoshowdb		mcmmo.commands.mmoshowdb
+mcconvert		mcmmo.commands.mcconvert
+partychat	pc,p	mcmmo.chat.partychat
+skillreset		mcmmo.commands.skillreset
+excavation		mcmmo.commands.excavation
+herbalism		mcmmo.commands.herbalism
+mining		mcmmo.commands.mining
+woodcutting		mcmmo.commands.woodcutting
+axes		mcmmo.commands.axes
+archery		mcmmo.commands.archery
+crossbows		mcmmo.commands.crossbows
+swords		mcmmo.commands.swords
+taming		mcmmo.commands.taming
+tridents		mcmmo.commands.tridents
+unarmed		mcmmo.commands.unarmed
+acrobatics		mcmmo.commands.acrobatics
+repair		mcmmo.commands.repair
+fishing		mcmmo.commands.fishing
+smelting		mcmmo.commands.smelting
+spears		mcmmo.commands.spears
+alchemy		mcmmo.commands.alchemy
+salvage		mcmmo.commands.salvage
+maces		mcmmo.commands.maces
+mmopower	mmopowerlevel,powerlevel	mcmmo.commands.mmopower
+adminchat	ac,a	mcmmo.chat.adminchat
+mcpurge		mcmmo.commands.mcpurge
+mcnotify	notify	mcmmo.commands.mcnotify
+mclevelupsound	levelupsound	mcmmo.commands.mclevelupsound
+mcscoreboard	mcsb	mcmmo.commands.mcscoreboard
+mcmmoreloadlocale	mcreloadlocale	mcmmo.commands.reloadlocale

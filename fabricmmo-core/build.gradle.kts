@@ -16,6 +16,10 @@ dependencies {
     modImplementation(permissionsApi)
     include(permissionsApi)
 
+    val mariadbDriver = "org.mariadb.jdbc:mariadb-java-client:3.5.8"
+    implementation(mariadbDriver)
+    include(mariadbDriver)
+
     testImplementation(platform("org.junit:junit-bom:5.11.4"))
     testImplementation("org.junit.jupiter:junit-jupiter")
 }

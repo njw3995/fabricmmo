@@ -1,6 +1,7 @@
 package io.github.njw3995.fabricmmo.core.fabric;
 
 import io.github.njw3995.fabricmmo.core.command.FabricMmoCommands;
+import io.github.njw3995.fabricmmo.core.chat.SharedChatHandler;
 import io.github.njw3995.fabricmmo.core.config.DefaultConfigInstaller;
 import io.github.njw3995.fabricmmo.core.permission.FabricCommandPermissionService;
 import io.github.njw3995.fabricmmo.core.skill.mining.MiningAbilityHandler;
@@ -14,6 +15,10 @@ import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.fabricmc.loader.api.FabricLoader;
 
 public final class FabricMmoMod implements ModInitializer {
@@ -24,6 +29,25 @@ public final class FabricMmoMod implements ModInitializer {
         MiningBlockBreakHandler.register();
         MiningBlastHandler.register();
         MiningAbilityHandler.register();
+        SharedChatHandler.register(permissions);
+        ServerTickEvents.END_SERVER_TICK.register(SharedServerSystems::tick);
+        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
+            if (SharedServerSystems.running()) {
+                SharedServerSystems.playerJoined(handler.player);
+            }
+        });
+        ServerPlayConnectionEvents.DISCONNECT.register((handler, server) ->
+                SharedServerSystems.playerDisconnected(handler.player));
+        ServerLivingEntityEvents.ALLOW_DAMAGE.register((entity, source, amount) -> {
+            if (entity instanceof ServerPlayerEntity player) {
+                boolean godMode = SharedServerSystems.godMode(player.getUuid());
+                if (!godMode && SharedServerSystems.running()) {
+                    SharedServerSystems.playerHurt(player);
+                }
+                return !godMode;
+            }
+            return true;
+        });
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) ->
                 FabricMmoCommands.register(dispatcher, registryAccess, environment, permissions));
         ServerLifecycleEvents.SERVER_STARTING.register(FabricMmoFabricRuntime::start);

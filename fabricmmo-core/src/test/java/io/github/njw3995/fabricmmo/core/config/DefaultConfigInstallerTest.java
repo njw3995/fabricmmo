@@ -1,6 +1,5 @@
 package io.github.njw3995.fabricmmo.core.config;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.nio.file.Files;
@@ -17,7 +16,10 @@ class DefaultConfigInstallerTest {
 
         DefaultConfigInstaller.installMissingDefaults(directory);
 
-        assertEquals("admin-value: keep\n", Files.readString(existing));
+        String updated = Files.readString(existing);
+        assertTrue(updated.startsWith("admin-value: keep\n"));
+        assertTrue(updated.contains("Scoreboard:"));
+        assertTrue(updated.contains("  UseScoreboards: false"));
         for (String fileName : DefaultConfigInstaller.allFiles()) {
             assertTrue(Files.isRegularFile(directory.resolve(fileName)), fileName);
         }

@@ -11,6 +11,8 @@ import io.github.njw3995.fabricmmo.core.block.RegionPlacedBlockTracker;
 import io.github.njw3995.fabricmmo.core.block.TrackedWorld;
 import io.github.njw3995.fabricmmo.core.config.WorldBlacklist;
 import io.github.njw3995.fabricmmo.core.progression.ProgressionSettings;
+import io.github.njw3995.fabricmmo.core.persistence.MySqlSettings;
+import io.github.njw3995.fabricmmo.core.player.PlayerSessionSettingsService;
 import io.github.njw3995.fabricmmo.core.runtime.FabricMmoServerRuntime;
 import io.github.njw3995.fabricmmo.core.skill.mining.MiningAbilityController;
 import io.github.njw3995.fabricmmo.core.skill.mining.MiningAbilityHandler;
@@ -46,6 +48,7 @@ public final class FabricMmoFabricRuntime {
     private static Path serverWorldRoot;
     private static WorldBlacklist worldBlacklist;
     private static ProgressionSettings progressionSettings;
+    private static PlayerSessionSettingsService playerSessionSettings;
 
     private FabricMmoFabricRuntime() {
     }
@@ -89,9 +92,11 @@ public final class FabricMmoFabricRuntime {
                 newWorldBlacklist.register(world);
                 newTracker.registerWorld(trackedWorld(world, worldRoot));
             }
+            MySqlSettings mySqlSettings = MySqlSettings.load(configFile);
             newRuntime = FabricMmoServerRuntime.start(
                     playerDataDirectory,
                     progressionSettings,
+                    mySqlSettings,
                     api -> FabricLoader.getInstance().invokeEntrypoints(
                             FabricMmoEntrypoint.KEY,
                             FabricMmoEntrypoint.class,
@@ -102,6 +107,17 @@ public final class FabricMmoFabricRuntime {
                     CoreMiningAbilities.SUPER_BREAKER, miningAbilityStates);
             newRuntime.api().abilityPipeline().registerStateView(
                     CoreMiningAbilities.BLAST_MINING, miningAbilityStates);
+            SharedServerSystems.start(
+                    server,
+                    worldRoot,
+                    playerDataDirectory,
+                    configDirectory,
+                    newRuntime.api(),
+                    newRuntime.store(),
+                    mySqlSettings,
+                    progressionSettings,
+                    newAbilityController,
+                    newMiningSettings);
             runtime = newRuntime;
             miningXpTable = newXpTable;
             miningDropSettings = newDropSettings;
@@ -111,6 +127,7 @@ public final class FabricMmoFabricRuntime {
             serverWorldRoot = worldRoot;
             worldBlacklist = newWorldBlacklist;
             FabricMmoFabricRuntime.progressionSettings = progressionSettings;
+            playerSessionSettings = new PlayerSessionSettingsService();
             LOGGER.info(
                     "Started with {} registered skills; player data directory: {}; placed-block directory: {}; Mining ability directory: {}",
                     runtime.api().skillRegistry().skills().size(),
@@ -162,6 +179,13 @@ public final class FabricMmoFabricRuntime {
         return runtime.api();
     }
 
+
+    public static synchronized PlayerSessionSettingsService playerSessionSettings() {
+        if (playerSessionSettings == null) {
+            throw new IllegalStateException("FabricMMO player session settings are not active");
+        }
+        return playerSessionSettings;
+    }
 
     public static synchronized ProgressionSettings progressionSettings() {
         if (progressionSettings == null) {
@@ -265,6 +289,7 @@ public final class FabricMmoFabricRuntime {
         if (runtime == null && placedBlockTracker == null && miningAbilityController == null) {
             return;
         }
+        SharedServerSystems.stop();
         FabricMmoServerRuntime activeRuntime = runtime;
         PlacedBlockTracker activeTracker = placedBlockTracker;
         MiningAbilityController activeAbilityController = miningAbilityController;
@@ -279,6 +304,10 @@ public final class FabricMmoFabricRuntime {
         serverWorldRoot = null;
         worldBlacklist = null;
         progressionSettings = null;
+        if (playerSessionSettings != null) {
+            playerSessionSettings.clear();
+        }
+        playerSessionSettings = null;
 
         IOException failure = null;
         if (activeAbilityController != null) {

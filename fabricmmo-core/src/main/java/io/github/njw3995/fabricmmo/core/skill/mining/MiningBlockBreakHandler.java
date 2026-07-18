@@ -149,6 +149,12 @@ public final class MiningBlockBreakHandler {
                 hasPermission,
                 protectionAllowed,
                 playerPlaced);
+        if (io.github.njw3995.fabricmmo.core.fabric.SharedServerSystems.running()) {
+            io.github.njw3995.fabricmmo.core.fabric.SharedServerSystems.require().diagnostics()
+                    .blockDecision(player.getUuid(), blockId.toString(), configuredXp,
+                            player.isCreative(), validTool, hasPermission, protectionAllowed,
+                            playerPlaced, decision.status().name());
+        }
         if (!decision.awardsXp()) {
             return;
         }
@@ -180,13 +186,6 @@ public final class MiningBlockBreakHandler {
         }
         if (result.newLevel() > result.oldLevel()) {
             player.sendMessage(MiningMessages.levelUp(result.newLevel()), false);
-            player.getWorld().playSound(
-                    null,
-                    player.getBlockPos(),
-                    net.minecraft.sound.SoundEvents.ENTITY_PLAYER_LEVELUP,
-                    net.minecraft.sound.SoundCategory.PLAYERS,
-                    1.0F,
-                    1.0F);
         }
         MiningAbilityHandler.applyToolDamage(player);
     }

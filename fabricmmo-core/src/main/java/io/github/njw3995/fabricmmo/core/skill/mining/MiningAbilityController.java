@@ -179,6 +179,15 @@ public final class MiningAbilityController implements AutoCloseable {
         return new TickResult(preparationExpired, abilityExpired);
     }
 
+    public synchronized void reset(UUID playerId) throws IOException {
+        Objects.requireNonNull(playerId, "playerId");
+        RuntimeState state = state(playerId);
+        state.persisted = MiningAbilityData.EMPTY;
+        state.preparedUntil = 0L;
+        state.activeUntil = 0L;
+        store.save(playerId, state.persisted);
+    }
+
     public synchronized void removeTransient(UUID playerId) {
         RuntimeState state = states.get(playerId);
         if (state != null) {

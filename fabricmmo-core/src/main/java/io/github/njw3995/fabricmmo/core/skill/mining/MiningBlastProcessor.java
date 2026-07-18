@@ -111,13 +111,6 @@ public final class MiningBlastProcessor {
                         owner.getName().getString(), result.detail());
             } else if (result.newLevel() > result.oldLevel()) {
                 owner.sendMessage(MiningMessages.levelUp(result.newLevel()), false);
-                world.playSound(
-                        null,
-                        owner.getBlockPos(),
-                        net.minecraft.sound.SoundEvents.ENTITY_PLAYER_LEVELUP,
-                        net.minecraft.sound.SoundCategory.PLAYERS,
-                        1.0F,
-                        1.0F);
             }
         }
         return true;

@@ -1,6 +1,7 @@
 package io.github.njw3995.fabricmmo.core.skill.mining;
 
 import io.github.njw3995.fabricmmo.core.fabric.FabricMmoFabricRuntime;
+import io.github.njw3995.fabricmmo.core.fabric.SharedServerSystems;
 import io.github.njw3995.fabricmmo.core.permission.FabricCommandPermissionService;
 import io.github.njw3995.fabricmmo.core.permission.PermissionNodes;
 import io.github.njw3995.fabricmmo.core.skill.CoreSkills;
@@ -40,6 +41,9 @@ public final class MiningAbilityHandler {
             ItemStack stack = player.getStackInHand(hand);
             if (hand != Hand.MAIN_HAND || world.isClient() || !(player instanceof ServerPlayerEntity serverPlayer)
                     || !stack.isIn(ItemTags.PICKAXES) || !FabricMmoFabricRuntime.running()
+                    || !(!SharedServerSystems.running()
+                            || SharedServerSystems.require().sessions()
+                                    .get(serverPlayer.getUuid()).abilityUse())
                     || FabricMmoFabricRuntime.isWorldBlacklisted(serverPlayer.getServerWorld())) {
                 return TypedActionResult.pass(stack);
             }
@@ -62,6 +66,9 @@ public final class MiningAbilityHandler {
                     || !(world instanceof ServerWorld serverWorld)
                     || !(player instanceof ServerPlayerEntity serverPlayer)
                     || !FabricMmoFabricRuntime.running()
+                    || !(!SharedServerSystems.running()
+                            || SharedServerSystems.require().sessions()
+                                    .get(serverPlayer.getUuid()).abilityUse())
                     || FabricMmoFabricRuntime.isWorldBlacklisted(serverWorld)) {
                 return ActionResult.PASS;
             }
@@ -105,6 +112,7 @@ public final class MiningAbilityHandler {
                 }
                 SuperBreakerAttributeBoost.clear(handler.player);
                 FabricMmoFabricRuntime.miningAbilities().removeTransient(playerId);
+                FabricMmoFabricRuntime.playerSessionSettings().remove(playerId);
             }
         });
     }
@@ -122,6 +130,22 @@ public final class MiningAbilityHandler {
     public static void restoreDroppedTool(ServerPlayerEntity player, ItemStack stack) {
         if (FabricMmoFabricRuntime.running()) {
             SuperBreakerAttributeBoost.restoreDroppedStack(player, stack);
+        }
+    }
+
+    public static void refresh(ServerPlayerEntity player) {
+        UUID playerId = player.getUuid();
+        try {
+            if (FabricMmoFabricRuntime.miningAbilities().isSuperBreakerPrepared(playerId)
+                    || FabricMmoFabricRuntime.miningAbilities().isSuperBreakerActive(playerId)) {
+                MiningAbilityEvents.cancelled(playerId, CoreMiningAbilities.SUPER_BREAKER);
+            }
+            SuperBreakerAttributeBoost.clear(player);
+            FabricMmoFabricRuntime.miningAbilities().reset(playerId);
+            SUPER_BREAKER_COOLDOWNS.remove(playerId);
+            BLAST_MINING_COOLDOWNS.remove(playerId);
+        } catch (IOException exception) {
+            throw new UncheckedIOException("Unable to refresh Mining abilities", exception);
         }
     }
 
@@ -241,7 +265,10 @@ public final class MiningAbilityHandler {
     }
 
     private static void message(ServerPlayerEntity player, MiningSettings settings, net.minecraft.text.Text text) {
-        if (settings.abilityMessages()) {
+        if (settings.abilityMessages()
+                && (!SharedServerSystems.running()
+                        || SharedServerSystems.require().sessions()
+                                .get(player.getUuid()).notifications())) {
             player.sendMessage(text, true);
         }
     }

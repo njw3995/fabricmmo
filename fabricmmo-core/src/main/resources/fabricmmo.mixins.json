@@ -21,7 +21,8 @@
     "FallingBlockEntityMixin",
     "AbstractBlockStateMixin",
     "BoneMealItemMixin",
-    "WorldNaturalGrowthMixin"
+    "WorldNaturalGrowthMixin",
+    "ItemEntityMixin"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -3,6 +3,15 @@ plugins {
     id("fabric-loom")
 }
 
+loom {
+    runs {
+        named("client") {
+            programArg("--username")
+            programArg("Player338")
+        }
+    }
+}
+
 dependencies {
     implementation(project(":fabricmmo-api"))
     implementation(project(path = ":fabricmmo-core", configuration = "namedElements"))

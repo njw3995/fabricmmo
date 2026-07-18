@@ -9,5 +9,9 @@ public interface ProgressionService {
 
     XpAwardResult award(XpAwardRequest request);
 
+    ProgressionSnapshot setLevel(UUID playerId, NamespacedId skillId, int level);
+
+    ProgressionSnapshot addLevels(UUID playerId, NamespacedId skillId, int levels);
+
     Map<NamespacedId, ProgressionSnapshot> queryAll(UUID playerId);
 }

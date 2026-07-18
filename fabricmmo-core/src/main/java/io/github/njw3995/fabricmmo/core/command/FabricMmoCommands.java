@@ -57,6 +57,10 @@ public final class FabricMmoCommands {
         registerMcstats(dispatcher, permissions);
         registerMining(dispatcher, permissions);
         registerAddXp(dispatcher, permissions);
+        PlayerUtilityCommands.register(dispatcher, permissions);
+        ProgressionAdminCommands.register(dispatcher, permissions);
+        SharedCommandRegistrar.register(dispatcher, permissions);
+        GenericCommandHelp.attach(dispatcher);
     }
 
     private static void registerMcmmo(
@@ -67,16 +71,38 @@ public final class FabricMmoCommands {
         Predicate<ServerCommandSource> helpPermission = source -> permissions.hasPermission(
                 source, PermissionNodes.MCMMO_HELP, true);
 
-        LiteralArgumentBuilder<ServerCommandSource> root = CommandManager.literal("mcmmo")
+        dispatcher.register(rootCommand(
+                "mcmmo", descriptionPermission, helpPermission, permissions));
+
+        Predicate<ServerCommandSource> fabricRootPermission = source -> permissions.hasPermission(
+                source, PermissionNodes.FABRICMMO_ROOT, true);
+        dispatcher.register(rootCommand(
+                "fabricmmo", fabricRootPermission, helpPermission, permissions));
+        dispatcher.register(rootCommand(
+                "fmmo", fabricRootPermission, helpPermission, permissions));
+    }
+
+    private static LiteralArgumentBuilder<ServerCommandSource> rootCommand(
+            String literal,
+            Predicate<ServerCommandSource> descriptionPermission,
+            Predicate<ServerCommandSource> helpPermission,
+            CommandPermissionService permissions) {
+        LiteralArgumentBuilder<ServerCommandSource> root = CommandManager.literal(literal)
                 .requires(descriptionPermission)
                 .executes(context -> showDescription(context.getSource()));
         root.then(CommandManager.literal("help").requires(helpPermission)
-                .executes(context -> showHelp(context.getSource())));
+                .executes(context -> InformationCommands.showHelpPage(context.getSource(), 1))
+                .then(CommandManager.argument("page", IntegerArgumentType.integer(1))
+                        .executes(context -> InformationCommands.showHelpPage(context.getSource(), IntegerArgumentType.getInteger(context, "page")))));
         root.then(CommandManager.literal("commands").requires(helpPermission)
-                .executes(context -> showHelp(context.getSource())));
+                .executes(context -> InformationCommands.showHelpPage(context.getSource(), 1))
+                .then(CommandManager.argument("page", IntegerArgumentType.integer(1))
+                        .executes(context -> InformationCommands.showHelpPage(context.getSource(), IntegerArgumentType.getInteger(context, "page")))));
         root.then(CommandManager.literal("?").requires(helpPermission)
-                .executes(context -> showHelp(context.getSource())));
-        dispatcher.register(root);
+                .executes(context -> InformationCommands.showHelpPage(context.getSource(), 1))
+                .then(CommandManager.argument("page", IntegerArgumentType.integer(1))
+                        .executes(context -> InformationCommands.showHelpPage(context.getSource(), IntegerArgumentType.getInteger(context, "page")))));
+        return root;
     }
 
     private static void registerMcstats(
@@ -101,6 +127,8 @@ public final class FabricMmoCommands {
         dispatcher.register(CommandManager.literal("mining")
                 .requires(miningPermission)
                 .executes(FabricMmoCommands::showMining)
+                .then(CommandManager.literal("keep")
+                        .executes(FabricMmoCommands::keepMiningBoard))
                 .then(CommandManager.literal("?")
                         .executes(context -> showMiningGuide(context, 1))
                         .then(CommandManager.argument("page", IntegerArgumentType.integer(1))
@@ -113,6 +141,28 @@ public final class FabricMmoCommands {
                                 .executes(context -> showMiningGuide(
                                         context,
                                         IntegerArgumentType.getInteger(context, "page"))))));
+    }
+
+    private static int keepMiningBoard(CommandContext<ServerCommandSource> context)
+            throws CommandSyntaxException {
+        ServerCommandSource source = context.getSource();
+        ServerPlayerEntity player = source.getPlayerOrThrow();
+        var systems = SharedCommandUtil.systems();
+        var settings = systems.uiConfiguration();
+        if (!settings.scoreboardsEnabled() || !settings.allowKeep()
+                || !settings.board(io.github.njw3995.fabricmmo.core.ui.UiSettings.BoardType.SKILL).enabled()) {
+            return SharedCommandUtil.error(source,
+                    LegacyText.strip(systems.locale().text("Commands.Disabled")));
+        }
+        try {
+            MiningPanel panel = miningPanel(player);
+            systems.scoreboards().show(player, Text.literal("MINING"), panel.boardLines(), -1);
+            systems.scoreboards().keep(player.getUuid());
+            return SharedCommandUtil.success(source,
+                    LegacyText.strip(systems.locale().text("Commands.Scoreboard.Keep")));
+        } catch (IOException exception) {
+            throw new UncheckedIOException("Unable to read Mining ability state", exception);
+        }
     }
 
     private static void registerAddXp(
@@ -146,13 +196,62 @@ public final class FabricMmoCommands {
         return Command.SINGLE_SUCCESS;
     }
 
-    private static int showHelp(ServerCommandSource source) {
+    private static int showHelp(
+            ServerCommandSource source,
+            CommandPermissionService permissions) {
         source.sendMessage(Text.literal("---- mcMMO Commands ----"));
-        source.sendMessage(Text.literal("/mcstats - Show your skill levels and XP"));
-        source.sendMessage(Text.literal("/mining - Show Mining stats and ability details"));
-        source.sendMessage(Text.literal("/addxp [player] <skill|all> <amount> - Award skill XP"));
-        source.sendMessage(Text.literal("Additional upstream commands are not implemented yet."));
+        sendHelpIfAllowed(source, permissions, PermissionNodes.MCSTATS, true,
+                "/mcstats - Show your skill levels and XP");
+        sendHelpIfAllowed(source, permissions, PermissionNodes.MMOPOWER, true,
+                "/mmopower - Show your power level");
+        sendHelpIfAllowed(source, permissions, PermissionNodes.MINING_COMMAND, true,
+                "/mining - Show Mining stats and ability details");
+        sendHelpIfAllowed(source, permissions, PermissionNodes.MCCOOLDOWN, true,
+                "/mccooldown - Show ability cooldowns");
+        sendHelpIfAllowed(source, permissions, PermissionNodes.MCABILITY, true,
+                "/mcability - Toggle ability activation");
+        sendHelpIfAllowed(source, permissions, PermissionNodes.MCNOTIFY, true,
+                "/mcnotify - Toggle skill notifications");
+        sendHelpIfAllowed(source, permissions, PermissionNodes.MCLEVELUPSOUND, true,
+                "/mclevelupsound - Toggle level-up sounds");
+        sendHelpIfAllowed(source, permissions, PermissionNodes.MCREFRESH,
+                ADMIN_FALLBACK_LEVEL,
+                "/mcrefresh [player] - Reset ability cooldowns");
+        sendHelpIfAllowed(source, permissions, PermissionNodes.ADD_XP,
+                ADMIN_FALLBACK_LEVEL,
+                "/addxp [player] <skill|all> <amount> - Award skill XP");
+        sendHelpIfAllowed(source, permissions, PermissionNodes.ADD_LEVELS,
+                ADMIN_FALLBACK_LEVEL,
+                "/addlevels [player] <skill|all> <amount> - Award skill levels");
+        sendHelpIfAllowed(source, permissions, PermissionNodes.MMO_EDIT,
+                ADMIN_FALLBACK_LEVEL,
+                "/mmoedit [player] <skill|all> <level> - Set a skill level");
+        sendHelpIfAllowed(source, permissions, PermissionNodes.SKILL_RESET,
+                ADMIN_FALLBACK_LEVEL,
+                "/skillreset [player] <skill|all> - Reset skill progress");
         return Command.SINGLE_SUCCESS;
+    }
+
+    private static void sendHelpIfAllowed(
+            ServerCommandSource source,
+            CommandPermissionService permissions,
+            String permission,
+            boolean fallback,
+            String line) {
+        if (permissions.hasPermission(source, permission, fallback)) {
+            source.sendMessage(Text.literal(line));
+        }
+    }
+
+    private static void sendHelpIfAllowed(
+            ServerCommandSource source,
+            CommandPermissionService permissions,
+            String permission,
+            int fallbackLevel,
+            String line) {
+        if (permissions.hasPermission(source, permission, fallbackLevel)) {
+            source.sendMessage(Text.literal(line));
+        }
     }
 
     private static int showStats(CommandContext<ServerCommandSource> context)
@@ -161,7 +260,14 @@ public final class FabricMmoCommands {
         FabricMmoApi api = FabricMmoFabricRuntime.requireApi();
         var lines = StatsTextFormatter.format(
                 api.skillRegistry(), api.progression().queryAll(player.getUuid()));
-        lines.forEach(context.getSource()::sendMessage);
+        List<Text> boardLines = lines.size() > 2
+                ? List.copyOf(lines.subList(2, lines.size())) : lines;
+        CommandUiDisplay.configured(
+                context.getSource(),
+                io.github.njw3995.fabricmmo.core.ui.UiSettings.BoardType.STATS,
+                Text.literal("mcMMO Stats"),
+                lines,
+                boardLines);
         return Command.SINGLE_SUCCESS;
     }
 
@@ -169,6 +275,18 @@ public final class FabricMmoCommands {
     private static int showMining(CommandContext<ServerCommandSource> context)
             throws CommandSyntaxException {
         ServerPlayerEntity player = context.getSource().getPlayerOrThrow();
+        try {
+            MiningPanel panel = miningPanel(player);
+            CommandUiDisplay.skill(
+                    context.getSource(), Text.literal("MINING"),
+                    panel.chatLines(), panel.boardLines());
+            return Command.SINGLE_SUCCESS;
+        } catch (IOException exception) {
+            throw new UncheckedIOException("Unable to read Mining ability state", exception);
+        }
+    }
+
+    private static MiningPanel miningPanel(ServerPlayerEntity player) throws IOException {
         var progress = FabricMmoFabricRuntime.requireApi().progression()
                 .query(player.getUuid(), CoreSkills.MINING);
         MiningSettings settings = FabricMmoFabricRuntime.miningSettings();
@@ -202,55 +320,49 @@ public final class FabricMmoCommands {
                 settings.blastMiningCooldownSeconds(), player.getCommandSource(), permissionService);
         int activationBonus = MiningPerks.activationBonusSeconds(
                 player.getCommandSource(), permissionService);
-        try {
-            MiningCommandSnapshot snapshot = new MiningCommandSnapshot(
-                    level,
-                    progress.xp(),
-                    progress.xpToNextLevel(),
-                    drops.doubleDropsUnlocked(level, settings.progressionMode())
-                            ? MiningProbability.chance(
-                                    level,
-                                    drops.doubleDropsMaxLevel(settings.progressionMode()),
-                                    drops.doubleDropsChanceMaxPercent(),
-                                    lucky) * 100.0D
-                            : 0.0D,
-                    drops.motherLodeUnlocked(level, settings.progressionMode())
-                            ? MiningProbability.chance(
-                                    level,
-                                    drops.motherLodeMaxLevel(settings.progressionMode()),
-                                    drops.motherLodeChanceMaxPercent(),
-                                    lucky) * 100.0D
-                            : 0.0D,
-                    settings.superBreakerDurationSeconds(level) + activationBonus,
-                    FabricMmoFabricRuntime.miningAbilities()
-                            .superBreakerCooldownRemaining(player.getUuid(), superBreakerCooldown),
-                    FabricMmoFabricRuntime.miningAbilities()
-                            .isSuperBreakerActive(player.getUuid()),
-                    FabricMmoFabricRuntime.miningAbilities()
-                            .superBreakerSecondsRemaining(player.getUuid()),
-                    rank,
-                    MiningSettings.BLAST_RANKS,
-                    settings.oreBonusFraction(rank) * 100.0D,
-                    settings.dropMultiplier(rank),
-                    settings.blastRadiusModifier(rank),
-                    settings.blastDamageDecreasePercent(rank),
-                    FabricMmoFabricRuntime.miningAbilities()
-                            .blastCooldownRemaining(player.getUuid(), blastCooldown),
-                    showDoubleDrops,
-                    showMotherLode,
-                    showSuperBreaker,
-                    showBlastMining,
-                    showBiggerBombs,
-                    showDemolitionsExpertise);
-            context.getSource().sendMessage(
-                    io.github.njw3995.fabricmmo.core.skill.mining.MiningMessages.header("MINING"));
-            MiningCommandFormatter.format(snapshot).forEach(line ->
-                    context.getSource().sendMessage(styledMiningLine(line)));
-            return Command.SINGLE_SUCCESS;
-        } catch (IOException exception) {
-            throw new UncheckedIOException("Unable to read Mining ability state", exception);
+        MiningCommandSnapshot snapshot = new MiningCommandSnapshot(
+                level,
+                progress.xp(),
+                progress.xpToNextLevel(),
+                drops.doubleDropsUnlocked(level, settings.progressionMode())
+                        ? MiningProbability.chance(
+                                level, drops.doubleDropsMaxLevel(settings.progressionMode()),
+                                drops.doubleDropsChanceMaxPercent(), lucky) * 100.0D
+                        : 0.0D,
+                drops.motherLodeUnlocked(level, settings.progressionMode())
+                        ? MiningProbability.chance(
+                                level, drops.motherLodeMaxLevel(settings.progressionMode()),
+                                drops.motherLodeChanceMaxPercent(), lucky) * 100.0D
+                        : 0.0D,
+                settings.superBreakerDurationSeconds(level) + activationBonus,
+                FabricMmoFabricRuntime.miningAbilities()
+                        .superBreakerCooldownRemaining(player.getUuid(), superBreakerCooldown),
+                FabricMmoFabricRuntime.miningAbilities().isSuperBreakerActive(player.getUuid()),
+                FabricMmoFabricRuntime.miningAbilities()
+                        .superBreakerSecondsRemaining(player.getUuid()),
+                rank,
+                MiningSettings.BLAST_RANKS,
+                settings.oreBonusFraction(rank) * 100.0D,
+                settings.dropMultiplier(rank),
+                settings.blastRadiusModifier(rank),
+                settings.blastDamageDecreasePercent(rank),
+                FabricMmoFabricRuntime.miningAbilities()
+                        .blastCooldownRemaining(player.getUuid(), blastCooldown),
+                showDoubleDrops, showMotherLode, showSuperBreaker, showBlastMining,
+                showBiggerBombs, showDemolitionsExpertise);
+        java.util.ArrayList<Text> chatLines = new java.util.ArrayList<>();
+        java.util.ArrayList<Text> boardLines = new java.util.ArrayList<>();
+        chatLines.add(io.github.njw3995.fabricmmo.core.skill.mining.MiningMessages
+                .header("MINING"));
+        for (String line : MiningCommandFormatter.format(snapshot)) {
+            Text styled = styledMiningLine(line);
+            chatLines.add(styled);
+            boardLines.add(styled);
         }
+        return new MiningPanel(List.copyOf(chatLines), List.copyOf(boardLines));
     }
+
+    private record MiningPanel(List<Text> chatLines, List<Text> boardLines) { }
 
     private static int showMiningGuide(
             CommandContext<ServerCommandSource> context,

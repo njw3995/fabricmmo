@@ -89,6 +89,54 @@ class DefaultProgressionServiceTest {
     }
 
     @Test
+    void levelAdministrationClearsXpAndPublishesLevelChanges() {
+        var api = FabricMmoBootstrap.create(new InMemoryProgressionStore(), ignored -> { });
+        UUID player = UUID.randomUUID();
+        AtomicInteger levelEvents = new AtomicInteger();
+        api.events().subscribe(LevelChangedEvent.class, ignored -> levelEvents.incrementAndGet());
+
+        api.progression().award(new XpAwardRequest(
+                player, CoreSkills.MINING, CoreXpSources.MINING_BLOCK_BREAK, 500, Map.of()));
+        api.progression().setLevel(player, CoreSkills.MINING, 12);
+        api.progression().addLevels(player, CoreSkills.MINING, -5);
+
+        assertEquals(7, api.progression().query(player, CoreSkills.MINING).level());
+        assertEquals(0, api.progression().query(player, CoreSkills.MINING).xp());
+        assertEquals(2, levelEvents.get());
+    }
+
+    @Test
+    void childSkillAddedLevelsSplitAcrossParents() {
+        var api = FabricMmoBootstrap.create(new InMemoryProgressionStore(), ignored -> { });
+        UUID player = UUID.randomUUID();
+
+        api.progression().addLevels(player, CoreSkills.SMELTING, 10);
+
+        assertEquals(5, api.progression().query(player, CoreSkills.MINING).level());
+        assertEquals(5, api.progression().query(player, CoreSkills.REPAIR).level());
+        assertEquals(5, api.progression().query(player, CoreSkills.SMELTING).level());
+        assertEquals(0, api.progression().query(player, CoreSkills.SMELTING).xp());
+        assertEquals(5, api.progression().queryAll(player).get(CoreSkills.SMELTING).level());
+    }
+
+    @Test
+    void childSkillLevelIsAverageOfCappedParents() {
+        InMemoryProgressionStore store = new InMemoryProgressionStore();
+        UUID player = UUID.randomUUID();
+        store.save(new PlayerProgressionData(player, 1, Map.of(
+                CoreSkills.MINING, new StoredSkillProgress(200, 0),
+                CoreSkills.REPAIR, new StoredSkillProgress(40, 0))));
+        ProgressionSettings settings = settings(
+                Map.of(CoreSkills.MINING, 100, CoreSkills.REPAIR, 100),
+                Integer.MAX_VALUE,
+                1.0D);
+        var api = FabricMmoBootstrap.create(
+                store, allowAll(), Clock.systemUTC(), settings, ignored -> { });
+
+        assertEquals(70, api.progression().query(player, CoreSkills.SMELTING).level());
+    }
+
+    @Test
     void powerCapUsesPermissionAwarePowerAfterFastUpperBoundCheck() {
         InMemoryProgressionStore store = new InMemoryProgressionStore();
         UUID player = UUID.randomUUID();

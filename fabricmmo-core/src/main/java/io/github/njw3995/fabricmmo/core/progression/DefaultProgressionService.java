@@ -12,9 +12,12 @@ import io.github.njw3995.fabricmmo.api.progression.XpAwardResult;
 import io.github.njw3995.fabricmmo.api.progression.XpSourceDefinition;
 import io.github.njw3995.fabricmmo.api.progression.XpSourceRegistryView;
 import io.github.njw3995.fabricmmo.api.registry.SkillRegistryView;
+import io.github.njw3995.fabricmmo.api.skill.SkillDefinition;
 import io.github.njw3995.fabricmmo.core.persistence.PlayerProgressionData;
 import io.github.njw3995.fabricmmo.core.persistence.ProgressionStore;
 import io.github.njw3995.fabricmmo.core.persistence.StoredSkillProgress;
+import io.github.njw3995.fabricmmo.core.party.PartyXpRuntime;
+import io.github.njw3995.fabricmmo.core.xprate.XpRateRuntime;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.time.Clock;
@@ -55,8 +58,11 @@ public final class DefaultProgressionService implements ProgressionService {
 
     @Override
     public ProgressionSnapshot query(UUID playerId, NamespacedId skillId) {
-        requireRegisteredSkill(skillId);
+        SkillDefinition skill = requireRegisteredSkillDefinition(skillId);
         PlayerProgressionData data = load(playerId);
+        if (skill.childSkill()) {
+            return childSnapshot(playerId, skill, data);
+        }
         StoredSkillProgress progress = data.skills()
                 .getOrDefault(skillId, new StoredSkillProgress(0, 0.0D));
         return snapshot(playerId, skillId, progress, data);
@@ -79,6 +85,12 @@ public final class DefaultProgressionService implements ProgressionService {
         if (!sourceDefinition.skillId().equals(request.skillId())) {
             return rejected("XP source " + request.sourceId() + " does not target "
                     + request.skillId(), 0);
+        }
+        if (!commandSource(sourceDefinition)) {
+            var partyResult = PartyXpRuntime.distribute(request, this::award);
+            if (partyResult.isPresent()) {
+                return partyResult.orElseThrow();
+            }
         }
 
         synchronized (playerLocks.computeIfAbsent(request.playerId(), ignored -> new Object())) {
@@ -198,15 +210,80 @@ public final class DefaultProgressionService implements ProgressionService {
     }
 
     @Override
+    public ProgressionSnapshot setLevel(UUID playerId, NamespacedId skillId, int requestedLevel) {
+        SkillDefinition skill = requireRegisteredSkillDefinition(skillId);
+        if (skill.childSkill()) {
+            throw new IllegalArgumentException("Child skills do not have independent levels: " + skillId);
+        }
+        int level = Math.max(0, requestedLevel);
+        synchronized (playerLocks.computeIfAbsent(playerId, ignored -> new Object())) {
+            PlayerProgressionData existing = load(playerId);
+            TreeMap<NamespacedId, StoredSkillProgress> updated = new TreeMap<>(existing.skills());
+            StoredSkillProgress current = updated.getOrDefault(
+                    skillId, new StoredSkillProgress(0, 0.0D));
+            updated.put(skillId, new StoredSkillProgress(level, 0.0D));
+            save(new PlayerProgressionData(playerId, existing.revision() + 1, updated));
+            if (current.level() != level) {
+                eventBus.publish(new LevelChangedEvent(
+                        playerId, skillId, current.level(), level));
+            }
+            return snapshot(playerId, skillId, updated.get(skillId),
+                    new PlayerProgressionData(playerId, existing.revision() + 1, updated));
+        }
+    }
+
+    @Override
+    public ProgressionSnapshot addLevels(UUID playerId, NamespacedId skillId, int levels) {
+        SkillDefinition skill = requireRegisteredSkillDefinition(skillId);
+        if (skill.childSkill()) {
+            if (skill.parents().isEmpty()) {
+                throw new IllegalStateException("Child skill has no parents: " + skillId);
+            }
+            int dividedLevels = levels / skill.parents().size();
+            for (NamespacedId parent : skill.parents()) {
+                addLevels(playerId, parent, dividedLevels);
+            }
+            return query(playerId, skillId);
+        }
+        ProgressionSnapshot current = query(playerId, skillId);
+        long requested = (long) current.level() + levels;
+        int target = requested <= 0L
+                ? 0
+                : requested >= Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) requested;
+        return setLevel(playerId, skillId, target);
+    }
+
+    @Override
     public Map<NamespacedId, ProgressionSnapshot> queryAll(UUID playerId) {
         PlayerProgressionData data = load(playerId);
         Map<NamespacedId, ProgressionSnapshot> snapshots = new TreeMap<>();
         for (var skill : registry.skills()) {
+            if (skill.childSkill()) {
+                snapshots.put(skill.id(), childSnapshot(playerId, skill, data));
+                continue;
+            }
             StoredSkillProgress progress = data.skills().getOrDefault(
                     skill.id(), new StoredSkillProgress(0, 0.0D));
             snapshots.put(skill.id(), snapshot(playerId, skill.id(), progress, data));
         }
         return Map.copyOf(snapshots);
+    }
+
+    private ProgressionSnapshot childSnapshot(
+            UUID playerId,
+            SkillDefinition child,
+            PlayerProgressionData data) {
+        if (child.parents().isEmpty()) {
+            return new ProgressionSnapshot(playerId, child.id(), 0, 0, 0);
+        }
+        long sum = 0L;
+        for (NamespacedId parent : child.parents()) {
+            int level = data.skills().getOrDefault(
+                    parent, new StoredSkillProgress(0, 0.0D)).level();
+            sum += Math.min(level, settings.levelCap(parent));
+        }
+        int level = (int) Math.min(Integer.MAX_VALUE, sum / child.parents().size());
+        return new ProgressionSnapshot(playerId, child.id(), level, 0, 0);
     }
 
     private ProgressionSnapshot snapshot(
@@ -286,19 +363,21 @@ public final class DefaultProgressionService implements ProgressionService {
     }
 
     private double effectiveXpRateMultiplier(XpAwardRequest request) {
+        double runtimeRate = XpRateRuntime.multiplierFor(request.skillId());
+        double effective = Math.max(settings.globalXpMultiplier(), runtimeRate);
         String configured = request.context().get("serverXpRateMultiplier");
         if (configured == null) {
-            return settings.globalXpMultiplier();
+            return effective;
         }
         try {
             double override = Double.parseDouble(configured);
             if (!Double.isFinite(override) || override <= 0.0D) {
-                return settings.globalXpMultiplier();
+                return effective;
             }
-            // mcMMO's per-skill /xprate override does not stack with the global rate.
-            return Math.max(override, settings.globalXpMultiplier());
+            // Global, per-skill, and contextual /xprate values do not stack.
+            return Math.max(override, effective);
         } catch (NumberFormatException ignored) {
-            return settings.globalXpMultiplier();
+            return effective;
         }
     }
 
@@ -371,8 +450,11 @@ public final class DefaultProgressionService implements ProgressionService {
     }
 
     private void requireRegisteredSkill(NamespacedId skillId) {
-        if (registry.find(skillId).isEmpty()) {
-            throw new IllegalArgumentException("Unknown skill: " + skillId);
-        }
+        requireRegisteredSkillDefinition(skillId);
+    }
+
+    private SkillDefinition requireRegisteredSkillDefinition(NamespacedId skillId) {
+        return registry.find(skillId).orElseThrow(
+                () -> new IllegalArgumentException("Unknown skill: " + skillId));
     }
 }

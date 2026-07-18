@@ -1,0 +1,594 @@
+# mcMMO 2.3.000 permission tree from plugin.yml at 2b855372a2856f68630a4f36866f59de95539184
+mcmmo.*	false	mcmmo.all
+mcmmo.ability.*	false	mcmmo.ability.all
+mcmmo.ability.acrobatics.*	false	mcmmo.ability.acrobatics.all
+mcmmo.ability.acrobatics.all	op	mcmmo.ability.acrobatics.dodge,mcmmo.ability.acrobatics.roll
+mcmmo.ability.acrobatics.dodge	op	
+mcmmo.ability.acrobatics.roll	op	
+mcmmo.ability.alchemy.*	false	mcmmo.ability.alchemy.all
+mcmmo.ability.alchemy.all	op	mcmmo.ability.alchemy.catalysis,mcmmo.ability.alchemy.concoctions
+mcmmo.ability.alchemy.catalysis	op	
+mcmmo.ability.alchemy.concoctions	op	
+mcmmo.ability.all	false	mcmmo.ability.acrobatics.all,mcmmo.ability.alchemy.all,mcmmo.ability.archery.all,mcmmo.ability.axes.all,mcmmo.ability.crossbows.all,mcmmo.ability.excavation.all,mcmmo.ability.fishing.all,mcmmo.ability.herbalism.all,mcmmo.ability.maces.all,mcmmo.ability.mining.all,mcmmo.ability.repair.all,mcmmo.ability.salvage.all,mcmmo.ability.smelting.all,mcmmo.ability.spears.all,mcmmo.ability.swords.all,mcmmo.ability.taming.all,mcmmo.ability.tridents.all,mcmmo.ability.unarmed.all,mcmmo.ability.woodcutting.all
+mcmmo.ability.archery.*	false	mcmmo.ability.archery.all
+mcmmo.ability.archery.all	op	mcmmo.ability.archery.archerylimitbreak,mcmmo.ability.archery.arrowretrieval,mcmmo.ability.archery.daze,mcmmo.ability.archery.explosiveshot,mcmmo.ability.archery.skillshot
+mcmmo.ability.archery.archerylimitbreak	op	
+mcmmo.ability.archery.arrowretrieval	op	
+mcmmo.ability.archery.daze	op	
+mcmmo.ability.archery.explosiveshot	op	
+mcmmo.ability.archery.skillshot	op	
+mcmmo.ability.axes.*	false	mcmmo.ability.axes.all
+mcmmo.ability.axes.all	op	mcmmo.ability.axes.armorimpact,mcmmo.ability.axes.axemastery,mcmmo.ability.axes.axeslimitbreak,mcmmo.ability.axes.criticalstrikes,mcmmo.ability.axes.greaterimpact,mcmmo.ability.axes.skullsplitter
+mcmmo.ability.axes.armorimpact	op	
+mcmmo.ability.axes.axemastery	op	
+mcmmo.ability.axes.axeslimitbreak	op	
+mcmmo.ability.axes.criticalstrikes	op	
+mcmmo.ability.axes.greaterimpact	op	
+mcmmo.ability.axes.skullsplitter	op	
+mcmmo.ability.crossbows.*	op	mcmmo.ability.crossbows.all
+mcmmo.ability.crossbows.all	op	mcmmo.ability.crossbows.crossbowslimitbreak,mcmmo.ability.crossbows.poweredshot,mcmmo.ability.crossbows.trickshot
+mcmmo.ability.crossbows.crossbowslimitbreak	op	
+mcmmo.ability.crossbows.poweredshot	op	
+mcmmo.ability.crossbows.trickshot	op	
+mcmmo.ability.excavation.*	false	mcmmo.ability.excavation.all
+mcmmo.ability.excavation.all	op	mcmmo.ability.excavation.archaeology,mcmmo.ability.excavation.gigadrillbreaker
+mcmmo.ability.excavation.archaeology	op	
+mcmmo.ability.excavation.gigadrillbreaker	op	
+mcmmo.ability.fishing.*	false	mcmmo.ability.fishing.all
+mcmmo.ability.fishing.all	op	mcmmo.ability.fishing.fishermansdiet,mcmmo.ability.fishing.icefishing,mcmmo.ability.fishing.magichunter,mcmmo.ability.fishing.masterangler,mcmmo.ability.fishing.shake,mcmmo.ability.fishing.treasurehunter,mcmmo.ability.fishing.vanillaxpboost
+mcmmo.ability.fishing.fishermansdiet	op	
+mcmmo.ability.fishing.icefishing	op	
+mcmmo.ability.fishing.magichunter	op	
+mcmmo.ability.fishing.masterangler	op	
+mcmmo.ability.fishing.shake	op	
+mcmmo.ability.fishing.treasurehunter	op	
+mcmmo.ability.fishing.vanillaxpboost	op	
+mcmmo.ability.herbalism.*	false	mcmmo.ability.herbalism.all
+mcmmo.ability.herbalism.all	op	mcmmo.ability.herbalism.doubledrops,mcmmo.ability.herbalism.farmersdiet,mcmmo.ability.herbalism.greenterra,mcmmo.ability.herbalism.greenthumb.all,mcmmo.ability.herbalism.hylianluck,mcmmo.ability.herbalism.shroomthumb,mcmmo.ability.herbalism.verdantbounty
+mcmmo.ability.herbalism.doubledrops	op	
+mcmmo.ability.herbalism.farmersdiet	op	
+mcmmo.ability.herbalism.greenterra	op	
+mcmmo.ability.herbalism.greenthumb.*	false	mcmmo.ability.herbalism.greenthumb.all
+mcmmo.ability.herbalism.greenthumb.all	op	mcmmo.ability.herbalism.greenthumb.blocks.all,mcmmo.ability.herbalism.greenthumb.plants.all
+mcmmo.ability.herbalism.greenthumb.blocks.*	false	mcmmo.ability.herbalism.greenthumb.blocks.all
+mcmmo.ability.herbalism.greenthumb.blocks.all	op	mcmmo.ability.herbalism.greenthumb.blocks.cobblestone,mcmmo.ability.herbalism.greenthumb.blocks.cobblestone_wall,mcmmo.ability.herbalism.greenthumb.blocks.dirt,mcmmo.ability.herbalism.greenthumb.blocks.grasspath,mcmmo.ability.herbalism.greenthumb.blocks.stonebricks
+mcmmo.ability.herbalism.greenthumb.blocks.cobblestone	op	
+mcmmo.ability.herbalism.greenthumb.blocks.cobblestone_wall	op	
+mcmmo.ability.herbalism.greenthumb.blocks.dirt	op	
+mcmmo.ability.herbalism.greenthumb.blocks.grasspath	op	
+mcmmo.ability.herbalism.greenthumb.blocks.stonebricks	op	
+mcmmo.ability.herbalism.greenthumb.plants.*	false	mcmmo.ability.herbalism.greenthumb.plants.all
+mcmmo.ability.herbalism.greenthumb.plants.all	op	mcmmo.ability.herbalism.greenthumb.plants.beetroots,mcmmo.ability.herbalism.greenthumb.plants.carrots,mcmmo.ability.herbalism.greenthumb.plants.cocoa,mcmmo.ability.herbalism.greenthumb.plants.netherwart,mcmmo.ability.herbalism.greenthumb.plants.potatoes,mcmmo.ability.herbalism.greenthumb.plants.wheat
+mcmmo.ability.herbalism.greenthumb.plants.beetroots	op	
+mcmmo.ability.herbalism.greenthumb.plants.carrots	op	
+mcmmo.ability.herbalism.greenthumb.plants.cocoa	op	
+mcmmo.ability.herbalism.greenthumb.plants.netherwart	op	
+mcmmo.ability.herbalism.greenthumb.plants.potatoes	op	
+mcmmo.ability.herbalism.greenthumb.plants.wheat	op	
+mcmmo.ability.herbalism.hylianluck	op	
+mcmmo.ability.herbalism.shroomthumb	op	
+mcmmo.ability.herbalism.verdantbounty	op	
+mcmmo.ability.maces.*	false	mcmmo.ability.mining.all
+mcmmo.ability.maces.all	op	mcmmo.ability.maces.cripple,mcmmo.ability.maces.crush,mcmmo.ability.maces.maceslimitbreak
+mcmmo.ability.maces.cripple	op	
+mcmmo.ability.maces.crush	op	
+mcmmo.ability.maces.maceslimitbreak	op	
+mcmmo.ability.mining.*	false	mcmmo.ability.mining.all
+mcmmo.ability.mining.all	op	mcmmo.ability.mining.blastmining.all,mcmmo.ability.mining.doubledrops,mcmmo.ability.mining.motherlode,mcmmo.ability.mining.superbreaker
+mcmmo.ability.mining.blastmining.*	false	mcmmo.ability.mining.blastmining.all
+mcmmo.ability.mining.blastmining.all	op	mcmmo.ability.mining.blastmining.biggerbombs,mcmmo.ability.mining.blastmining.demolitionsexpertise,mcmmo.ability.mining.blastmining.detonate
+mcmmo.ability.mining.blastmining.biggerbombs	op	
+mcmmo.ability.mining.blastmining.demolitionsexpertise	op	
+mcmmo.ability.mining.blastmining.detonate	op	
+mcmmo.ability.mining.doubledrops	op	
+mcmmo.ability.mining.motherlode	op	
+mcmmo.ability.mining.superbreaker	op	
+mcmmo.ability.repair.*	false	mcmmo.ability.repair.all
+mcmmo.ability.repair.all	op	mcmmo.ability.repair.arcaneforging,mcmmo.ability.repair.armorrepair,mcmmo.ability.repair.copperrepair,mcmmo.ability.repair.diamondrepair,mcmmo.ability.repair.goldrepair,mcmmo.ability.repair.ironrepair,mcmmo.ability.repair.leatherrepair,mcmmo.ability.repair.netheriterepair,mcmmo.ability.repair.othermaterialrepair,mcmmo.ability.repair.otherrepair,mcmmo.ability.repair.repairbonus,mcmmo.ability.repair.repairmastery,mcmmo.ability.repair.stonerepair,mcmmo.ability.repair.stringrepair,mcmmo.ability.repair.superrepair,mcmmo.ability.repair.toolrepair,mcmmo.ability.repair.woodrepair
+mcmmo.ability.repair.arcaneforging	op	
+mcmmo.ability.repair.armorrepair	op	
+mcmmo.ability.repair.copperrepair	op	
+mcmmo.ability.repair.diamondrepair	op	
+mcmmo.ability.repair.goldrepair	op	
+mcmmo.ability.repair.ironrepair	op	
+mcmmo.ability.repair.leatherrepair	op	
+mcmmo.ability.repair.netheriterepair	op	
+mcmmo.ability.repair.othermaterialrepair	op	
+mcmmo.ability.repair.otherrepair	op	
+mcmmo.ability.repair.repairmastery	op	
+mcmmo.ability.repair.stonerepair	op	
+mcmmo.ability.repair.stringrepair	op	
+mcmmo.ability.repair.superrepair	op	
+mcmmo.ability.repair.toolrepair	op	
+mcmmo.ability.repair.woodrepair	op	
+mcmmo.ability.salvage.*	false	mcmmo.ability.salvage.all
+mcmmo.ability.salvage.all	op	mcmmo.ability.salvage.arcanesalvage,mcmmo.ability.salvage.armorsalvage,mcmmo.ability.salvage.coppersalvage,mcmmo.ability.salvage.diamondsalvage,mcmmo.ability.salvage.goldsalvage,mcmmo.ability.salvage.ironsalvage,mcmmo.ability.salvage.leathersalvage,mcmmo.ability.salvage.netheritesalvage,mcmmo.ability.salvage.othermaterialsalvage,mcmmo.ability.salvage.othersalvage,mcmmo.ability.salvage.scrapcollector,mcmmo.ability.salvage.stonesalvage,mcmmo.ability.salvage.stringsalvage,mcmmo.ability.salvage.toolsalvage,mcmmo.ability.salvage.woodsalvage
+mcmmo.ability.salvage.arcanesalvage	op	
+mcmmo.ability.salvage.armorsalvage	op	
+mcmmo.ability.salvage.coppersalvage	op	
+mcmmo.ability.salvage.diamondsalvage	op	
+mcmmo.ability.salvage.goldsalvage	op	
+mcmmo.ability.salvage.ironsalvage	op	
+mcmmo.ability.salvage.leathersalvage	op	
+mcmmo.ability.salvage.netheritesalvage	op	
+mcmmo.ability.salvage.othermaterialsalvage	op	
+mcmmo.ability.salvage.othersalvage	op	
+mcmmo.ability.salvage.scrapcollector	op	
+mcmmo.ability.salvage.stonesalvage	op	
+mcmmo.ability.salvage.stringsalvage	op	
+mcmmo.ability.salvage.toolsalvage	op	
+mcmmo.ability.salvage.woodsalvage	op	
+mcmmo.ability.smelting.*	false	mcmmo.ability.smelting.all
+mcmmo.ability.smelting.all	op	mcmmo.ability.smelting.fluxmining,mcmmo.ability.smelting.fuelefficiency,mcmmo.ability.smelting.secondsmelt,mcmmo.ability.smelting.vanillaxpboost
+mcmmo.ability.smelting.fluxmining	op	
+mcmmo.ability.smelting.fuelefficiency	op	
+mcmmo.ability.smelting.secondsmelt	op	
+mcmmo.ability.smelting.vanillaxpboost	op	
+mcmmo.ability.spears.*	false	mcmmo.ability.spears.all
+mcmmo.ability.spears.all	op	mcmmo.ability.spears.momentum,mcmmo.ability.spears.spearmastery,mcmmo.ability.spears.spearslimitbreak
+mcmmo.ability.spears.momentum	op	
+mcmmo.ability.spears.spearmastery	op	
+mcmmo.ability.spears.spearslimitbreak	op	
+mcmmo.ability.swords.*	false	mcmmo.ability.swords.all
+mcmmo.ability.swords.all	op	mcmmo.ability.swords.counterattack,mcmmo.ability.swords.rupture,mcmmo.ability.swords.serratedstrikes,mcmmo.ability.swords.stab,mcmmo.ability.swords.swordslimitbreak
+mcmmo.ability.swords.counterattack	op	
+mcmmo.ability.swords.rupture	op	
+mcmmo.ability.swords.serratedstrikes	op	
+mcmmo.ability.swords.stab	op	
+mcmmo.ability.swords.swordslimitbreak	op	
+mcmmo.ability.taming.*	false	mcmmo.ability.taming.all
+mcmmo.ability.taming.all	op	mcmmo.ability.taming.beastlore,mcmmo.ability.taming.callofthewild,mcmmo.ability.taming.environmentallyaware,mcmmo.ability.taming.fastfoodservice,mcmmo.ability.taming.gore,mcmmo.ability.taming.holyhound,mcmmo.ability.taming.pummel,mcmmo.ability.taming.sharpenedclaws,mcmmo.ability.taming.shockproof,mcmmo.ability.taming.thickfur
+mcmmo.ability.taming.beastlore	op	
+mcmmo.ability.taming.callofthewild	op	mcmmo.ability.taming.callofthewild.horse,mcmmo.ability.taming.callofthewild.ocelot,mcmmo.ability.taming.callofthewild.wolf
+mcmmo.ability.taming.callofthewild.*	false	mcmmo.ability.taming.callofthewild
+mcmmo.ability.taming.callofthewild.horse	op	
+mcmmo.ability.taming.callofthewild.ocelot	op	
+mcmmo.ability.taming.callofthewild.wolf	op	
+mcmmo.ability.taming.environmentallyaware	op	
+mcmmo.ability.taming.fastfoodservice	op	
+mcmmo.ability.taming.gore	op	
+mcmmo.ability.taming.holyhound	op	
+mcmmo.ability.taming.pummel	op	
+mcmmo.ability.taming.sharpenedclaws	op	
+mcmmo.ability.taming.shockproof	op	
+mcmmo.ability.taming.thickfur	op	
+mcmmo.ability.tridents.*	false	mcmmo.ability.tridents.all
+mcmmo.ability.tridents.all	op	mcmmo.ability.tridents.impale,mcmmo.ability.tridents.tridentslimitbreak
+mcmmo.ability.tridents.impale	op	
+mcmmo.ability.tridents.tridentslimitbreak	op	
+mcmmo.ability.unarmed.*	false	mcmmo.ability.unarmed.all
+mcmmo.ability.unarmed.all	op	mcmmo.ability.unarmed.arrowdeflect,mcmmo.ability.unarmed.berserk,mcmmo.ability.unarmed.blockcracker,mcmmo.ability.unarmed.disarm,mcmmo.ability.unarmed.irongrip,mcmmo.ability.unarmed.steelarmstyle,mcmmo.ability.unarmed.unarmedlimitbreak
+mcmmo.ability.unarmed.arrowdeflect	op	
+mcmmo.ability.unarmed.berserk	op	
+mcmmo.ability.unarmed.blockcracker	op	
+mcmmo.ability.unarmed.disarm	op	
+mcmmo.ability.unarmed.irongrip	op	
+mcmmo.ability.unarmed.steelarmstyle	op	
+mcmmo.ability.unarmed.unarmedlimitbreak	op	
+mcmmo.ability.woodcutting.*	false	mcmmo.ability.woodcutting.all
+mcmmo.ability.woodcutting.all	op	mcmmo.ability.woodcutting.barksurgeon,mcmmo.ability.woodcutting.cleancuts,mcmmo.ability.woodcutting.harvestlumber,mcmmo.ability.woodcutting.knockonwood,mcmmo.ability.woodcutting.leafblower,mcmmo.ability.woodcutting.naturesbounty,mcmmo.ability.woodcutting.splinter,mcmmo.ability.woodcutting.treefeller
+mcmmo.ability.woodcutting.barksurgeon	op	
+mcmmo.ability.woodcutting.cleancuts	op	
+mcmmo.ability.woodcutting.harvestlumber	op	
+mcmmo.ability.woodcutting.knockonwood	op	
+mcmmo.ability.woodcutting.leafblower	op	
+mcmmo.ability.woodcutting.naturesbounty	op	
+mcmmo.ability.woodcutting.splinter	op	
+mcmmo.ability.woodcutting.treefeller	op	
+mcmmo.admin	false	mcmmo.commands.mcconvert.all,mcmmo.commands.xprate.all
+mcmmo.all	false	mcmmo.admin,mcmmo.bypass.all,mcmmo.commands.all,mcmmo.defaults,mcmmo.defaultsop,mcmmo.party.all,mcmmo.perks.all
+mcmmo.broadcast.levelup	op	
+mcmmo.bypass.*	false	mcmmo.bypass.all
+mcmmo.bypass.all	false	mcmmo.bypass.arcanebypass,mcmmo.bypass.hardcoremode,mcmmo.bypass.partylimit,mcmmo.commands.inspect.far,mcmmo.commands.inspect.hidden
+mcmmo.bypass.arcanebypass	false	
+mcmmo.bypass.hardcoremode	false	
+mcmmo.bypass.partylimit	false	
+mcmmo.chat.*	false	mcmmo.chat.all
+mcmmo.chat.adminchat	op	
+mcmmo.chat.all	op	mcmmo.chat.adminchat,mcmmo.chat.colors,mcmmo.chat.partychat
+mcmmo.chat.colors	op	
+mcmmo.chat.partychat	op	
+mcmmo.commands.*	false	mcmmo.commands.all
+mcmmo.commands.acrobatics	op	
+mcmmo.commands.addlevels	op	
+mcmmo.commands.addlevels.others	op	
+mcmmo.commands.addxp	op	
+mcmmo.commands.addxp.others	op	
+mcmmo.commands.alchemy	op	
+mcmmo.commands.all	false	mcmmo.commands.defaults,mcmmo.commands.defaultsop
+mcmmo.commands.archery	op	
+mcmmo.commands.axes	op	
+mcmmo.commands.crossbows	op	
+mcmmo.commands.defaults	op	mcmmo.commands.acrobatics,mcmmo.commands.alchemy,mcmmo.commands.archery,mcmmo.commands.axes,mcmmo.commands.crossbows,mcmmo.commands.excavation,mcmmo.commands.fishing,mcmmo.commands.herbalism,mcmmo.commands.inspect,mcmmo.commands.maces,mcmmo.commands.mcability,mcmmo.commands.mccooldown,mcmmo.commands.mclevelupsound,mcmmo.commands.mcmmo.all,mcmmo.commands.mcnotify,mcmmo.commands.mcrank,mcmmo.commands.mcscoreboard,mcmmo.commands.mcstats,mcmmo.commands.mctop.all,mcmmo.commands.mining,mcmmo.commands.mmoinfo,mcmmo.commands.mmopower,mcmmo.commands.party.all,mcmmo.commands.ptp.all,mcmmo.commands.repair,mcmmo.commands.salvage,mcmmo.commands.smelting,mcmmo.commands.spears,mcmmo.commands.swords,mcmmo.commands.taming,mcmmo.commands.tridents,mcmmo.commands.unarmed,mcmmo.commands.woodcutting,mcmmo.commands.xprate.show
+mcmmo.commands.defaultsop	op	mcmmo.commands.addlevels,mcmmo.commands.addlevels.others,mcmmo.commands.addxp,mcmmo.commands.addxp.others,mcmmo.commands.defaults,mcmmo.commands.inspect.far,mcmmo.commands.inspect.hidden,mcmmo.commands.mcability.others,mcmmo.commands.mcchatspy,mcmmo.commands.mcchatspy.others,mcmmo.commands.mcconvert.all,mcmmo.commands.mcgod,mcmmo.commands.mcgod.others,mcmmo.commands.mcpurge,mcmmo.commands.mcrank.others.all,mcmmo.commands.mcrefresh,mcmmo.commands.mcrefresh.others,mcmmo.commands.mcremove,mcmmo.commands.mmoedit,mcmmo.commands.mmoedit.others,mcmmo.commands.mmoshowdb,mcmmo.commands.ptp.world.all,mcmmo.commands.reloadlocale,mcmmo.commands.skillreset.all,mcmmo.commands.xprate.all
+mcmmo.commands.excavation	op	
+mcmmo.commands.fishing	op	
+mcmmo.commands.herbalism	op	
+mcmmo.commands.inspect	op	
+mcmmo.commands.inspect.*	false	mcmmo.commands.inspect.all
+mcmmo.commands.inspect.all	false	mcmmo.commands.inspect,mcmmo.commands.inspect.far,mcmmo.commands.inspect.hidden
+mcmmo.commands.inspect.far	op	
+mcmmo.commands.inspect.hidden	op	
+mcmmo.commands.mcability	op	
+mcmmo.commands.mcability.others	op	
+mcmmo.commands.mcchatspy	op	
+mcmmo.commands.mcchatspy.others	op	
+mcmmo.commands.mcconvert.*	false	mcmmo.commands.mcconvert.all
+mcmmo.commands.mcconvert.all	op	mcmmo.commands.mcconvert.database,mcmmo.commands.mcconvert.experience
+mcmmo.commands.mcconvert.database	op	
+mcmmo.commands.mcconvert.experience	op	
+mcmmo.commands.mccooldown	op	
+mcmmo.commands.mcgod	op	
+mcmmo.commands.mcgod.others	op	
+mcmmo.commands.mclevelupsound	op	
+mcmmo.commands.mcmmo.*	false	mcmmo.commands.mcmmo.all
+mcmmo.commands.mcmmo.all	op	mcmmo.commands.mcmmo.description,mcmmo.commands.mcmmo.help
+mcmmo.commands.mcmmo.description	op	
+mcmmo.commands.mcmmo.help	op	
+mcmmo.commands.mcnotify	op	
+mcmmo.commands.mcpurge	op	
+mcmmo.commands.mcrank	op	
+mcmmo.commands.mcrank.others	op	
+mcmmo.commands.mcrank.others.*	false	mcmmo.commands.mcrank.others.all
+mcmmo.commands.mcrank.others.all	op	mcmmo.commands.mcrank.others,mcmmo.commands.mcrank.others.far
+mcmmo.commands.mcrank.others.far	op	
+mcmmo.commands.mcrefresh	op	
+mcmmo.commands.mcrefresh.others	op	
+mcmmo.commands.mcremove	op	
+mcmmo.commands.mcscoreboard	op	
+mcmmo.commands.mcstats	op	
+mcmmo.commands.mctop	op	
+mcmmo.commands.mctop.*	false	mcmmo.commands.mctop.all
+mcmmo.commands.mctop.acrobatics	op	
+mcmmo.commands.mctop.alchemy	op	
+mcmmo.commands.mctop.all	op	mcmmo.commands.mctop,mcmmo.commands.mctop.acrobatics,mcmmo.commands.mctop.alchemy,mcmmo.commands.mctop.archery,mcmmo.commands.mctop.axes,mcmmo.commands.mctop.crossbows,mcmmo.commands.mctop.excavation,mcmmo.commands.mctop.fishing,mcmmo.commands.mctop.herbalism,mcmmo.commands.mctop.maces,mcmmo.commands.mctop.mining,mcmmo.commands.mctop.repair,mcmmo.commands.mctop.salvage,mcmmo.commands.mctop.smelting,mcmmo.commands.mctop.spears,mcmmo.commands.mctop.swords,mcmmo.commands.mctop.taming,mcmmo.commands.mctop.tridents,mcmmo.commands.mctop.unarmed,mcmmo.commands.mctop.woodcutting
+mcmmo.commands.mctop.archery	op	
+mcmmo.commands.mctop.axes	op	
+mcmmo.commands.mctop.crossbows	op	
+mcmmo.commands.mctop.excavation	op	
+mcmmo.commands.mctop.fishing	op	
+mcmmo.commands.mctop.herbalism	op	
+mcmmo.commands.mctop.maces	op	
+mcmmo.commands.mctop.mining	op	
+mcmmo.commands.mctop.repair	op	
+mcmmo.commands.mctop.salvage	op	
+mcmmo.commands.mctop.smelting	op	
+mcmmo.commands.mctop.spears	op	
+mcmmo.commands.mctop.swords	op	
+mcmmo.commands.mctop.taming	op	
+mcmmo.commands.mctop.tridents	op	
+mcmmo.commands.mctop.unarmed	op	
+mcmmo.commands.mctop.woodcutting	op	
+mcmmo.commands.mhd	false	
+mcmmo.commands.mining	op	
+mcmmo.commands.mmoedit	op	
+mcmmo.commands.mmoedit.others	op	
+mcmmo.commands.mmoshowdb	op	
+mcmmo.commands.party	op	
+mcmmo.commands.party.*	false	mcmmo.commands.party.all
+mcmmo.commands.party.accept	op	
+mcmmo.commands.party.all	op	mcmmo.commands.party,mcmmo.commands.party.accept,mcmmo.commands.party.alliance,mcmmo.commands.party.chat,mcmmo.commands.party.create,mcmmo.commands.party.disband,mcmmo.commands.party.help,mcmmo.commands.party.info,mcmmo.commands.party.invite,mcmmo.commands.party.itemshare,mcmmo.commands.party.join,mcmmo.commands.party.kick,mcmmo.commands.party.lock,mcmmo.commands.party.owner,mcmmo.commands.party.password,mcmmo.commands.party.quit,mcmmo.commands.party.rename,mcmmo.commands.party.teleport,mcmmo.commands.party.unlock,mcmmo.commands.party.xpshare
+mcmmo.commands.party.alliance	op	
+mcmmo.commands.party.chat	op	mcmmo.chat.partychat
+mcmmo.commands.party.create	op	
+mcmmo.commands.party.disband	op	
+mcmmo.commands.party.help	op	
+mcmmo.commands.party.info	op	
+mcmmo.commands.party.invite	op	
+mcmmo.commands.party.itemshare	op	
+mcmmo.commands.party.join	op	
+mcmmo.commands.party.kick	op	
+mcmmo.commands.party.lock	op	
+mcmmo.commands.party.owner	op	
+mcmmo.commands.party.password	op	
+mcmmo.commands.party.quit	op	
+mcmmo.commands.party.rename	op	
+mcmmo.commands.party.teleport	op	mcmmo.commands.ptp
+mcmmo.commands.party.unlock	op	
+mcmmo.commands.party.xpshare	op	
+mcmmo.commands.ptp	op	
+mcmmo.commands.ptp.*	false	mcmmo.commands.ptp.all
+mcmmo.commands.ptp.accept	op	
+mcmmo.commands.ptp.acceptall	op	
+mcmmo.commands.ptp.all	false	mcmmo.commands.ptp,mcmmo.commands.ptp.accept,mcmmo.commands.ptp.acceptall,mcmmo.commands.ptp.send,mcmmo.commands.ptp.toggle,mcmmo.commands.ptp.world.all
+mcmmo.commands.ptp.send	op	
+mcmmo.commands.ptp.toggle	op	
+mcmmo.commands.ptp.world.*	false	mcmmo.commands.ptp.world.all
+mcmmo.commands.ptp.world.all	op	
+mcmmo.commands.repair	op	
+mcmmo.commands.salvage	op	
+mcmmo.commands.skillreset	op	
+mcmmo.commands.skillreset.*	false	mcmmo.commands.skillreset.all
+mcmmo.commands.skillreset.acrobatics	op	
+mcmmo.commands.skillreset.alchemy	op	
+mcmmo.commands.skillreset.all	op	mcmmo.commands.skillreset,mcmmo.commands.skillreset.acrobatics,mcmmo.commands.skillreset.alchemy,mcmmo.commands.skillreset.archery,mcmmo.commands.skillreset.axes,mcmmo.commands.skillreset.crossbows,mcmmo.commands.skillreset.excavation,mcmmo.commands.skillreset.fishing,mcmmo.commands.skillreset.herbalism,mcmmo.commands.skillreset.maces,mcmmo.commands.skillreset.mining,mcmmo.commands.skillreset.others.all,mcmmo.commands.skillreset.repair,mcmmo.commands.skillreset.salvage,mcmmo.commands.skillreset.smelting,mcmmo.commands.skillreset.spears,mcmmo.commands.skillreset.swords,mcmmo.commands.skillreset.taming,mcmmo.commands.skillreset.tridents,mcmmo.commands.skillreset.unarmed,mcmmo.commands.skillreset.woodcutting
+mcmmo.commands.skillreset.archery	op	
+mcmmo.commands.skillreset.axes	op	
+mcmmo.commands.skillreset.crossbows	op	
+mcmmo.commands.skillreset.excavation	op	
+mcmmo.commands.skillreset.fishing	op	
+mcmmo.commands.skillreset.herbalism	op	
+mcmmo.commands.skillreset.maces	op	
+mcmmo.commands.skillreset.mining	op	
+mcmmo.commands.skillreset.others	op	
+mcmmo.commands.skillreset.others.*	false	mcmmo.commands.skillreset.others.all
+mcmmo.commands.skillreset.others.acrobatics	op	
+mcmmo.commands.skillreset.others.alchemy	op	
+mcmmo.commands.skillreset.others.all	op	mcmmo.commands.skillreset.others,mcmmo.commands.skillreset.others.acrobatics,mcmmo.commands.skillreset.others.alchemy,mcmmo.commands.skillreset.others.archery,mcmmo.commands.skillreset.others.axes,mcmmo.commands.skillreset.others.crossbows,mcmmo.commands.skillreset.others.excavation,mcmmo.commands.skillreset.others.fishing,mcmmo.commands.skillreset.others.herbalism,mcmmo.commands.skillreset.others.maces,mcmmo.commands.skillreset.others.mining,mcmmo.commands.skillreset.others.repair,mcmmo.commands.skillreset.others.salvage,mcmmo.commands.skillreset.others.smelting,mcmmo.commands.skillreset.others.spears,mcmmo.commands.skillreset.others.swords,mcmmo.commands.skillreset.others.taming,mcmmo.commands.skillreset.others.tridents,mcmmo.commands.skillreset.others.unarmed,mcmmo.commands.skillreset.others.woodcutting
+mcmmo.commands.skillreset.others.archery	op	
+mcmmo.commands.skillreset.others.axes	op	
+mcmmo.commands.skillreset.others.crossbows	op	
+mcmmo.commands.skillreset.others.excavation	op	
+mcmmo.commands.skillreset.others.fishing	op	
+mcmmo.commands.skillreset.others.herbalism	op	
+mcmmo.commands.skillreset.others.maces	op	
+mcmmo.commands.skillreset.others.mining	op	
+mcmmo.commands.skillreset.others.repair	op	
+mcmmo.commands.skillreset.others.salvage	op	
+mcmmo.commands.skillreset.others.smelting	op	
+mcmmo.commands.skillreset.others.spears	op	
+mcmmo.commands.skillreset.others.swords	op	
+mcmmo.commands.skillreset.others.taming	op	
+mcmmo.commands.skillreset.others.tridents	op	
+mcmmo.commands.skillreset.others.unarmed	op	
+mcmmo.commands.skillreset.others.woodcutting	op	
+mcmmo.commands.skillreset.repair	op	
+mcmmo.commands.skillreset.salvage	op	
+mcmmo.commands.skillreset.smelting	op	
+mcmmo.commands.skillreset.spears	op	
+mcmmo.commands.skillreset.swords	op	
+mcmmo.commands.skillreset.taming	op	
+mcmmo.commands.skillreset.tridents	op	
+mcmmo.commands.skillreset.unarmed	op	
+mcmmo.commands.skillreset.woodcutting	op	
+mcmmo.commands.smelting	op	
+mcmmo.commands.swords	op	
+mcmmo.commands.taming	op	
+mcmmo.commands.tridents	op	
+mcmmo.commands.unarmed	op	
+mcmmo.commands.woodcutting	op	
+mcmmo.commands.xprate	op	
+mcmmo.commands.xprate.*	false	mcmmo.commands.xprate.all
+mcmmo.commands.xprate.all	op	mcmmo.commands.xprate,mcmmo.commands.xprate.reset,mcmmo.commands.xprate.set,mcmmo.commands.xprate.show
+mcmmo.commands.xprate.reset	op	
+mcmmo.commands.xprate.set	op	
+mcmmo.commands.xprate.show	op	
+mcmmo.defaults	true	mcmmo.broadcast.levelup,mcmmo.chat.colors,mcmmo.chat.partychat,mcmmo.commands.defaults,mcmmo.motd,mcmmo.skills.all
+mcmmo.defaultsop	op	mcmmo.chat.adminchat,mcmmo.commands.defaultsop,mcmmo.item.all,mcmmo.tools.all
+mcmmo.item.*	true	mcmmo.item.all
+mcmmo.item.all	op	mcmmo.item.chimaerawing
+mcmmo.item.chimaerawing	op	
+mcmmo.motd	op	
+mcmmo.party.*	false	mcmmo.party.all
+mcmmo.party.all	false	mcmmo.party.friendlyfire
+mcmmo.party.friendlyfire	false	
+mcmmo.perks.*	false	mcmmo.perks.all
+mcmmo.perks.activationtime.*	false	mcmmo.perks.activationtime.all
+mcmmo.perks.activationtime.all	false	mcmmo.perks.activationtime.eightseconds,mcmmo.perks.activationtime.fourseconds,mcmmo.perks.activationtime.twelveseconds
+mcmmo.perks.activationtime.eightseconds	false	
+mcmmo.perks.activationtime.fourseconds	false	
+mcmmo.perks.activationtime.twelveseconds	false	
+mcmmo.perks.all	false	mcmmo.perks.activationtime.all,mcmmo.perks.bypass.repairenchant,mcmmo.perks.bypass.salvageenchant,mcmmo.perks.cooldowns.all,mcmmo.perks.lucky.all,mcmmo.perks.xp.all
+mcmmo.perks.bypass.*	false	mcmmo.perks.bypass.all
+mcmmo.perks.bypass.all	false	mcmmo.perks.bypass.repairenchant,mcmmo.perks.bypass.salvageenchant
+mcmmo.perks.bypass.repairenchant	false	
+mcmmo.perks.bypass.salvageenchant	false	
+mcmmo.perks.cooldowns.*	false	mcmmo.perks.cooldowns.all
+mcmmo.perks.cooldowns.all	false	mcmmo.perks.cooldowns.halved,mcmmo.perks.cooldowns.quartered,mcmmo.perks.cooldowns.thirded
+mcmmo.perks.cooldowns.halved	false	
+mcmmo.perks.cooldowns.quartered	false	
+mcmmo.perks.cooldowns.thirded	false	
+mcmmo.perks.lucky.*	false	mcmmo.perks.lucky.all
+mcmmo.perks.lucky.acrobatics	false	
+mcmmo.perks.lucky.alchemy	false	
+mcmmo.perks.lucky.all	false	mcmmo.perks.lucky.acrobatics,mcmmo.perks.lucky.alchemy,mcmmo.perks.lucky.archery,mcmmo.perks.lucky.axes,mcmmo.perks.lucky.crossbows,mcmmo.perks.lucky.excavation,mcmmo.perks.lucky.fishing,mcmmo.perks.lucky.herbalism,mcmmo.perks.lucky.maces,mcmmo.perks.lucky.mining,mcmmo.perks.lucky.repair,mcmmo.perks.lucky.salvage,mcmmo.perks.lucky.smelting,mcmmo.perks.lucky.spears,mcmmo.perks.lucky.swords,mcmmo.perks.lucky.taming,mcmmo.perks.lucky.tridents,mcmmo.perks.lucky.unarmed,mcmmo.perks.lucky.woodcutting
+mcmmo.perks.lucky.archery	false	
+mcmmo.perks.lucky.axes	false	
+mcmmo.perks.lucky.crossbows	false	
+mcmmo.perks.lucky.excavation	false	
+mcmmo.perks.lucky.fishing	false	
+mcmmo.perks.lucky.herbalism	false	
+mcmmo.perks.lucky.maces	false	
+mcmmo.perks.lucky.mining	false	
+mcmmo.perks.lucky.repair	false	
+mcmmo.perks.lucky.salvage	false	
+mcmmo.perks.lucky.smelting	false	
+mcmmo.perks.lucky.spears	false	
+mcmmo.perks.lucky.swords	false	
+mcmmo.perks.lucky.taming	false	
+mcmmo.perks.lucky.tridents	false	
+mcmmo.perks.lucky.unarmed	false	
+mcmmo.perks.lucky.woodcutting	false	
+mcmmo.perks.xp.*	false	mcmmo.perks.xp.all
+mcmmo.perks.xp.10percentboost	false	mcmmo.perks.xp.10percentboost.all
+mcmmo.perks.xp.10percentboost.*	false	mcmmo.perks.xp.10percentboost.all
+mcmmo.perks.xp.10percentboost.acrobatics	false	
+mcmmo.perks.xp.10percentboost.alchemy	false	
+mcmmo.perks.xp.10percentboost.all	false	mcmmo.perks.xp.10percentboost.acrobatics,mcmmo.perks.xp.10percentboost.alchemy,mcmmo.perks.xp.10percentboost.archery,mcmmo.perks.xp.10percentboost.axes,mcmmo.perks.xp.10percentboost.crossbows,mcmmo.perks.xp.10percentboost.excavation,mcmmo.perks.xp.10percentboost.fishing,mcmmo.perks.xp.10percentboost.herbalism,mcmmo.perks.xp.10percentboost.maces,mcmmo.perks.xp.10percentboost.mining,mcmmo.perks.xp.10percentboost.repair,mcmmo.perks.xp.10percentboost.smelting,mcmmo.perks.xp.10percentboost.spears,mcmmo.perks.xp.10percentboost.swords,mcmmo.perks.xp.10percentboost.taming,mcmmo.perks.xp.10percentboost.tridents,mcmmo.perks.xp.10percentboost.unarmed,mcmmo.perks.xp.10percentboost.woodcutting
+mcmmo.perks.xp.10percentboost.archery	false	
+mcmmo.perks.xp.10percentboost.axes	false	
+mcmmo.perks.xp.10percentboost.crossbows	false	
+mcmmo.perks.xp.10percentboost.excavation	false	
+mcmmo.perks.xp.10percentboost.fishing	false	
+mcmmo.perks.xp.10percentboost.herbalism	false	
+mcmmo.perks.xp.10percentboost.maces	false	
+mcmmo.perks.xp.10percentboost.mining	false	
+mcmmo.perks.xp.10percentboost.repair	false	
+mcmmo.perks.xp.10percentboost.smelting	false	
+mcmmo.perks.xp.10percentboost.spears	false	
+mcmmo.perks.xp.10percentboost.swords	false	
+mcmmo.perks.xp.10percentboost.taming	false	
+mcmmo.perks.xp.10percentboost.tridents	false	
+mcmmo.perks.xp.10percentboost.unarmed	false	
+mcmmo.perks.xp.10percentboost.woodcutting	false	
+mcmmo.perks.xp.150percentboost	false	mcmmo.perks.xp.150percentboost.all
+mcmmo.perks.xp.150percentboost.*	false	mcmmo.perks.xp.150percentboost.all
+mcmmo.perks.xp.150percentboost.acrobatics	false	
+mcmmo.perks.xp.150percentboost.alchemy	false	
+mcmmo.perks.xp.150percentboost.all	false	mcmmo.perks.xp.150percentboost.acrobatics,mcmmo.perks.xp.150percentboost.alchemy,mcmmo.perks.xp.150percentboost.archery,mcmmo.perks.xp.150percentboost.axes,mcmmo.perks.xp.150percentboost.crossbows,mcmmo.perks.xp.150percentboost.excavation,mcmmo.perks.xp.150percentboost.fishing,mcmmo.perks.xp.150percentboost.herbalism,mcmmo.perks.xp.150percentboost.maces,mcmmo.perks.xp.150percentboost.mining,mcmmo.perks.xp.150percentboost.repair,mcmmo.perks.xp.150percentboost.smelting,mcmmo.perks.xp.150percentboost.spears,mcmmo.perks.xp.150percentboost.swords,mcmmo.perks.xp.150percentboost.taming,mcmmo.perks.xp.150percentboost.tridents,mcmmo.perks.xp.150percentboost.unarmed,mcmmo.perks.xp.150percentboost.woodcutting
+mcmmo.perks.xp.150percentboost.archery	false	
+mcmmo.perks.xp.150percentboost.axes	false	
+mcmmo.perks.xp.150percentboost.crossbows	false	
+mcmmo.perks.xp.150percentboost.excavation	false	
+mcmmo.perks.xp.150percentboost.fishing	false	
+mcmmo.perks.xp.150percentboost.herbalism	false	
+mcmmo.perks.xp.150percentboost.maces	false	
+mcmmo.perks.xp.150percentboost.mining	false	
+mcmmo.perks.xp.150percentboost.repair	false	
+mcmmo.perks.xp.150percentboost.smelting	false	
+mcmmo.perks.xp.150percentboost.spears	false	
+mcmmo.perks.xp.150percentboost.swords	false	
+mcmmo.perks.xp.150percentboost.taming	false	
+mcmmo.perks.xp.150percentboost.tridents	false	
+mcmmo.perks.xp.150percentboost.unarmed	false	
+mcmmo.perks.xp.150percentboost.woodcutting	false	
+mcmmo.perks.xp.25percentboost	false	mcmmo.perks.xp.25percentboost.all
+mcmmo.perks.xp.25percentboost.*	false	mcmmo.perks.xp.25percentboost.all
+mcmmo.perks.xp.25percentboost.acrobatics	false	
+mcmmo.perks.xp.25percentboost.alchemy	false	
+mcmmo.perks.xp.25percentboost.all	false	mcmmo.perks.xp.25percentboost.acrobatics,mcmmo.perks.xp.25percentboost.alchemy,mcmmo.perks.xp.25percentboost.archery,mcmmo.perks.xp.25percentboost.axes,mcmmo.perks.xp.25percentboost.crossbows,mcmmo.perks.xp.25percentboost.excavation,mcmmo.perks.xp.25percentboost.fishing,mcmmo.perks.xp.25percentboost.herbalism,mcmmo.perks.xp.25percentboost.maces,mcmmo.perks.xp.25percentboost.mining,mcmmo.perks.xp.25percentboost.repair,mcmmo.perks.xp.25percentboost.smelting,mcmmo.perks.xp.25percentboost.spears,mcmmo.perks.xp.25percentboost.swords,mcmmo.perks.xp.25percentboost.taming,mcmmo.perks.xp.25percentboost.tridents,mcmmo.perks.xp.25percentboost.unarmed,mcmmo.perks.xp.25percentboost.woodcutting
+mcmmo.perks.xp.25percentboost.archery	false	
+mcmmo.perks.xp.25percentboost.axes	false	
+mcmmo.perks.xp.25percentboost.crossbows	false	
+mcmmo.perks.xp.25percentboost.excavation	false	
+mcmmo.perks.xp.25percentboost.fishing	false	
+mcmmo.perks.xp.25percentboost.herbalism	false	
+mcmmo.perks.xp.25percentboost.maces	false	
+mcmmo.perks.xp.25percentboost.mining	false	
+mcmmo.perks.xp.25percentboost.repair	false	
+mcmmo.perks.xp.25percentboost.smelting	false	
+mcmmo.perks.xp.25percentboost.spears	false	
+mcmmo.perks.xp.25percentboost.swords	false	
+mcmmo.perks.xp.25percentboost.taming	false	
+mcmmo.perks.xp.25percentboost.tridents	false	
+mcmmo.perks.xp.25percentboost.unarmed	false	
+mcmmo.perks.xp.25percentboost.woodcutting	false	
+mcmmo.perks.xp.50percentboost	false	mcmmo.perks.xp.50percentboost.all
+mcmmo.perks.xp.50percentboost.*	false	mcmmo.perks.xp.50percentboost.all
+mcmmo.perks.xp.50percentboost.acrobatics	false	
+mcmmo.perks.xp.50percentboost.alchemy	false	
+mcmmo.perks.xp.50percentboost.all	false	mcmmo.perks.xp.50percentboost.acrobatics,mcmmo.perks.xp.50percentboost.alchemy,mcmmo.perks.xp.50percentboost.archery,mcmmo.perks.xp.50percentboost.axes,mcmmo.perks.xp.50percentboost.crossbows,mcmmo.perks.xp.50percentboost.excavation,mcmmo.perks.xp.50percentboost.fishing,mcmmo.perks.xp.50percentboost.herbalism,mcmmo.perks.xp.50percentboost.maces,mcmmo.perks.xp.50percentboost.mining,mcmmo.perks.xp.50percentboost.repair,mcmmo.perks.xp.50percentboost.smelting,mcmmo.perks.xp.50percentboost.spears,mcmmo.perks.xp.50percentboost.swords,mcmmo.perks.xp.50percentboost.taming,mcmmo.perks.xp.50percentboost.tridents,mcmmo.perks.xp.50percentboost.unarmed,mcmmo.perks.xp.50percentboost.woodcutting
+mcmmo.perks.xp.50percentboost.archery	false	
+mcmmo.perks.xp.50percentboost.axes	false	
+mcmmo.perks.xp.50percentboost.crossbows	false	
+mcmmo.perks.xp.50percentboost.excavation	false	
+mcmmo.perks.xp.50percentboost.fishing	false	
+mcmmo.perks.xp.50percentboost.herbalism	false	
+mcmmo.perks.xp.50percentboost.maces	false	
+mcmmo.perks.xp.50percentboost.mining	false	
+mcmmo.perks.xp.50percentboost.repair	false	
+mcmmo.perks.xp.50percentboost.smelting	false	
+mcmmo.perks.xp.50percentboost.spears	false	
+mcmmo.perks.xp.50percentboost.swords	false	
+mcmmo.perks.xp.50percentboost.taming	false	
+mcmmo.perks.xp.50percentboost.tridents	false	
+mcmmo.perks.xp.50percentboost.unarmed	false	
+mcmmo.perks.xp.50percentboost.woodcutting	false	
+mcmmo.perks.xp.all	false	mcmmo.perks.xp.10percentboost.all,mcmmo.perks.xp.150percentboost.all,mcmmo.perks.xp.25percentboost.all,mcmmo.perks.xp.50percentboost.all,mcmmo.perks.xp.customboost.all,mcmmo.perks.xp.double.all,mcmmo.perks.xp.quadruple.all,mcmmo.perks.xp.triple.all
+mcmmo.perks.xp.customboost	false	mcmmo.perks.xp.customboost.all
+mcmmo.perks.xp.customboost.*	false	mcmmo.perks.xp.customboost.all
+mcmmo.perks.xp.customboost.acrobatics	false	
+mcmmo.perks.xp.customboost.alchemy	false	
+mcmmo.perks.xp.customboost.all	false	mcmmo.perks.xp.customboost.acrobatics,mcmmo.perks.xp.customboost.alchemy,mcmmo.perks.xp.customboost.archery,mcmmo.perks.xp.customboost.axes,mcmmo.perks.xp.customboost.crossbows,mcmmo.perks.xp.customboost.excavation,mcmmo.perks.xp.customboost.fishing,mcmmo.perks.xp.customboost.herbalism,mcmmo.perks.xp.customboost.maces,mcmmo.perks.xp.customboost.mining,mcmmo.perks.xp.customboost.repair,mcmmo.perks.xp.customboost.smelting,mcmmo.perks.xp.customboost.spears,mcmmo.perks.xp.customboost.swords,mcmmo.perks.xp.customboost.taming,mcmmo.perks.xp.customboost.tridents,mcmmo.perks.xp.customboost.unarmed,mcmmo.perks.xp.customboost.woodcutting
+mcmmo.perks.xp.customboost.archery	false	
+mcmmo.perks.xp.customboost.axes	false	
+mcmmo.perks.xp.customboost.crossbows	false	
+mcmmo.perks.xp.customboost.excavation	false	
+mcmmo.perks.xp.customboost.fishing	false	
+mcmmo.perks.xp.customboost.herbalism	false	
+mcmmo.perks.xp.customboost.maces	false	
+mcmmo.perks.xp.customboost.mining	false	
+mcmmo.perks.xp.customboost.repair	false	
+mcmmo.perks.xp.customboost.smelting	false	
+mcmmo.perks.xp.customboost.spears	false	
+mcmmo.perks.xp.customboost.swords	false	
+mcmmo.perks.xp.customboost.taming	false	
+mcmmo.perks.xp.customboost.tridents	false	
+mcmmo.perks.xp.customboost.unarmed	false	
+mcmmo.perks.xp.customboost.woodcutting	false	
+mcmmo.perks.xp.double	false	mcmmo.perks.xp.double.all
+mcmmo.perks.xp.double.*	false	mcmmo.perks.xp.double.all
+mcmmo.perks.xp.double.acrobatics	false	
+mcmmo.perks.xp.double.alchemy	false	
+mcmmo.perks.xp.double.all	false	mcmmo.perks.xp.double.acrobatics,mcmmo.perks.xp.double.alchemy,mcmmo.perks.xp.double.archery,mcmmo.perks.xp.double.axes,mcmmo.perks.xp.double.crossbows,mcmmo.perks.xp.double.excavation,mcmmo.perks.xp.double.fishing,mcmmo.perks.xp.double.herbalism,mcmmo.perks.xp.double.maces,mcmmo.perks.xp.double.mining,mcmmo.perks.xp.double.repair,mcmmo.perks.xp.double.smelting,mcmmo.perks.xp.double.spears,mcmmo.perks.xp.double.swords,mcmmo.perks.xp.double.taming,mcmmo.perks.xp.double.tridents,mcmmo.perks.xp.double.unarmed,mcmmo.perks.xp.double.woodcutting
+mcmmo.perks.xp.double.archery	false	
+mcmmo.perks.xp.double.axes	false	
+mcmmo.perks.xp.double.crossbows	false	
+mcmmo.perks.xp.double.excavation	false	
+mcmmo.perks.xp.double.fishing	false	
+mcmmo.perks.xp.double.herbalism	false	
+mcmmo.perks.xp.double.maces	false	
+mcmmo.perks.xp.double.mining	false	
+mcmmo.perks.xp.double.repair	false	
+mcmmo.perks.xp.double.smelting	false	
+mcmmo.perks.xp.double.spears	false	
+mcmmo.perks.xp.double.swords	false	
+mcmmo.perks.xp.double.taming	false	
+mcmmo.perks.xp.double.tridents	false	
+mcmmo.perks.xp.double.unarmed	false	
+mcmmo.perks.xp.double.woodcutting	false	
+mcmmo.perks.xp.quadruple	false	mcmmo.perks.xp.quadruple.all
+mcmmo.perks.xp.quadruple.*	false	mcmmo.perks.xp.quadruple.all
+mcmmo.perks.xp.quadruple.acrobatics	false	
+mcmmo.perks.xp.quadruple.alchemy	false	
+mcmmo.perks.xp.quadruple.all	false	mcmmo.perks.xp.quadruple.acrobatics,mcmmo.perks.xp.quadruple.alchemy,mcmmo.perks.xp.quadruple.archery,mcmmo.perks.xp.quadruple.axes,mcmmo.perks.xp.quadruple.crossbows,mcmmo.perks.xp.quadruple.excavation,mcmmo.perks.xp.quadruple.fishing,mcmmo.perks.xp.quadruple.herbalism,mcmmo.perks.xp.quadruple.maces,mcmmo.perks.xp.quadruple.mining,mcmmo.perks.xp.quadruple.repair,mcmmo.perks.xp.quadruple.smelting,mcmmo.perks.xp.quadruple.spears,mcmmo.perks.xp.quadruple.swords,mcmmo.perks.xp.quadruple.taming,mcmmo.perks.xp.quadruple.tridents,mcmmo.perks.xp.quadruple.unarmed,mcmmo.perks.xp.quadruple.woodcutting
+mcmmo.perks.xp.quadruple.archery	false	
+mcmmo.perks.xp.quadruple.axes	false	
+mcmmo.perks.xp.quadruple.crossbows	false	
+mcmmo.perks.xp.quadruple.excavation	false	
+mcmmo.perks.xp.quadruple.fishing	false	
+mcmmo.perks.xp.quadruple.herbalism	false	
+mcmmo.perks.xp.quadruple.maces	false	
+mcmmo.perks.xp.quadruple.mining	false	
+mcmmo.perks.xp.quadruple.repair	false	
+mcmmo.perks.xp.quadruple.smelting	false	
+mcmmo.perks.xp.quadruple.spears	false	
+mcmmo.perks.xp.quadruple.swords	false	
+mcmmo.perks.xp.quadruple.taming	false	
+mcmmo.perks.xp.quadruple.tridents	false	
+mcmmo.perks.xp.quadruple.unarmed	false	
+mcmmo.perks.xp.quadruple.woodcutting	false	
+mcmmo.perks.xp.triple	false	mcmmo.perks.xp.triple.all
+mcmmo.perks.xp.triple.*	false	mcmmo.perks.xp.triple.all
+mcmmo.perks.xp.triple.acrobatics	false	
+mcmmo.perks.xp.triple.alchemy	false	
+mcmmo.perks.xp.triple.all	false	mcmmo.perks.xp.triple.acrobatics,mcmmo.perks.xp.triple.alchemy,mcmmo.perks.xp.triple.archery,mcmmo.perks.xp.triple.axes,mcmmo.perks.xp.triple.crossbows,mcmmo.perks.xp.triple.excavation,mcmmo.perks.xp.triple.fishing,mcmmo.perks.xp.triple.herbalism,mcmmo.perks.xp.triple.maces,mcmmo.perks.xp.triple.mining,mcmmo.perks.xp.triple.repair,mcmmo.perks.xp.triple.smelting,mcmmo.perks.xp.triple.spears,mcmmo.perks.xp.triple.swords,mcmmo.perks.xp.triple.taming,mcmmo.perks.xp.triple.tridents,mcmmo.perks.xp.triple.unarmed,mcmmo.perks.xp.triple.woodcutting
+mcmmo.perks.xp.triple.archery	false	
+mcmmo.perks.xp.triple.axes	false	
+mcmmo.perks.xp.triple.crossbows	false	
+mcmmo.perks.xp.triple.excavation	false	
+mcmmo.perks.xp.triple.fishing	false	
+mcmmo.perks.xp.triple.herbalism	false	
+mcmmo.perks.xp.triple.maces	false	
+mcmmo.perks.xp.triple.mining	false	
+mcmmo.perks.xp.triple.repair	false	
+mcmmo.perks.xp.triple.smelting	false	
+mcmmo.perks.xp.triple.spears	false	
+mcmmo.perks.xp.triple.swords	false	
+mcmmo.perks.xp.triple.taming	false	
+mcmmo.perks.xp.triple.tridents	false	
+mcmmo.perks.xp.triple.unarmed	false	
+mcmmo.perks.xp.triple.woodcutting	false	
+mcmmo.showversion	true	
+mcmmo.skillreset	false	mcmmo.commands.skillreset.all,mcmmo.commands.skillreset.others.all
+mcmmo.skills.*	false	mcmmo.skills.all
+mcmmo.skills.acrobatics	op	mcmmo.ability.acrobatics.all,mcmmo.commands.acrobatics
+mcmmo.skills.alchemy	op	mcmmo.ability.alchemy.all,mcmmo.commands.alchemy
+mcmmo.skills.all	op	mcmmo.skills.acrobatics,mcmmo.skills.alchemy,mcmmo.skills.archery,mcmmo.skills.axes,mcmmo.skills.crossbows,mcmmo.skills.excavation,mcmmo.skills.fishing,mcmmo.skills.herbalism,mcmmo.skills.maces,mcmmo.skills.mining,mcmmo.skills.repair,mcmmo.skills.salvage,mcmmo.skills.smelting,mcmmo.skills.spears,mcmmo.skills.swords,mcmmo.skills.taming,mcmmo.skills.tridents,mcmmo.skills.unarmed,mcmmo.skills.woodcutting
+mcmmo.skills.archery	op	mcmmo.ability.archery.all,mcmmo.commands.archery
+mcmmo.skills.axes	op	mcmmo.ability.axes.all,mcmmo.commands.axes
+mcmmo.skills.crossbows	op	mcmmo.ability.crossbows.all,mcmmo.commands.crossbows
+mcmmo.skills.excavation	op	mcmmo.ability.excavation.all,mcmmo.commands.excavation
+mcmmo.skills.fishing	op	mcmmo.ability.fishing.all,mcmmo.commands.fishing
+mcmmo.skills.herbalism	op	mcmmo.ability.herbalism.all,mcmmo.commands.herbalism
+mcmmo.skills.maces	op	mcmmo.ability.maces.all,mcmmo.commands.maces
+mcmmo.skills.mining	op	mcmmo.ability.mining.all,mcmmo.commands.mining
+mcmmo.skills.repair	op	mcmmo.ability.repair.all,mcmmo.commands.repair
+mcmmo.skills.salvage	op	mcmmo.ability.salvage.all,mcmmo.commands.salvage
+mcmmo.skills.smelting	op	mcmmo.ability.smelting.all,mcmmo.commands.smelting
+mcmmo.skills.spears	op	mcmmo.ability.spears.all,mcmmo.commands.spears
+mcmmo.skills.swords	op	mcmmo.ability.swords.all,mcmmo.commands.swords
+mcmmo.skills.taming	op	mcmmo.ability.taming.all,mcmmo.commands.taming
+mcmmo.skills.tridents	op	mcmmo.ability.tridents.all,mcmmo.commands.tridents
+mcmmo.skills.unarmed	op	mcmmo.ability.unarmed.all,mcmmo.commands.unarmed
+mcmmo.skills.woodcutting	op	mcmmo.ability.woodcutting.all,mcmmo.commands.woodcutting

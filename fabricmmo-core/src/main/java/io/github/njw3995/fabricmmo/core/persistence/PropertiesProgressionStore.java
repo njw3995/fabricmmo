@@ -8,6 +8,9 @@ import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.time.Instant;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
@@ -16,7 +19,7 @@ import java.util.UUID;
 /**
  * Versioned atomic persistence that preserves unknown namespaced skill data.
  */
-public final class PropertiesProgressionStore implements ProgressionStore {
+public final class PropertiesProgressionStore implements ManagedProgressionStore {
     private static final String FORMAT_VERSION = "1";
     private final Path directory;
 
@@ -82,6 +85,45 @@ public final class PropertiesProgressionStore implements ProgressionStore {
         } catch (AtomicMoveNotSupportedException ignored) {
             Files.move(temporary, target, StandardCopyOption.REPLACE_EXISTING);
         }
+    }
+
+    @Override
+    public String backendName() {
+        return "flatfile";
+    }
+
+    @Override
+    public synchronized Set<UUID> playerIds() throws IOException {
+        TreeSet<UUID> ids = new TreeSet<>();
+        try (var paths = Files.list(directory)) {
+            for (Path candidate : paths.filter(Files::isRegularFile).toList()) {
+                String name = candidate.getFileName().toString();
+                if (!name.endsWith(".properties")) continue;
+                try {
+                    ids.add(UUID.fromString(name.substring(0, name.length() - ".properties".length())));
+                } catch (IllegalArgumentException ignored) {
+                    // Ignore unrelated files rather than making maintenance commands destructive.
+                }
+            }
+        }
+        return Set.copyOf(ids);
+    }
+
+    @Override
+    public synchronized boolean delete(UUID playerId) throws IOException {
+        return Files.deleteIfExists(path(playerId));
+    }
+
+    @Override
+    public synchronized Instant lastSeen(UUID playerId) throws IOException {
+        Path file = path(playerId);
+        return Files.exists(file) ? Files.getLastModifiedTime(file).toInstant() : Instant.EPOCH;
+    }
+
+    @Override
+    public synchronized void touch(UUID playerId, Instant instant) throws IOException {
+        Path file = path(playerId);
+        if (Files.exists(file)) Files.setLastModifiedTime(file, java.nio.file.attribute.FileTime.from(instant));
     }
 
     private Path path(UUID playerId) {

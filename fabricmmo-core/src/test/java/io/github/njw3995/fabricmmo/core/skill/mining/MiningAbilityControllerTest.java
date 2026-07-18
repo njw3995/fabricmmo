@@ -1,6 +1,7 @@
 package io.github.njw3995.fabricmmo.core.skill.mining;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -68,6 +69,32 @@ class MiningAbilityControllerTest {
             assertEquals(135, controller.superBreakerCooldownRemaining(playerId, 120));
             clock.advanceSeconds(15);
             assertEquals(120, controller.superBreakerCooldownRemaining(playerId, 120));
+        }
+    }
+
+    @Test
+    void refreshClearsPersistedCooldownsAndTransientState() throws Exception {
+        MiningSettings settings = settings();
+        MutableClock clock = new MutableClock(Instant.parse("2026-07-17T00:00:00Z"));
+        UUID playerId = UUID.randomUUID();
+        try (MiningAbilityController controller = new MiningAbilityController(
+                new PropertiesMiningAbilityStore(temporaryDirectory), clock)) {
+            assertSame(MiningAbilityController.SuperBreakerPreparation.READY,
+                    controller.prepareSuperBreaker(playerId, 50, settings));
+            controller.activateSuperBreaker(playerId, 50, settings);
+            controller.activateBlastMining(playerId, 100, settings);
+
+            controller.reset(playerId);
+
+            assertEquals(0, controller.superBreakerCooldownRemaining(playerId, settings));
+            assertEquals(0, controller.blastCooldownRemaining(playerId, settings));
+            assertFalse(controller.isSuperBreakerActive(playerId));
+            assertFalse(controller.isSuperBreakerPrepared(playerId));
+        }
+        try (MiningAbilityController reopened = new MiningAbilityController(
+                new PropertiesMiningAbilityStore(temporaryDirectory), clock)) {
+            assertEquals(0, reopened.superBreakerCooldownRemaining(playerId, settings));
+            assertEquals(0, reopened.blastCooldownRemaining(playerId, settings));
         }
     }
 

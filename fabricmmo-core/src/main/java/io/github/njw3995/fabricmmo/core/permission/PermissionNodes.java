@@ -1,6 +1,21 @@
 package io.github.njw3995.fabricmmo.core.permission;
 
 public final class PermissionNodes {
+    public static final String FABRICMMO_ROOT = "fabricmmo.commands.fabricmmo";
+    public static final String MCABILITY = "mcmmo.commands.mcability";
+    public static final String MCABILITY_OTHERS = "mcmmo.commands.mcability.others";
+    public static final String MCCOOLDOWN = "mcmmo.commands.mccooldown";
+    public static final String MCLEVELUPSOUND = "mcmmo.commands.mclevelupsound";
+    public static final String MCNOTIFY = "mcmmo.commands.mcnotify";
+    public static final String MCREFRESH = "mcmmo.commands.mcrefresh";
+    public static final String MCREFRESH_OTHERS = "mcmmo.commands.mcrefresh.others";
+    public static final String MMOPOWER = "mcmmo.commands.mmopower";
+    public static final String ADD_LEVELS = "mcmmo.commands.addlevels";
+    public static final String ADD_LEVELS_OTHERS = "mcmmo.commands.addlevels.others";
+    public static final String MMO_EDIT = "mcmmo.commands.mmoedit";
+    public static final String MMO_EDIT_OTHERS = "mcmmo.commands.mmoedit.others";
+    public static final String SKILL_RESET = "mcmmo.commands.skillreset";
+    public static final String SKILL_RESET_OTHERS = "mcmmo.commands.skillreset.others";
     public static final String MCMMO_DESCRIPTION = "mcmmo.commands.mcmmo.description";
     public static final String MCMMO_HELP = "mcmmo.commands.mcmmo.help";
     public static final String MCSTATS = "mcmmo.commands.mcstats";
@@ -32,6 +47,11 @@ public final class PermissionNodes {
     public static final String COOLDOWN_HALVED = "mcmmo.perks.cooldowns.halved";
     public static final String COOLDOWN_THIRDED = "mcmmo.perks.cooldowns.thirded";
     public static final String COOLDOWN_QUARTERED = "mcmmo.perks.cooldowns.quartered";
+
+    public static String skill(String skillPath) {
+        return "mcmmo.skills." + skillPath;
+    }
+
 
     private PermissionNodes() {
     }

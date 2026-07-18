@@ -13,12 +13,16 @@ class CoreCommandMetadataTest {
 
         CoreCommandMetadata.registerDefaults(registry);
 
-        assertEquals(4, registry.commands().size());
+        assertEquals(13, registry.commands().size());
         assertEquals("mcmmo.commands.mcstats",
                 registry.find(NamespacedId.parse("fabricmmo:mcstats")).orElseThrow().permission());
         assertTrue(registry.find(NamespacedId.parse("fabricmmo:mcstats"))
                 .orElseThrow().aliases().contains("stats"));
         assertEquals("mcmmo.commands.mining",
                 registry.find(NamespacedId.parse("fabricmmo:mining")).orElseThrow().permission());
+        assertTrue(registry.find(NamespacedId.parse("fabricmmo:mcmmo"))
+                .orElseThrow().aliases().contains("fabricmmo"));
+        assertTrue(registry.find(NamespacedId.parse("fabricmmo:mmopower"))
+                .orElseThrow().aliases().contains("powerlevel"));
     }
 }
