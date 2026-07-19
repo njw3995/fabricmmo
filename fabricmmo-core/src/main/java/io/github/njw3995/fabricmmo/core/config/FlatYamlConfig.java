@@ -8,7 +8,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /** Minimal strict reader for the scalar YAML configuration used by FabricMMO defaults. */
@@ -16,7 +17,7 @@ public final class FlatYamlConfig {
     private final Map<String, String> values;
 
     private FlatYamlConfig(Map<String, String> values) {
-        this.values = Map.copyOf(values);
+        this.values = Collections.unmodifiableMap(new LinkedHashMap<>(values));
     }
 
     public static FlatYamlConfig load(Path file) throws IOException {
@@ -32,7 +33,7 @@ public final class FlatYamlConfig {
         BufferedReader reader = source instanceof BufferedReader buffered
                 ? buffered
                 : new BufferedReader(source);
-        Map<String, String> values = new HashMap<>();
+        Map<String, String> values = new LinkedHashMap<>();
         Deque<YamlParent> parents = new ArrayDeque<>();
         String line;
         int lineNumber = 0;
@@ -48,6 +49,11 @@ public final class FlatYamlConfig {
             }
             int indent = leadingSpaces(withoutComment);
             String trimmed = withoutComment.trim();
+            if (trimmed.startsWith("- ")) {
+                // Scalar consumers intentionally ignore YAML sequence members. Specialized
+                // loaders may read those entries directly while retaining this flat map.
+                continue;
+            }
             int separator = trimmed.indexOf(':');
             if (separator <= 0) {
                 throw new IllegalArgumentException(
@@ -74,13 +80,13 @@ public final class FlatYamlConfig {
     }
 
     public Map<String, String> valuesWithPrefix(String prefix) {
-        Map<String, String> matches = new HashMap<>();
+        Map<String, String> matches = new LinkedHashMap<>();
         values.forEach((key, value) -> {
             if (key.startsWith(prefix)) {
                 matches.put(key, value);
             }
         });
-        return Map.copyOf(matches);
+        return Collections.unmodifiableMap(matches);
     }
 
     public boolean contains(String path) {

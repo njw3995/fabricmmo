@@ -42,6 +42,13 @@ Skills:
     Level_Cap: 0
   Fishing:
     Level_Cap: 0
+    Drops_Enabled: true
+    Override_Vanilla_Treasures: true
+    # Always catch fish, even when treasure is found
+    Extra_Fish: false
+    Lure_Modifier: 4.0
+    # Makes items with conflicting enchantments obtainable through Magic Hunter.
+    Allow_Conflicting_Enchants: false
   Herbalism:
     Level_Cap: 0
     Prevent_AFK_Leveling: true

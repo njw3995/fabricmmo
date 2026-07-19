@@ -33,4 +33,19 @@ class FlatYamlConfigTest {
         assertThrows(IllegalArgumentException.class,
                 () -> config.requiredBoolean("Enabled"));
     }
+
+    @Test
+    void preservesScalarOrderAndIgnoresYamlSequenceMembers() throws Exception {
+        FlatYamlConfig config = FlatYamlConfig.parse(new StringReader("""
+                Root:
+                  First: 1
+                  List:
+                    - alpha
+                    - beta
+                  Second: 2
+                """), "test");
+
+        assertEquals(java.util.List.of("Root.First", "Root.Second"),
+                java.util.List.copyOf(config.valuesWithPrefix("Root.").keySet()));
+    }
 }

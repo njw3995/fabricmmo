@@ -51,7 +51,9 @@ public final class DefaultConfigInstaller {
             Path target = configDirectory.resolve(fileName);
             String resourceName = "/defaults/" + fileName;
             if (Files.exists(target)) {
-                if (RECURSIVE_MERGE_FILES.contains(fileName)) {
+                if (isEmptyFishingTreasurePlaceholder(fileName, target)) {
+                    replacePlaceholderWithDefault(target, resourceName);
+                } else if (RECURSIVE_MERGE_FILES.contains(fileName)) {
                     mergeMissingYamlDefaults(target, resourceName);
                 } else if (fileName.endsWith(".yml")) {
                     appendMissingTopLevelSections(target, resourceName);
@@ -68,6 +70,25 @@ public final class DefaultConfigInstaller {
         Files.createDirectories(configDirectory.resolve("locales"));
     }
 
+
+    private static boolean isEmptyFishingTreasurePlaceholder(String fileName, Path target)
+            throws IOException {
+        return fileName.equals("fishing_treasures.yml")
+                && Files.readString(target, StandardCharsets.UTF_8).trim().equals("{}");
+    }
+
+    private static void replacePlaceholderWithDefault(Path target, String resourceName)
+            throws IOException {
+        Path backup = target.resolveSibling(target.getFileName() + ".pre-update.bak");
+        Files.copy(target, backup, StandardCopyOption.REPLACE_EXISTING,
+                StandardCopyOption.COPY_ATTRIBUTES);
+        try (InputStream input = DefaultConfigInstaller.class.getResourceAsStream(resourceName)) {
+            if (input == null) {
+                throw new IOException("Missing packaged config default " + resourceName);
+            }
+            Files.copy(input, target, StandardCopyOption.REPLACE_EXISTING);
+        }
+    }
 
     private static void mergeMissingYamlDefaults(Path target, String resourceName)
             throws IOException {

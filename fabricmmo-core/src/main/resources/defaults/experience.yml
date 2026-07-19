@@ -3,9 +3,13 @@
 EarlyGameBoost:
   Enabled: true
 ExploitFix:
+  Fishing: true
   LavaStoneAndCobbleFarming: true
   PistonCheating: true
   TreeFellerReducedXP: true
+Fishing_ExploitFix_Options:
+  MoveRange: 3
+  OverFishLimit: 10
 Experience_Bars:
     # Turn this to false if you want to disable XP bars
     Enable: true
@@ -256,6 +260,12 @@ Experience_Values:
     Packed_Mud: 30
     Mud_Bricks: 40
     Dripstone_Block: 35
+  Fishing:
+    Cod: 100
+    Salmon: 600
+    Tropical_Fish: 10000
+    Pufferfish: 2400
+    Shake: 50
   Excavation:
     Clay: 40
     Dirt: 40

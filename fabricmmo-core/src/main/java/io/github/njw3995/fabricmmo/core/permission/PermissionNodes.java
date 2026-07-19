@@ -59,6 +59,22 @@ public final class PermissionNodes {
     public static final String HERBALISM_HYLIAN_LUCK = "mcmmo.ability.herbalism.hylianluck";
     public static final String HERBALISM_SHROOM_THUMB = "mcmmo.ability.herbalism.shroomthumb";
     public static final String HERBALISM_LUCKY = "mcmmo.perks.lucky.herbalism";
+    public static final String FISHING = "mcmmo.skills.fishing";
+    public static final String FISHING_COMMAND = "mcmmo.commands.fishing";
+    public static final String FISHING_TREASURE_HUNTER =
+            "mcmmo.ability.fishing.treasurehunter";
+    public static final String FISHING_MAGIC_HUNTER =
+            "mcmmo.ability.fishing.magichunter";
+    public static final String FISHING_SHAKE = "mcmmo.ability.fishing.shake";
+    public static final String FISHING_FISHERMANS_DIET =
+            "mcmmo.ability.fishing.fishermansdiet";
+    public static final String FISHING_MASTER_ANGLER =
+            "mcmmo.ability.fishing.masterangler";
+    public static final String FISHING_ICE_FISHING =
+            "mcmmo.ability.fishing.icefishing";
+    public static final String FISHING_VANILLA_XP_BOOST =
+            "mcmmo.ability.fishing.vanillaxpboost";
+    public static final String FISHING_LUCKY = "mcmmo.perks.lucky.fishing";
     public static final String XP_CUSTOM_ALL = "mcmmo.perks.xp.customboost.all";
     public static final String XP_QUADRUPLE_ALL = "mcmmo.perks.xp.quadruple.all";
     public static final String XP_TRIPLE_ALL = "mcmmo.perks.xp.triple.all";

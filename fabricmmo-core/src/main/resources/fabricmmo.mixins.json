@@ -24,7 +24,8 @@
     "AbstractBlockStateMixin",
     "BoneMealItemMixin",
     "WorldNaturalGrowthMixin",
-    "ItemEntityMixin"
+    "ItemEntityMixin",
+    "FishingBobberEntityMixin"
   ],
   "injectors": {
     "defaultRequire": 1

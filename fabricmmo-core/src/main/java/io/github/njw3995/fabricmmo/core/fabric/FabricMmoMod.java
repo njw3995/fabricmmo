@@ -10,6 +10,8 @@ import io.github.njw3995.fabricmmo.core.skill.herbalism.HerbalismAbilityHandler;
 import io.github.njw3995.fabricmmo.core.skill.herbalism.HerbalismBlockBreakHandler;
 import io.github.njw3995.fabricmmo.core.skill.herbalism.HerbalismFoodHandler;
 import io.github.njw3995.fabricmmo.core.skill.herbalism.HerbalismInteractionHandler;
+import io.github.njw3995.fabricmmo.core.skill.fishing.FishingFoodHandler;
+import io.github.njw3995.fabricmmo.core.skill.fishing.FishingRuntimeHandler;
 import io.github.njw3995.fabricmmo.core.skill.mining.MiningAbilityHandler;
 import io.github.njw3995.fabricmmo.core.skill.mining.MiningBlastHandler;
 import io.github.njw3995.fabricmmo.core.skill.mining.MiningBlockBreakHandler;
@@ -45,6 +47,7 @@ public final class FabricMmoMod implements ModInitializer {
         HerbalismAbilityHandler.register();
         HerbalismInteractionHandler.register();
         HerbalismFoodHandler.register();
+        FishingFoodHandler.register();
         SharedChatHandler.register(permissions);
         ServerTickEvents.END_SERVER_TICK.register(SharedServerSystems::tick);
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
@@ -52,8 +55,10 @@ public final class FabricMmoMod implements ModInitializer {
                 SharedServerSystems.playerJoined(handler.player);
             }
         });
-        ServerPlayConnectionEvents.DISCONNECT.register((handler, server) ->
-                SharedServerSystems.playerDisconnected(handler.player));
+        ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> {
+            FishingRuntimeHandler.playerDisconnected(handler.player.getUuid());
+            SharedServerSystems.playerDisconnected(handler.player);
+        });
         ServerLivingEntityEvents.ALLOW_DAMAGE.register((entity, source, amount) -> {
             if (entity instanceof ServerPlayerEntity player) {
                 boolean godMode = SharedServerSystems.godMode(player.getUuid());

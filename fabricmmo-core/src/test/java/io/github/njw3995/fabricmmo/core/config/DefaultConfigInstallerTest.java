@@ -50,4 +50,20 @@ class DefaultConfigInstallerTest {
                     Coal_Ore: 9999
                 """, Files.readString(directory.resolve("experience.yml.pre-update.bak")));
     }
+
+    @Test
+    void replacesLegacyEmptyFishingTreasurePlaceholderWithBackup(@TempDir Path directory)
+            throws Exception {
+        Path fishingTreasures = directory.resolve("fishing_treasures.yml");
+        Files.writeString(fishingTreasures, "{}\n");
+
+        DefaultConfigInstaller.installMissingDefaults(directory);
+
+        String installed = Files.readString(fishingTreasures);
+        assertTrue(installed.contains("Fishing:"));
+        assertTrue(installed.contains("Item_Drop_Rates:"));
+        assertTrue(installed.contains("Shake:"));
+        assertEquals("{}\n", Files.readString(
+                directory.resolve("fishing_treasures.yml.pre-update.bak")));
+    }
 }

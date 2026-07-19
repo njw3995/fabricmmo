@@ -18,6 +18,37 @@ Skills:
           CapLevel: 1000
           IncreaseLevel: 50
       EnchantBuff: 5
+  Fishing:
+    ShakeChance:
+      Rank_1: 15.0
+      Rank_2: 20.0
+      Rank_3: 25.0
+      Rank_4: 35.0
+      Rank_5: 45.0
+      Rank_6: 55.0
+      Rank_7: 65.0
+      Rank_8: 75.0
+    VanillaXPMultiplier:
+      Rank_1: 1
+      Rank_2: 2
+      Rank_3: 3
+      Rank_4: 3
+      Rank_5: 4
+      Rank_6: 4
+      Rank_7: 5
+      Rank_8: 5
+    FishermansDiet:
+      RankChange: 20
+    MasterAngler:
+      Boat_Tick_Reduction:
+        Min_Wait: 10
+        Max_Wait: 30
+      Tick_Reduction_Per_Rank:
+        Min_Wait: 10
+        Max_Wait: 30
+      Tick_Reduction_Caps:
+        Min_Wait: 40
+        Max_Wait: 100
   Herbalism:
     GreenThumb:
       ChanceMax: 100.0

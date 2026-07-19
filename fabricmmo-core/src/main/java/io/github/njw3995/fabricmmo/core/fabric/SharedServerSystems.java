@@ -49,6 +49,9 @@ import io.github.njw3995.fabricmmo.core.skill.herbalism.CoreHerbalismAbilities;
 import io.github.njw3995.fabricmmo.core.skill.herbalism.HerbalismAbilityController;
 import io.github.njw3995.fabricmmo.core.skill.herbalism.HerbalismDropSettings;
 import io.github.njw3995.fabricmmo.core.skill.herbalism.HerbalismPanelMechanicsProvider;
+import io.github.njw3995.fabricmmo.core.skill.fishing.FishingPanelMechanicsProvider;
+import io.github.njw3995.fabricmmo.core.skill.fishing.FishingSettings;
+import io.github.njw3995.fabricmmo.core.skill.fishing.FishingTreasureTable;
 import io.github.njw3995.fabricmmo.core.skill.herbalism.HerbalismSettings;
 import io.github.njw3995.fabricmmo.core.skill.mining.CoreMiningAbilities;
 import io.github.njw3995.fabricmmo.core.skill.mining.MiningAbilityController;
@@ -116,7 +119,9 @@ public final class SharedServerSystems {
             ExcavationSettings excavationSettings,
             HerbalismAbilityController herbalismAbilities,
             HerbalismSettings herbalismSettings,
-            HerbalismDropSettings herbalismDropSettings) throws IOException {
+            HerbalismDropSettings herbalismDropSettings,
+            FishingSettings fishingSettings,
+            FishingTreasureTable fishingTreasures) throws IOException {
         if (state != null) {
             throw new IllegalStateException("Shared FabricMMO systems already active");
         }
@@ -194,6 +199,9 @@ public final class SharedServerSystems {
         skillPanelMechanics.register(
                 CoreSkills.HERBALISM,
                 new HerbalismPanelMechanicsProvider(server, herbalismSettings, locale));
+        skillPanelMechanics.register(
+                CoreSkills.FISHING,
+                new FishingPanelMechanicsProvider(server, fishingSettings, fishingTreasures, locale));
         DebugDiagnosticsService diagnostics = new DebugDiagnosticsService(server, sessions);
         ProgressionMaintenanceService maintenance = new ProgressionMaintenanceService(
                 progressionStore, playerDataDirectory, mySqlSettings, Clock.systemUTC());

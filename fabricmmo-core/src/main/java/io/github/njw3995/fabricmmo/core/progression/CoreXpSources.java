@@ -24,6 +24,10 @@ public final class CoreXpSources {
             NamespacedId.parse("fabricmmo:herbalism_berry_harvest");
     public static final NamespacedId HERBALISM_HYLIAN_LUCK =
             NamespacedId.parse("fabricmmo:herbalism_hylian_luck");
+    public static final NamespacedId FISHING_CATCH =
+            NamespacedId.parse("fabricmmo:fishing_catch");
+    public static final NamespacedId FISHING_SHAKE =
+            NamespacedId.parse("fabricmmo:fishing_shake");
 
     private CoreXpSources() {
     }
@@ -65,6 +69,14 @@ public final class CoreXpSources {
                 HERBALISM_HYLIAN_LUCK,
                 CoreSkills.HERBALISM,
                 Map.of("upstream", "HerbalismManager#processHylianLuck")));
+        registrar.registerXpSource(new XpSourceDefinition(
+                FISHING_CATCH,
+                CoreSkills.FISHING,
+                Map.of("upstream", "FishingManager#processFishing")));
+        registrar.registerXpSource(new XpSourceDefinition(
+                FISHING_SHAKE,
+                CoreSkills.FISHING,
+                Map.of("upstream", "FishingManager#shakeCheck")));
     }
 
     public static void registerCommandSources(

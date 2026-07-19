@@ -44,6 +44,12 @@ import io.github.njw3995.fabricmmo.core.skill.mining.MiningSettings;
 import io.github.njw3995.fabricmmo.core.skill.mining.PropertiesMiningAbilityStore;
 import io.github.njw3995.fabricmmo.core.skill.mining.MiningXpTable;
 import io.github.njw3995.fabricmmo.core.skill.gathering.ConfiguredBlockXpTable;
+import io.github.njw3995.fabricmmo.core.skill.fishing.FishingAntiExploitTracker;
+import io.github.njw3995.fabricmmo.core.skill.fishing.FishingFoodHandler;
+import io.github.njw3995.fabricmmo.core.skill.fishing.FishingRuntimeHandler;
+import io.github.njw3995.fabricmmo.core.skill.fishing.FishingSettings;
+import io.github.njw3995.fabricmmo.core.skill.fishing.FishingTreasureTable;
+import io.github.njw3995.fabricmmo.core.skill.fishing.FishingXpTable;
 import io.github.njw3995.fabricmmo.core.skill.woodcutting.CoreWoodcuttingAbilities;
 import io.github.njw3995.fabricmmo.core.skill.woodcutting.PropertiesWoodcuttingAbilityStore;
 import io.github.njw3995.fabricmmo.core.skill.woodcutting.WoodcuttingAbilityController;
@@ -87,6 +93,10 @@ public final class FabricMmoFabricRuntime {
     private static HerbalismSettings herbalismSettings;
     private static HerbalismHylianTreasureTable herbalismTreasures;
     private static HerbalismAbilityController herbalismAbilityController;
+    private static FishingXpTable fishingXpTable;
+    private static FishingSettings fishingSettings;
+    private static FishingTreasureTable fishingTreasures;
+    private static FishingAntiExploitTracker fishingAntiExploit;
     private static Path serverWorldRoot;
     private static WorldBlacklist worldBlacklist;
     private static ProgressionSettings progressionSettings;
@@ -113,6 +123,7 @@ public final class FabricMmoFabricRuntime {
         Path advancedFile = configDirectory.resolve("advanced.yml");
         Path skillRanksFile = configDirectory.resolve("skillranks.yml");
         Path treasuresFile = configDirectory.resolve("treasures.yml");
+        Path fishingTreasuresFile = configDirectory.resolve("fishing_treasures.yml");
         Path persistentDataFile = configDirectory.resolve("persistent_data.yml");
         Path worldBlacklistFile = configDirectory.resolve("world_blacklist.txt");
 
@@ -151,6 +162,13 @@ public final class FabricMmoFabricRuntime {
                     configFile, advancedFile, skillRanksFile, experienceFile);
             HerbalismHylianTreasureTable newHerbalismTreasures =
                     HerbalismHylianTreasureTable.load(treasuresFile);
+            FishingXpTable newFishingXpTable = FishingXpTable.load(experienceFile);
+            FishingSettings newFishingSettings = FishingSettings.load(
+                    configFile, advancedFile, skillRanksFile, experienceFile);
+            FishingTreasureTable newFishingTreasures = FishingTreasureTable.load(
+                    fishingTreasuresFile);
+            FishingAntiExploitTracker newFishingAntiExploit = new FishingAntiExploitTracker(
+                    newFishingSettings.exploitMoveRange(), newFishingSettings.overFishLimit());
             newAbilityController = new MiningAbilityController(
                     new PropertiesMiningAbilityStore(miningAbilityDirectory), Clock.systemUTC());
             newWoodcuttingAbilityController = new WoodcuttingAbilityController(
@@ -216,7 +234,9 @@ public final class FabricMmoFabricRuntime {
                     newExcavationSettings,
                     newHerbalismAbilityController,
                     newHerbalismSettings,
-                    newHerbalismDropSettings);
+                    newHerbalismDropSettings,
+                    newFishingSettings,
+                    newFishingTreasures);
             runtime = newRuntime;
             miningXpTable = newXpTable;
             miningDropSettings = newDropSettings;
@@ -236,6 +256,10 @@ public final class FabricMmoFabricRuntime {
             herbalismSettings = newHerbalismSettings;
             herbalismTreasures = newHerbalismTreasures;
             herbalismAbilityController = newHerbalismAbilityController;
+            fishingXpTable = newFishingXpTable;
+            fishingSettings = newFishingSettings;
+            fishingTreasures = newFishingTreasures;
+            fishingAntiExploit = newFishingAntiExploit;
             serverWorldRoot = worldRoot;
             worldBlacklist = newWorldBlacklist;
             FabricMmoFabricRuntime.progressionSettings = progressionSettings;
@@ -503,6 +527,34 @@ public final class FabricMmoFabricRuntime {
         }
     }
 
+    public static synchronized FishingXpTable fishingXpTable() {
+        if (fishingXpTable == null) {
+            throw new IllegalStateException("FabricMMO Fishing XP configuration is not active");
+        }
+        return fishingXpTable;
+    }
+
+    public static synchronized FishingSettings fishingSettings() {
+        if (fishingSettings == null) {
+            throw new IllegalStateException("FabricMMO Fishing settings are not active");
+        }
+        return fishingSettings;
+    }
+
+    public static synchronized FishingTreasureTable fishingTreasures() {
+        if (fishingTreasures == null) {
+            throw new IllegalStateException("FabricMMO Fishing treasures are not active");
+        }
+        return fishingTreasures;
+    }
+
+    public static synchronized FishingAntiExploitTracker fishingAntiExploit() {
+        if (fishingAntiExploit == null) {
+            throw new IllegalStateException("FabricMMO Fishing anti-exploit state is not active");
+        }
+        return fishingAntiExploit;
+    }
+
     public static synchronized boolean isWorldBlacklisted(ServerWorld world) {
         return worldBlacklist != null && worldBlacklist.isBlacklisted(world);
     }
@@ -584,6 +636,8 @@ public final class FabricMmoFabricRuntime {
         HerbalismBlockBreakHandler.reset();
         HerbalismInteractionHandler.reset();
         HerbalismFoodHandler.reset();
+        FishingFoodHandler.reset();
+        FishingRuntimeHandler.reset();
         runtime = null;
         miningXpTable = null;
         miningDropSettings = null;
@@ -603,6 +657,10 @@ public final class FabricMmoFabricRuntime {
         herbalismSettings = null;
         herbalismTreasures = null;
         herbalismAbilityController = null;
+        fishingXpTable = null;
+        fishingSettings = null;
+        fishingTreasures = null;
+        fishingAntiExploit = null;
         serverWorldRoot = null;
         worldBlacklist = null;
         progressionSettings = null;
