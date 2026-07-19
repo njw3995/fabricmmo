@@ -79,3 +79,17 @@ Skills:
         Rank_6: 3.0
         Rank_7: 4.0
         Rank_8: 4.0
+  Woodcutting:
+    TreeFeller:
+      Knock_On_Wood:
+        Add_XP_Orbs_To_Drops: true
+    CleanCuts:
+      ChanceMax: 50.0
+      MaxBonusLevel:
+        Standard: 1000
+        RetroMode: 10000
+    HarvestLumber:
+      ChanceMax: 100.0
+      MaxBonusLevel:
+        Standard: 100
+        RetroMode: 1000

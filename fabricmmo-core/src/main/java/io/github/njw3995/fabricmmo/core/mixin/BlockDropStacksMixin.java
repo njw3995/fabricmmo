@@ -1,6 +1,7 @@
 package io.github.njw3995.fabricmmo.core.mixin;
 
 import io.github.njw3995.fabricmmo.core.skill.mining.MiningBonusDropHandler;
+import io.github.njw3995.fabricmmo.core.skill.woodcutting.WoodcuttingBonusDropHandler;
 import java.util.List;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -28,7 +29,7 @@ abstract class BlockDropStacksMixin {
                             + "Lnet/minecraft/block/entity/BlockEntity;"
                             + "Lnet/minecraft/entity/Entity;"
                             + "Lnet/minecraft/item/ItemStack;)Ljava/util/List;"))
-    private static List<ItemStack> fabricmmo$applyMiningBonusDrops(
+    private static List<ItemStack> fabricmmo$applySkillBonusDrops(
             BlockState state,
             ServerWorld serverWorld,
             BlockPos pos,
@@ -37,7 +38,9 @@ abstract class BlockDropStacksMixin {
             ItemStack tool) {
         List<ItemStack> drops = Block.getDroppedStacks(
                 state, serverWorld, pos, blockEntity, entity, tool);
-        return MiningBonusDropHandler.apply(
+        List<ItemStack> miningDrops = MiningBonusDropHandler.apply(
                 state, serverWorld, pos, blockEntity, entity, tool, drops);
+        return WoodcuttingBonusDropHandler.apply(
+                state, serverWorld, pos, blockEntity, entity, tool, miningDrops);
     }
 }

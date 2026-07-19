@@ -38,7 +38,10 @@ class CoreXpSourcesTest {
 
         assertTrue(sources.find(CoreXpSources.MINING_BLOCK_BREAK).isPresent());
         assertTrue(sources.find(CoreXpSources.MINING_BLAST).isPresent());
-        assertEquals(2, sources.sources().size());
+        long miningSources = sources.sources().stream()
+                .filter(source -> source.skillId().equals(CoreSkills.MINING))
+                .count();
+        assertEquals(2, miningSources);
     }
 
 }

@@ -14,9 +14,13 @@ Abilities:
   Cooldowns:
     Blast_Mining: 60
     Super_Breaker: 240
+    Tree_Feller: 240
   Max_Seconds:
     Blast_Mining: 0
     Super_Breaker: 0
+    Tree_Feller: 0
+  Limits:
+    Tree_Feller_Threshold: 1000
   Tools:
     Durability_Loss: 1
 Skills:
@@ -57,6 +61,7 @@ Skills:
     Level_Cap: 0
   Woodcutting:
     Level_Cap: 0
+    Tree_Feller_Sounds: true
 Bonus_Drops:
   Mining:
     Tuff: true
@@ -128,6 +133,32 @@ Bonus_Drops:
     Raw_Copper: true
     Raw_Iron: true
     Raw_Gold: true
+  Woodcutting:
+    Crimson_Hyphae: true
+    Warped_Hyphae: true
+    Stripped_Crimson_Hyphae: true
+    Stripped_Warped_Hyphae: true
+    Shroomlight: true
+    Crimson_Stem: true
+    Warped_Stem: true
+    Crimson_Roots: true
+    Warped_Roots: true
+    Acacia_Wood: true
+    Acacia_Log: true
+    Birch_Wood: true
+    Birch_Log: true
+    Cherry_Wood: true
+    Cherry_Log: true
+    Dark_Oak_Wood: true
+    Dark_Oak_Log: true
+    Oak_Wood: true
+    Oak_Log: true
+    Jungle_Wood: true
+    Jungle_Log: true
+    Spruce_Wood: true
+    Spruce_Log: true
+    Mangrove_Wood: true
+    Mangrove_Log: true
 
 # Shared mcMMO 2.3.000 command, party, scoreboard, and storage defaults.
 Party:

@@ -99,21 +99,21 @@ final class InformationCommands {
                 .requires(source -> permissions.hasPermission(source, "mcmmo.commands." + skill, true))
                 .executes(context -> showSkill(context.getSource(), skill));
         root.then(CommandManager.literal("?")
-                .executes(context -> guide(context.getSource(), skill, 1))
+                .executes(context -> showSkillGuide(context.getSource(), skill, 1))
                 .then(CommandManager.argument("page", IntegerArgumentType.integer(1))
-                        .executes(context -> guide(context.getSource(), skill,
+                        .executes(context -> showSkillGuide(context.getSource(), skill,
                                 IntegerArgumentType.getInteger(context, "page")))));
         root.then(CommandManager.literal("keep")
                 .executes(context -> keepSkillBoard(context.getSource(), skill)));
         root.then(CommandManager.literal("help")
-                .executes(context -> guide(context.getSource(), skill, 1))
+                .executes(context -> showSkillGuide(context.getSource(), skill, 1))
                 .then(CommandManager.argument("page", IntegerArgumentType.integer(1))
-                        .executes(context -> guide(context.getSource(), skill,
+                        .executes(context -> showSkillGuide(context.getSource(), skill,
                                 IntegerArgumentType.getInteger(context, "page")))));
         dispatcher.register(root);
     }
 
-    private static int keepSkillBoard(ServerCommandSource source, String skillName) {
+    static int keepSkillBoard(ServerCommandSource source, String skillName) {
         if (!(source.getEntity() instanceof ServerPlayerEntity player)) {
             return SharedCommandUtil.error(source, "This command requires a player.");
         }
@@ -138,7 +138,7 @@ final class InformationCommands {
                 LegacyText.strip(systems.locale().text("Commands.Scoreboard.Keep")));
     }
 
-    private static int showSkill(ServerCommandSource source, String skillName) {
+    static int showSkill(ServerCommandSource source, String skillName) {
         ServerPlayerEntity player;
         try { player = source.getPlayerOrThrow(); }
         catch (Exception exception) { return SharedCommandUtil.error(source, "This command requires a player."); }
@@ -152,7 +152,7 @@ final class InformationCommands {
         return 1;
     }
 
-    private static int guide(ServerCommandSource source, String skill, int page) {
+    static int showSkillGuide(ServerCommandSource source, String skill, int page) {
         List<String> lines = SharedServerSystems.require().guides().guide(skill);
         int perPage = 7;
         int pages = Math.max(1, (lines.size() + perPage - 1) / perPage);

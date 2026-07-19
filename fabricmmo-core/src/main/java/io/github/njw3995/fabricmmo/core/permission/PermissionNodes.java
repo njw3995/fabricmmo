@@ -30,6 +30,19 @@ public final class PermissionNodes {
     public static final String MINING_DOUBLE_DROPS = "mcmmo.ability.mining.doubledrops";
     public static final String MINING_MOTHER_LODE = "mcmmo.ability.mining.motherlode";
     public static final String MINING_LUCKY = "mcmmo.perks.lucky.mining";
+    public static final String WOODCUTTING = "mcmmo.skills.woodcutting";
+    public static final String WOODCUTTING_COMMAND = "mcmmo.commands.woodcutting";
+    public static final String WOODCUTTING_TREE_FELLER =
+            "mcmmo.ability.woodcutting.treefeller";
+    public static final String WOODCUTTING_HARVEST_LUMBER =
+            "mcmmo.ability.woodcutting.harvestlumber";
+    public static final String WOODCUTTING_CLEAN_CUTS =
+            "mcmmo.ability.woodcutting.cleancuts";
+    public static final String WOODCUTTING_KNOCK_ON_WOOD =
+            "mcmmo.ability.woodcutting.knockonwood";
+    public static final String WOODCUTTING_LEAF_BLOWER =
+            "mcmmo.ability.woodcutting.leafblower";
+    public static final String WOODCUTTING_LUCKY = "mcmmo.perks.lucky.woodcutting";
     public static final String XP_CUSTOM_ALL = "mcmmo.perks.xp.customboost.all";
     public static final String XP_QUADRUPLE_ALL = "mcmmo.perks.xp.quadruple.all";
     public static final String XP_TRIPLE_ALL = "mcmmo.perks.xp.triple.all";

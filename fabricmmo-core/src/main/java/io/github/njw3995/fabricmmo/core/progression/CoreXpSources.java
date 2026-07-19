@@ -10,6 +10,10 @@ import java.util.Map;
 public final class CoreXpSources {
     public static final NamespacedId MINING_BLOCK_BREAK = NamespacedId.parse("fabricmmo:mining_block_break");
     public static final NamespacedId MINING_BLAST = NamespacedId.parse("fabricmmo:mining_blast");
+    public static final NamespacedId WOODCUTTING_BLOCK_BREAK =
+            NamespacedId.parse("fabricmmo:woodcutting_block_break");
+    public static final NamespacedId WOODCUTTING_TREE_FELLER =
+            NamespacedId.parse("fabricmmo:woodcutting_tree_feller");
 
     private CoreXpSources() {
     }
@@ -23,6 +27,14 @@ public final class CoreXpSources {
                 MINING_BLAST,
                 CoreSkills.MINING,
                 Map.of("upstream", "MiningManager#blastMiningDropProcessing")));
+        registrar.registerXpSource(new XpSourceDefinition(
+                WOODCUTTING_BLOCK_BREAK,
+                CoreSkills.WOODCUTTING,
+                Map.of("upstream", "WoodcuttingManager#processWoodcuttingBlock")));
+        registrar.registerXpSource(new XpSourceDefinition(
+                WOODCUTTING_TREE_FELLER,
+                CoreSkills.WOODCUTTING,
+                Map.of("upstream", "WoodcuttingManager#processTreeFeller")));
     }
 
     public static void registerCommandSources(

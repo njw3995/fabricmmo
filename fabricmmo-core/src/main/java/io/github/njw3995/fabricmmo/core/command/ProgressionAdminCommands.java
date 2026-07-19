@@ -43,61 +43,92 @@ public final class ProgressionAdminCommands {
                         || permissions.hasPermission(source, operation.others, 2))
                 .executes(context -> GenericCommandHelp.show(
                         dispatcher, operation.literal, context.getSource()))
-                .then(CommandManager.argument("skill", StringArgumentType.word())
-                        .requires(source -> permissions.hasPermission(
-                                source, operation.self, 2))
-                        .suggests((context, builder) -> CommandSource.suggestMatching(
-                                SharedCommandUtil.skills(true), builder))
-                        .then(CommandManager.argument(
-                                        valueArgument, IntegerArgumentType.integer())
-                                .executes(context -> applySelf(
+                .then(CommandManager.argument("targetOrSkill", StringArgumentType.word())
+                        .suggests((context, builder) -> suggestFirstArgument(
+                                context.getSource(), builder, permissions, operation))
+                        .then(CommandManager.argument("skillOrValue", StringArgumentType.word())
+                                .suggests((context, builder) -> suggestSecondArgument(
+                                        context.getSource(),
+                                        builder,
+                                        StringArgumentType.getString(context, "targetOrSkill"),
+                                        permissions,
+                                        operation))
+                                .executes(context -> applySelfFromContext(
                                         context.getSource(),
                                         operation,
-                                        StringArgumentType.getString(context, "skill"),
-                                        IntegerArgumentType.getInteger(
-                                                context, valueArgument),
+                                        StringArgumentType.getString(context, "targetOrSkill"),
+                                        StringArgumentType.getString(context, "skillOrValue"),
                                         false))
                                 .then(CommandManager.literal(SILENT)
-                                        .executes(context -> applySelf(
+                                        .executes(context -> applySelfFromContext(
                                                 context.getSource(),
                                                 operation,
-                                                StringArgumentType.getString(
-                                                        context, "skill"),
-                                                IntegerArgumentType.getInteger(
-                                                        context, valueArgument),
-                                                true)))))
-                .then(CommandManager.argument("player", StringArgumentType.word())
-                        .requires(source -> permissions.hasPermission(
-                                source, operation.others, 2))
-                        .suggests((context, builder) -> suggestPlayers(
-                                context.getSource(), builder))
-                        .then(CommandManager.argument("skill", StringArgumentType.word())
-                                .suggests((context, builder) -> CommandSource.suggestMatching(
-                                        SharedCommandUtil.skills(true), builder))
-                                .then(CommandManager.argument(
-                                                valueArgument,
-                                                IntegerArgumentType.integer())
+                                                StringArgumentType.getString(context, "targetOrSkill"),
+                                                StringArgumentType.getString(context, "skillOrValue"),
+                                                true)))
+                                .then(CommandManager.argument(valueArgument, IntegerArgumentType.integer())
+                                        .requires(source -> permissions.hasPermission(
+                                                source, operation.others, 2))
                                         .executes(context -> applyOther(
                                                 context.getSource(),
                                                 operation,
-                                                StringArgumentType.getString(
-                                                        context, "player"),
-                                                StringArgumentType.getString(
-                                                        context, "skill"),
-                                                IntegerArgumentType.getInteger(
-                                                        context, valueArgument),
+                                                StringArgumentType.getString(context, "targetOrSkill"),
+                                                StringArgumentType.getString(context, "skillOrValue"),
+                                                IntegerArgumentType.getInteger(context, valueArgument),
                                                 false))
                                         .then(CommandManager.literal(SILENT)
                                                 .executes(context -> applyOther(
                                                         context.getSource(),
                                                         operation,
-                                                        StringArgumentType.getString(
-                                                                context, "player"),
-                                                        StringArgumentType.getString(
-                                                                context, "skill"),
-                                                        IntegerArgumentType.getInteger(
-                                                                context, valueArgument),
+                                                        StringArgumentType.getString(context, "targetOrSkill"),
+                                                        StringArgumentType.getString(context, "skillOrValue"),
+                                                        IntegerArgumentType.getInteger(context, valueArgument),
                                                         true)))))));
+    }
+
+    private static CompletableFuture<Suggestions> suggestFirstArgument(
+            ServerCommandSource source,
+            SuggestionsBuilder builder,
+            CommandPermissionService permissions,
+            Operation operation) {
+        LinkedHashSet<String> suggestions = new LinkedHashSet<>();
+        if (permissions.hasPermission(source, operation.self, 2)) {
+            suggestions.addAll(SharedCommandUtil.skills(true));
+        }
+        if (permissions.hasPermission(source, operation.others, 2)) {
+            suggestions.addAll(source.getPlayerNames());
+            suggestions.addAll(SharedCommandUtil.systems().identities().identities().values());
+        }
+        return CommandSource.suggestMatching(suggestions, builder);
+    }
+
+    private static CompletableFuture<Suggestions> suggestSecondArgument(
+            ServerCommandSource source,
+            SuggestionsBuilder builder,
+            String firstArgument,
+            CommandPermissionService permissions,
+            Operation operation) {
+        if (permissions.hasPermission(source, operation.others, 2)
+                && SharedCommandUtil.playerId(source, firstArgument).isPresent()) {
+            return CommandSource.suggestMatching(SharedCommandUtil.skills(true), builder);
+        }
+        return builder.buildFuture();
+    }
+
+    private static int applySelfFromContext(
+            ServerCommandSource source,
+            Operation operation,
+            String skill,
+            String rawValue,
+            boolean silent) {
+        int value;
+        try {
+            value = Integer.parseInt(rawValue);
+        } catch (NumberFormatException exception) {
+            return SharedCommandUtil.error(source,
+                    "Expected a whole number for " + operation.valueName + ".");
+        }
+        return applySelf(source, operation, skill, value, silent);
     }
 
     private static void registerReset(
@@ -253,17 +284,19 @@ public final class ProgressionAdminCommands {
     }
 
     private enum Operation {
-        ADD("addlevels", PermissionNodes.ADD_LEVELS, PermissionNodes.ADD_LEVELS_OTHERS),
-        SET("mmoedit", PermissionNodes.MMO_EDIT, PermissionNodes.MMO_EDIT_OTHERS);
+        ADD("addlevels", PermissionNodes.ADD_LEVELS, PermissionNodes.ADD_LEVELS_OTHERS, "levels"),
+        SET("mmoedit", PermissionNodes.MMO_EDIT, PermissionNodes.MMO_EDIT_OTHERS, "level");
 
         private final String literal;
         private final String self;
         private final String others;
+        private final String valueName;
 
-        Operation(String literal, String self, String others) {
+        Operation(String literal, String self, String others, String valueName) {
             this.literal = literal;
             this.self = self;
             this.others = others;
+            this.valueName = valueName;
         }
     }
 }

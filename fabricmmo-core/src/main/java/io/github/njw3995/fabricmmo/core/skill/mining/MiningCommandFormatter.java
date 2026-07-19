@@ -46,22 +46,7 @@ public final class MiningCommandFormatter {
         return List.copyOf(lines);
     }
 
-    public static List<String> guide() {
-        return List.of(
-                "About Mining:",
-                "Mining consists of mining stone and ores. It provides bonuses to the amount of materials dropped while mining.",
-                "XP GAIN: To gain XP, mine configured Mining blocks with a pickaxe or hoe. Only configured blocks award XP.",
-                "Compatible Materials:",
-                "Stone and configured ores, minerals, deepslate variants, Nether materials, End materials, and other entries in experience.yml.",
-                "How to use Super Breaker:",
-                "With a pickaxe in your hand, right-click to ready your tool. You then have about 4 seconds to strike a Mining-compatible block.",
-                "What is Super Breaker?",
-                "Super Breaker has a Mining cooldown. It enhances breaking speed, increases tool wear, and upgrades Double Drops while active.",
-                "How to use Blast Mining:",
-                "With a pickaxe or configured detonator in hand, crouch and right-click TNT from within the configured range to detonate it instantly.",
-                "How does Blast Mining work?",
-                "Blast Mining has a Mining cooldown and grants TNT-mining bonuses. Bigger Bombs increases radius, Demolitions Expertise reduces your own TNT damage, and higher Blast Mining ranks improve ore yield.");
-    }
+
 
     private static String percent(double value) {
         return decimal(value) + '%';

@@ -7,6 +7,8 @@ import io.github.njw3995.fabricmmo.core.permission.FabricCommandPermissionServic
 import io.github.njw3995.fabricmmo.core.skill.mining.MiningAbilityHandler;
 import io.github.njw3995.fabricmmo.core.skill.mining.MiningBlastHandler;
 import io.github.njw3995.fabricmmo.core.skill.mining.MiningBlockBreakHandler;
+import io.github.njw3995.fabricmmo.core.skill.woodcutting.WoodcuttingAbilityHandler;
+import io.github.njw3995.fabricmmo.core.skill.woodcutting.WoodcuttingBlockBreakHandler;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Path;
@@ -29,6 +31,8 @@ public final class FabricMmoMod implements ModInitializer {
         MiningBlockBreakHandler.register();
         MiningBlastHandler.register();
         MiningAbilityHandler.register();
+        WoodcuttingBlockBreakHandler.register();
+        WoodcuttingAbilityHandler.register();
         SharedChatHandler.register(permissions);
         ServerTickEvents.END_SERVER_TICK.register(SharedServerSystems::tick);
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {

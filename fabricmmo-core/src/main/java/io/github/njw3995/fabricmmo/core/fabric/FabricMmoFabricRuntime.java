@@ -23,6 +23,15 @@ import io.github.njw3995.fabricmmo.core.skill.mining.MiningDropSettings;
 import io.github.njw3995.fabricmmo.core.skill.mining.MiningSettings;
 import io.github.njw3995.fabricmmo.core.skill.mining.PropertiesMiningAbilityStore;
 import io.github.njw3995.fabricmmo.core.skill.mining.MiningXpTable;
+import io.github.njw3995.fabricmmo.core.skill.gathering.ConfiguredBlockXpTable;
+import io.github.njw3995.fabricmmo.core.skill.woodcutting.CoreWoodcuttingAbilities;
+import io.github.njw3995.fabricmmo.core.skill.woodcutting.PropertiesWoodcuttingAbilityStore;
+import io.github.njw3995.fabricmmo.core.skill.woodcutting.WoodcuttingAbilityController;
+import io.github.njw3995.fabricmmo.core.skill.woodcutting.WoodcuttingAbilityHandler;
+import io.github.njw3995.fabricmmo.core.skill.woodcutting.WoodcuttingAbilityStateView;
+import io.github.njw3995.fabricmmo.core.skill.woodcutting.WoodcuttingDropSettings;
+import io.github.njw3995.fabricmmo.core.skill.woodcutting.WoodcuttingSettings;
+import io.github.njw3995.fabricmmo.core.skill.woodcutting.WoodcuttingXpDefaults;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Path;
@@ -45,6 +54,10 @@ public final class FabricMmoFabricRuntime {
     private static PlacedBlockTracker placedBlockTracker;
     private static MiningSettings miningSettings;
     private static MiningAbilityController miningAbilityController;
+    private static ConfiguredBlockXpTable woodcuttingXpTable;
+    private static WoodcuttingDropSettings woodcuttingDropSettings;
+    private static WoodcuttingSettings woodcuttingSettings;
+    private static WoodcuttingAbilityController woodcuttingAbilityController;
     private static Path serverWorldRoot;
     private static WorldBlacklist worldBlacklist;
     private static ProgressionSettings progressionSettings;
@@ -62,6 +75,7 @@ public final class FabricMmoFabricRuntime {
         Path playerDataDirectory = resolvePlayerDataDirectory(worldRoot);
         Path placedBlockDirectory = resolvePlacedBlockDirectory(worldRoot);
         Path miningAbilityDirectory = resolveMiningAbilityDirectory(worldRoot);
+        Path woodcuttingAbilityDirectory = resolveWoodcuttingAbilityDirectory(worldRoot);
         Path configDirectory = FabricLoader.getInstance().getConfigDir().resolve("fabricmmo");
         Path experienceFile = configDirectory.resolve("experience.yml");
         Path configFile = configDirectory.resolve("config.yml");
@@ -73,6 +87,7 @@ public final class FabricMmoFabricRuntime {
         FabricMmoServerRuntime newRuntime = null;
         PlacedBlockTracker newTracker = null;
         MiningAbilityController newAbilityController = null;
+        WoodcuttingAbilityController newWoodcuttingAbilityController = null;
         try {
             ProgressionSettings progressionSettings = ProgressionSettings.load(
                     configFile, experienceFile);
@@ -82,8 +97,18 @@ public final class FabricMmoFabricRuntime {
                     configFile, advancedFile, skillRanksFile);
             MiningSettings newMiningSettings = MiningSettings.load(
                     configFile, advancedFile, skillRanksFile, experienceFile);
+            ConfiguredBlockXpTable newWoodcuttingXpTable =
+                    ConfiguredBlockXpTable.load(
+                            experienceFile, "Woodcutting", WoodcuttingXpDefaults.values());
+            WoodcuttingDropSettings newWoodcuttingDropSettings = WoodcuttingDropSettings.load(
+                    configFile, advancedFile, skillRanksFile);
+            WoodcuttingSettings newWoodcuttingSettings = WoodcuttingSettings.load(
+                    configFile, advancedFile, skillRanksFile, experienceFile);
             newAbilityController = new MiningAbilityController(
                     new PropertiesMiningAbilityStore(miningAbilityDirectory), Clock.systemUTC());
+            newWoodcuttingAbilityController = new WoodcuttingAbilityController(
+                    new PropertiesWoodcuttingAbilityStore(woodcuttingAbilityDirectory),
+                    Clock.systemUTC());
             PlacedBlockSettings placedBlockSettings = PlacedBlockSettings.load(persistentDataFile);
             newTracker = placedBlockSettings.regionSystemEnabled()
                     ? new RegionPlacedBlockTracker(placedBlockDirectory)
@@ -107,6 +132,10 @@ public final class FabricMmoFabricRuntime {
                     CoreMiningAbilities.SUPER_BREAKER, miningAbilityStates);
             newRuntime.api().abilityPipeline().registerStateView(
                     CoreMiningAbilities.BLAST_MINING, miningAbilityStates);
+            WoodcuttingAbilityStateView woodcuttingAbilityStates = new WoodcuttingAbilityStateView(
+                    server, newWoodcuttingAbilityController, newWoodcuttingSettings);
+            newRuntime.api().abilityPipeline().registerStateView(
+                    CoreWoodcuttingAbilities.TREE_FELLER, woodcuttingAbilityStates);
             SharedServerSystems.start(
                     server,
                     worldRoot,
@@ -117,31 +146,42 @@ public final class FabricMmoFabricRuntime {
                     mySqlSettings,
                     progressionSettings,
                     newAbilityController,
-                    newMiningSettings);
+                    newMiningSettings,
+                    newDropSettings,
+                    newWoodcuttingAbilityController,
+                    newWoodcuttingSettings,
+                    newWoodcuttingDropSettings);
             runtime = newRuntime;
             miningXpTable = newXpTable;
             miningDropSettings = newDropSettings;
             placedBlockTracker = newTracker;
             miningSettings = newMiningSettings;
             miningAbilityController = newAbilityController;
+            woodcuttingXpTable = newWoodcuttingXpTable;
+            woodcuttingDropSettings = newWoodcuttingDropSettings;
+            woodcuttingSettings = newWoodcuttingSettings;
+            woodcuttingAbilityController = newWoodcuttingAbilityController;
             serverWorldRoot = worldRoot;
             worldBlacklist = newWorldBlacklist;
             FabricMmoFabricRuntime.progressionSettings = progressionSettings;
             playerSessionSettings = new PlayerSessionSettingsService();
             LOGGER.info(
-                    "Started with {} registered skills; player data directory: {}; placed-block directory: {}; Mining ability directory: {}",
+                    "Started with {} registered skills; player data directory: {}; placed-block directory: {}; Mining ability directory: {}; Woodcutting ability directory: {}",
                     runtime.api().skillRegistry().skills().size(),
                     playerDataDirectory,
                     placedBlockDirectory,
-                    miningAbilityDirectory);
+                    miningAbilityDirectory,
+                    woodcuttingAbilityDirectory);
         } catch (IOException exception) {
             closeAfterFailedStart(newRuntime, exception);
             closeAfterFailedStart(newAbilityController, exception);
+            closeAfterFailedStart(newWoodcuttingAbilityController, exception);
             closeAfterFailedStart(newTracker, exception);
             throw new UncheckedIOException("Unable to start FabricMMO persistence", exception);
         } catch (RuntimeException | Error exception) {
             closeAfterFailedStart(newRuntime, exception);
             closeAfterFailedStart(newAbilityController, exception);
+            closeAfterFailedStart(newWoodcuttingAbilityController, exception);
             closeAfterFailedStart(newTracker, exception);
             throw exception;
         }
@@ -168,6 +208,14 @@ public final class FabricMmoFabricRuntime {
         Objects.requireNonNull(worldRoot, "worldRoot");
         return worldRoot.resolve("fabricmmo")
                 .resolve("mining-abilities")
+                .toAbsolutePath()
+                .normalize();
+    }
+
+    static Path resolveWoodcuttingAbilityDirectory(Path worldRoot) {
+        Objects.requireNonNull(worldRoot, "worldRoot");
+        return worldRoot.resolve("fabricmmo")
+                .resolve("woodcutting-abilities")
                 .toAbsolutePath()
                 .normalize();
     }
@@ -230,6 +278,46 @@ public final class FabricMmoFabricRuntime {
         return miningXpTable.xpFor(blockId);
     }
 
+    public static synchronized ConfiguredBlockXpTable woodcuttingXpTable() {
+        if (woodcuttingXpTable == null) {
+            throw new IllegalStateException("FabricMMO Woodcutting XP configuration is not active");
+        }
+        return woodcuttingXpTable;
+    }
+
+    public static synchronized int woodcuttingXpFor(NamespacedId blockId) {
+        return woodcuttingXpTable().xpFor(blockId);
+    }
+
+    public static synchronized WoodcuttingDropSettings woodcuttingDropSettings() {
+        if (woodcuttingDropSettings == null) {
+            throw new IllegalStateException("FabricMMO Woodcutting drop configuration is not active");
+        }
+        return woodcuttingDropSettings;
+    }
+
+    public static synchronized WoodcuttingSettings woodcuttingSettings() {
+        if (woodcuttingSettings == null) {
+            throw new IllegalStateException("FabricMMO Woodcutting settings are not active");
+        }
+        return woodcuttingSettings;
+    }
+
+    public static synchronized WoodcuttingAbilityController woodcuttingAbilities() {
+        if (woodcuttingAbilityController == null) {
+            throw new IllegalStateException("FabricMMO Woodcutting ability runtime is not active");
+        }
+        return woodcuttingAbilityController;
+    }
+
+    public static synchronized boolean isTreeFellerActive(UUID playerId) {
+        try {
+            return woodcuttingAbilities().isActive(playerId);
+        } catch (IOException exception) {
+            throw new UncheckedIOException("Unable to read Woodcutting ability state", exception);
+        }
+    }
+
     public static synchronized boolean isWorldBlacklisted(ServerWorld world) {
         return worldBlacklist != null && worldBlacklist.isBlacklisted(world);
     }
@@ -286,21 +374,31 @@ public final class FabricMmoFabricRuntime {
     }
 
     public static synchronized void stop() {
-        if (runtime == null && placedBlockTracker == null && miningAbilityController == null) {
+        if (runtime == null
+                && placedBlockTracker == null
+                && miningAbilityController == null
+                && woodcuttingAbilityController == null) {
             return;
         }
         SharedServerSystems.stop();
         FabricMmoServerRuntime activeRuntime = runtime;
         PlacedBlockTracker activeTracker = placedBlockTracker;
         MiningAbilityController activeAbilityController = miningAbilityController;
+        WoodcuttingAbilityController activeWoodcuttingAbilityController =
+                woodcuttingAbilityController;
         MiningBlastRegistry.clear();
         MiningAbilityHandler.reset();
+        WoodcuttingAbilityHandler.reset();
         runtime = null;
         miningXpTable = null;
         miningDropSettings = null;
         placedBlockTracker = null;
         miningSettings = null;
         miningAbilityController = null;
+        woodcuttingXpTable = null;
+        woodcuttingDropSettings = null;
+        woodcuttingSettings = null;
+        woodcuttingAbilityController = null;
         serverWorldRoot = null;
         worldBlacklist = null;
         progressionSettings = null;
@@ -315,6 +413,17 @@ public final class FabricMmoFabricRuntime {
                 activeAbilityController.close();
             } catch (IOException exception) {
                 failure = exception;
+            }
+        }
+        if (activeWoodcuttingAbilityController != null) {
+            try {
+                activeWoodcuttingAbilityController.close();
+            } catch (IOException exception) {
+                if (failure == null) {
+                    failure = exception;
+                } else {
+                    failure.addSuppressed(exception);
+                }
             }
         }
         if (activeTracker != null) {

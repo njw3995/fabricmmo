@@ -17,6 +17,7 @@ import io.github.njw3995.fabricmmo.core.chat.ChatStateService;
 import io.github.njw3995.fabricmmo.core.command.StatsTextFormatter;
 import io.github.njw3995.fabricmmo.core.diagnostic.DebugDiagnosticsService;
 import io.github.njw3995.fabricmmo.core.info.SkillGuideCatalog;
+import io.github.njw3995.fabricmmo.core.info.SkillPanelMechanicsCatalog;
 import io.github.njw3995.fabricmmo.core.info.SkillPanelService;
 import io.github.njw3995.fabricmmo.core.leaderboard.LeaderboardService;
 import io.github.njw3995.fabricmmo.core.locale.LocaleService;
@@ -38,7 +39,14 @@ import io.github.njw3995.fabricmmo.core.session.PlayerSessionStateService;
 import io.github.njw3995.fabricmmo.core.skill.CoreSkills;
 import io.github.njw3995.fabricmmo.core.skill.mining.CoreMiningAbilities;
 import io.github.njw3995.fabricmmo.core.skill.mining.MiningAbilityController;
+import io.github.njw3995.fabricmmo.core.skill.mining.MiningDropSettings;
 import io.github.njw3995.fabricmmo.core.skill.mining.MiningSettings;
+import io.github.njw3995.fabricmmo.core.skill.mining.MiningPanelMechanicsProvider;
+import io.github.njw3995.fabricmmo.core.skill.woodcutting.CoreWoodcuttingAbilities;
+import io.github.njw3995.fabricmmo.core.skill.woodcutting.WoodcuttingAbilityController;
+import io.github.njw3995.fabricmmo.core.skill.woodcutting.WoodcuttingDropSettings;
+import io.github.njw3995.fabricmmo.core.skill.woodcutting.WoodcuttingPanelMechanicsProvider;
+import io.github.njw3995.fabricmmo.core.skill.woodcutting.WoodcuttingSettings;
 import io.github.njw3995.fabricmmo.core.teleport.PartyTeleportService;
 import io.github.njw3995.fabricmmo.core.ui.InMemoryPlayerUiSettingsStore;
 import io.github.njw3995.fabricmmo.core.ui.PlayerScoreboardService;
@@ -86,7 +94,11 @@ public final class SharedServerSystems {
             MySqlSettings mySqlSettings,
             ProgressionSettings progressionSettings,
             MiningAbilityController miningAbilities,
-            MiningSettings miningSettings) throws IOException {
+            MiningSettings miningSettings,
+            MiningDropSettings miningDropSettings,
+            WoodcuttingAbilityController woodcuttingAbilities,
+            WoodcuttingSettings woodcuttingSettings,
+            WoodcuttingDropSettings woodcuttingDropSettings) throws IOException {
         if (state != null) {
             throw new IllegalStateException("Shared FabricMMO systems already active");
         }
@@ -129,7 +141,16 @@ public final class SharedServerSystems {
                 scoreboardTips::timedBoardShown, uiConfiguration.rainbows());
         XpBossBarService xpBars = new XpBossBarService(
                 api, locale, progressionSettings, uiConfiguration);
-        AbilityCooldownService cooldowns = cooldowns(miningAbilities, miningSettings);
+        AbilityCooldownService cooldowns = cooldowns(
+                miningAbilities, miningSettings, woodcuttingAbilities, woodcuttingSettings);
+        SkillPanelMechanicsCatalog skillPanelMechanics = new SkillPanelMechanicsCatalog();
+        skillPanelMechanics.register(
+                CoreSkills.MINING,
+                new MiningPanelMechanicsProvider(server, miningSettings, miningDropSettings));
+        skillPanelMechanics.register(
+                CoreSkills.WOODCUTTING,
+                new WoodcuttingPanelMechanicsProvider(
+                        server, woodcuttingSettings, woodcuttingDropSettings));
         DebugDiagnosticsService diagnostics = new DebugDiagnosticsService(server, sessions);
         ProgressionMaintenanceService maintenance = new ProgressionMaintenanceService(
                 progressionStore, playerDataDirectory, mySqlSettings, Clock.systemUTC());
@@ -167,7 +188,7 @@ public final class SharedServerSystems {
                         CoreSkills.primarySkillIds().stream().sorted().toList()),
                 locale,
                 new SkillGuideCatalog(locale),
-                new SkillPanelService(api),
+                new SkillPanelService(api, skillPanelMechanics),
                 new ExperienceConversionService(
                         progressionStore,
                         progressionSettings,
@@ -204,7 +225,9 @@ public final class SharedServerSystems {
 
     private static AbilityCooldownService cooldowns(
             MiningAbilityController miningAbilities,
-            MiningSettings miningSettings) {
+            MiningSettings miningSettings,
+            WoodcuttingAbilityController woodcuttingAbilities,
+            WoodcuttingSettings woodcuttingSettings) {
         AbilityCooldownService cooldowns = new AbilityCooldownService();
         AbilityCooldownService.Provider miningProvider = new AbilityCooldownService.Provider() {
             @Override
@@ -241,6 +264,27 @@ public final class SharedServerSystems {
                 miningProvider.reset(playerId);
             }
         });
+        cooldowns.register(CoreWoodcuttingAbilities.TREE_FELLER,
+                new AbilityCooldownService.Provider() {
+                    @Override
+                    public int remainingSeconds(UUID playerId) {
+                        try {
+                            return woodcuttingAbilities.cooldownRemaining(
+                                    playerId, woodcuttingSettings.treeFellerCooldownSeconds());
+                        } catch (IOException exception) {
+                            throw new UncheckedIOException(exception);
+                        }
+                    }
+
+                    @Override
+                    public void reset(UUID playerId) {
+                        try {
+                            woodcuttingAbilities.reset(playerId);
+                        } catch (IOException exception) {
+                            throw new UncheckedIOException(exception);
+                        }
+                    }
+                });
         return cooldowns;
     }
 

@@ -30,10 +30,6 @@ public final class SkillPanelService {
 
     public Panel panel(UUID playerId, SkillDefinition skill) {
         var progress = api.progression().query(playerId, skill.id());
-        int power = api.progression().queryAll(playerId).entrySet().stream()
-                .filter(entry -> api.skillRegistry().find(entry.getKey())
-                        .map(definition -> !definition.childSkill()).orElse(false))
-                .mapToInt(entry -> entry.getValue().level()).sum();
         ArrayList<Text> chat = new ArrayList<>();
         ArrayList<Text> board = new ArrayList<>();
         String name = cap(skill.id().path());
@@ -50,19 +46,18 @@ public final class SkillPanelService {
             board.add(Text.literal("Level: " + progress.level()));
             board.add(Text.literal("Parents: " + parents));
         } else {
-            chat.add(Text.literal("Level: " + progress.level() + "  XP: " + progress.xp()
+            chat.add(Text.literal("XP GAIN: See /" + skill.id().path() + " ?")
+                    .formatted(Formatting.YELLOW));
+            chat.add(Text.literal(name + " Level: " + progress.level() + "  XP: " + progress.xp()
                     + "/" + progress.xpToNextLevel()).formatted(Formatting.GREEN));
             board.add(Text.literal("Level: " + progress.level()));
             board.add(Text.literal("XP: " + progress.xp() + "/" + progress.xpToNextLevel()));
         }
-        chat.add(Text.literal("Power Level: " + power + "  Category: " + skill.category())
-                .formatted(Formatting.YELLOW));
-        board.add(Text.literal("Power: " + power));
 
         List<SkillPanelMechanicsProvider.MechanicRow> mechanicRows =
                 mechanics.provider(skill.id()).rows(playerId, progress.level());
         if (!mechanicRows.isEmpty()) {
-            chat.add(Text.literal("Mechanics:").formatted(Formatting.GOLD));
+            chat.add(Text.literal("STATS").formatted(Formatting.GOLD));
             for (SkillPanelMechanicsProvider.MechanicRow row : mechanicRows) {
                 chat.add(Text.literal("  " + row.label() + ": ").formatted(Formatting.YELLOW)
                         .append(Text.literal(row.value()).formatted(Formatting.GRAY)));
@@ -76,7 +71,7 @@ public final class SkillPanelService {
                 .sorted(Comparator.comparing(SubSkillInfo::configName, String.CASE_INSENSITIVE_ORDER))
                 .toList();
         if (!subskills.isEmpty()) {
-            chat.add(Text.literal("Subskills:").formatted(Formatting.GOLD));
+            chat.add(Text.literal("SUBSKILLS").formatted(Formatting.GOLD));
             for (SubSkillInfo subskill : subskills) {
                 Text line = Text.literal("  " + subskill.configName()
                                 + (subskill.ranks() > 0 ? " (" + subskill.ranks() + " ranks)" : ""))

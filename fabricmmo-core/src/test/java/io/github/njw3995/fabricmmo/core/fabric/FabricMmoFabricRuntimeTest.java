@@ -13,14 +13,26 @@ class FabricMmoFabricRuntimeTest {
 
         Path players = FabricMmoFabricRuntime.resolvePlayerDataDirectory(worldRoot);
         Path placedBlocks = FabricMmoFabricRuntime.resolvePlacedBlockDirectory(worldRoot);
+        Path miningAbilities = FabricMmoFabricRuntime.resolveMiningAbilityDirectory(worldRoot);
+        Path woodcuttingAbilities =
+                FabricMmoFabricRuntime.resolveWoodcuttingAbilityDirectory(worldRoot);
 
         assertTrue(players.isAbsolute());
         assertTrue(placedBlocks.isAbsolute());
+        assertTrue(miningAbilities.isAbsolute());
+        assertTrue(woodcuttingAbilities.isAbsolute());
         assertEquals(
                 Path.of("world", "fabricmmo", "players").toAbsolutePath().normalize(),
                 players);
         assertEquals(
                 Path.of("world", "fabricmmo", "placed-blocks").toAbsolutePath().normalize(),
                 placedBlocks);
+        assertEquals(
+                Path.of("world", "fabricmmo", "mining-abilities").toAbsolutePath().normalize(),
+                miningAbilities);
+        assertEquals(
+                Path.of("world", "fabricmmo", "woodcutting-abilities")
+                        .toAbsolutePath().normalize(),
+                woodcuttingAbilities);
     }
 }

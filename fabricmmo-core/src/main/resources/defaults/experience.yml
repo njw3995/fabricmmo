@@ -5,6 +5,7 @@ EarlyGameBoost:
 ExploitFix:
   LavaStoneAndCobbleFarming: true
   PistonCheating: true
+  TreeFellerReducedXP: true
 Experience_Bars:
     # Turn this to false if you want to disable XP bars
     Enable: true
@@ -255,3 +256,50 @@ Experience_Values:
     Packed_Mud: 30
     Mud_Bricks: 40
     Dripstone_Block: 35
+  Woodcutting:
+    Crimson_Hyphae: 50
+    Stripped_Crimson_Hyphae: 50
+    Warped_Hyphae: 50
+    Stripped_Warped_Hyphae: 50
+    Nether_Wart_Block: 1
+    Warped_Wart_Block: 1
+    Shroomlight: 100
+    Crimson_Stem: 35
+    Warped_Stem: 35
+    Oak_Log: 70
+    Cherry_Log: 105
+    Spruce_Log: 80
+    Birch_Log: 90
+    Jungle_Log: 100
+    Acacia_Log: 90
+    Dark_Oak_Log: 90
+    Stripped_Oak_Log: 70
+    Stripped_Cherry_Log: 105
+    Stripped_Spruce_Log: 80
+    Stripped_Birch_Log: 90
+    Stripped_Jungle_Log: 100
+    Stripped_Acacia_Log: 90
+    Stripped_Dark_Oak_Log: 90
+    Stripped_Oak_Wood: 70
+    Stripped_Cherry_Wood: 70
+    Stripped_Spruce_Wood: 80
+    Stripped_Birch_Wood: 90
+    Stripped_Jungle_Wood: 100
+    Stripped_Acacia_Wood: 90
+    Stripped_Dark_Oak_Wood: 90
+    Stripped_Mangrove_Log: 110
+    Stripped_Crimson_Stem: 50
+    Stripped_Warped_Stem: 50
+    Oak_Wood: 70
+    Cherry_Wood: 105
+    Spruce_Wood: 70
+    Birch_Wood: 70
+    Jungle_Wood: 70
+    Acacia_Wood: 70
+    Dark_Oak_Wood: 70
+    Mangrove_Wood: 80
+    Mangrove_Log: 95
+    Mangrove_Roots: 10
+    Red_Mushroom_Block: 70
+    Brown_Mushroom_Block: 70
+    Mushroom_Stem: 80
