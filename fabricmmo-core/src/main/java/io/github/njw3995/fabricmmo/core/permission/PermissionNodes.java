@@ -50,6 +50,15 @@ public final class PermissionNodes {
     public static final String EXCAVATION_ARCHAEOLOGY =
             "mcmmo.ability.excavation.archaeology";
     public static final String EXCAVATION_LUCKY = "mcmmo.perks.lucky.excavation";
+    public static final String HERBALISM = "mcmmo.skills.herbalism";
+    public static final String HERBALISM_COMMAND = "mcmmo.commands.herbalism";
+    public static final String HERBALISM_GREEN_TERRA = "mcmmo.ability.herbalism.greenterra";
+    public static final String HERBALISM_DOUBLE_DROPS = "mcmmo.ability.herbalism.doubledrops";
+    public static final String HERBALISM_VERDANT_BOUNTY = "mcmmo.ability.herbalism.verdantbounty";
+    public static final String HERBALISM_FARMERS_DIET = "mcmmo.ability.herbalism.farmersdiet";
+    public static final String HERBALISM_HYLIAN_LUCK = "mcmmo.ability.herbalism.hylianluck";
+    public static final String HERBALISM_SHROOM_THUMB = "mcmmo.ability.herbalism.shroomthumb";
+    public static final String HERBALISM_LUCKY = "mcmmo.perks.lucky.herbalism";
     public static final String XP_CUSTOM_ALL = "mcmmo.perks.xp.customboost.all";
     public static final String XP_QUADRUPLE_ALL = "mcmmo.perks.xp.quadruple.all";
     public static final String XP_TRIPLE_ALL = "mcmmo.perks.xp.triple.all";
@@ -70,6 +79,16 @@ public final class PermissionNodes {
 
     public static String skill(String skillPath) {
         return "mcmmo.skills." + skillPath;
+    }
+
+    public static String herbalismGreenThumbBlock(String blockPath) {
+        return "mcmmo.ability.herbalism.greenthumb.blocks."
+                + blockPath.replace("_", "").toLowerCase(java.util.Locale.ROOT);
+    }
+
+    public static String herbalismGreenThumbPlant(String blockPath) {
+        return "mcmmo.ability.herbalism.greenthumb.plants."
+                + blockPath.replace("_", "").toLowerCase(java.util.Locale.ROOT);
     }
 
 

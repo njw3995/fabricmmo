@@ -18,6 +18,32 @@ Skills:
           CapLevel: 1000
           IncreaseLevel: 50
       EnchantBuff: 5
+  Herbalism:
+    GreenThumb:
+      ChanceMax: 100.0
+      MaxBonusLevel:
+        Standard: 100
+        RetroMode: 1000
+    DoubleDrops:
+      ChanceMax: 100.0
+      MaxBonusLevel:
+        Standard: 100
+        RetroMode: 1000
+    VerdantBounty:
+      ChanceMax: 50.0
+      MaxBonusLevel:
+        Standard: 1000
+        RetroMode: 10000
+    HylianLuck:
+      ChanceMax: 10.0
+      MaxBonusLevel:
+        Standard: 100
+        RetroMode: 1000
+    ShroomThumb:
+      ChanceMax: 50.0
+      MaxBonusLevel:
+        Standard: 100
+        RetroMode: 1000
   Mining:
     MotherLode:
       MaxBonusLevel:

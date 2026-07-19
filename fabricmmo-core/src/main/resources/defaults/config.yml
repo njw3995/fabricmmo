@@ -16,11 +16,13 @@ Abilities:
     Super_Breaker: 240
     Tree_Feller: 240
     Giga_Drill_Breaker: 240
+    Green_Terra: 240
   Max_Seconds:
     Blast_Mining: 0
     Super_Breaker: 0
     Tree_Feller: 0
     Giga_Drill_Breaker: 0
+    Green_Terra: 0
   Limits:
     Tree_Feller_Threshold: 1000
   Tools:
@@ -42,6 +44,7 @@ Skills:
     Level_Cap: 0
   Herbalism:
     Level_Cap: 0
+    Prevent_AFK_Leveling: true
   Maces:
     Level_Cap: 0
   Mining:
@@ -64,7 +67,111 @@ Skills:
   Woodcutting:
     Level_Cap: 0
     Tree_Feller_Sounds: true
+Green_Thumb_Replanting_Crops:
+  Carrots: true
+  Wheat: true
+  Nether_Wart: true
+  Potatoes: true
+  Beetroots: true
+  Cocoa: true
+  Sweet_Berry_Bush: true
 Bonus_Drops:
+  Herbalism:
+    Pitcher_Plant: true
+    Pink_Petals: true
+    Small_Dripleaf: true
+    Big_Dripleaf: true
+    Cave_Vines: true
+    Cave_Vines_Plant: true
+    Glow_Lichen: true
+    Moss_Block: true
+    Crimson_Roots: true
+    Warped_Roots: true
+    Nether_Wart_Block: true
+    Warped_Wart_Block: true
+    Kelp: true
+    Kelp_Plant: true
+    Nether_Sprouts: true
+    Seagrass: true
+    Tall_Seagrass: true
+    Fern: true
+    Grass: true
+    Short_Grass: true
+    Vine: true
+    Bamboo: true
+    Crimson_Fungus: true
+    Warped_Fungus: true
+    Sweet_Berry_Bush: true
+    Carrots: true
+    Potatoes: true
+    Wheat: true
+    Beetroots: true
+    Nether_Wart: true
+    Lilac: true
+    Peony: true
+    Rose_Bush: true
+    Sunflower: true
+    Tall_Grass: true
+    Large_Fern: true
+    Shroomlight: true
+    Bee_Nest: true
+    Tube_Coral: true
+    Tube_Coral_Fan: true
+    Tube_Coral_Wall_Fan: true
+    Brain_Coral: true
+    Brain_Coral_Fan: true
+    Brain_Coral_Wall_Fan: true
+    Bubble_Coral: true
+    Bubble_Coral_Fan: true
+    Bubble_Coral_Wall_Fan: true
+    Fire_Coral: true
+    Fire_Coral_Fan: true
+    Fire_Coral_Wall_Fan: true
+    Horn_Coral: true
+    Horn_Coral_Fan: true
+    Horn_Coral_Wall_Fan: true
+    Dead_Tube_Coral: true
+    Dead_Brain_Coral: true
+    Dead_Bubble_Coral: true
+    Dead_Fire_Coral: true
+    Dead_Horn_Coral: true
+    Dead_Tube_Coral_Fan: true
+    Dead_Brain_Coral_Fan: true
+    Dead_Bubble_Coral_Fan: true
+    Dead_Fire_Coral_Fan: true
+    Dead_Horn_Coral_Fan: true
+    Dead_Tube_Coral_Wall_Fan: true
+    Dead_Brain_Coral_Wall_Fan: true
+    Dead_Bubble_Coral_Wall_Fan: true
+    Dead_Fire_Coral_Wall_Fan: true
+    Dead_Horn_Coral_Wall_Fan: true
+    Allium: true
+    Azure_Bluet: true
+    Blue_Orchid: true
+    Brown_Mushroom: true
+    Orange_Tulip: true
+    Oxeye_Daisy: true
+    Pink_Tulip: true
+    Red_Mushroom: true
+    Red_Tulip: true
+    White_Tulip: true
+    Cornflower: true
+    Lily_Of_The_Valley: true
+    Cactus: true
+    Cocoa: true
+    Dead_Bush: true
+    Sugar_Cane: true
+    Chorus_Flower: true
+    Chorus_Plant: true
+    Melon: true
+    Pumpkin: true
+    Poppy: true
+    Lily_Pad: true
+    Dandelion: true
+    Weeping_Vines_Plant: true
+    Twisting_Vines_Plant: true
+    Wither_Rose: true
+    Torchflower: true
   Mining:
     Tuff: true
     Deepslate_Redstone_Ore: true
@@ -263,4 +370,4 @@ MySQL:
 # TEMPORARY: remove after upstream UI parity verification is complete.
 Debugging:
   UI_Trace:
-    Enabled: true
+    Enabled: false

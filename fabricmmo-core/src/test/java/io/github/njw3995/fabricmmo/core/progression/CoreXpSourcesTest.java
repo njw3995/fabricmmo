@@ -45,7 +45,7 @@ class CoreXpSourcesTest {
     }
 
     @Test
-    void registersSeparateExcavationBlockAndTreasureSources() {
+    void registersGatheringXpSources() {
         DefaultSkillRegistry skills = new DefaultSkillRegistry();
         CoreSkills.registerAll(skills);
         DefaultXpSourceRegistry sources = new DefaultXpSourceRegistry(skills);
@@ -54,10 +54,17 @@ class CoreXpSourcesTest {
 
         assertTrue(sources.find(CoreXpSources.EXCAVATION_BLOCK_BREAK).isPresent());
         assertTrue(sources.find(CoreXpSources.EXCAVATION_TREASURE).isPresent());
+        assertTrue(sources.find(CoreXpSources.HERBALISM_BLOCK_BREAK).isPresent());
+        assertTrue(sources.find(CoreXpSources.HERBALISM_BERRY_HARVEST).isPresent());
+        assertTrue(sources.find(CoreXpSources.HERBALISM_HYLIAN_LUCK).isPresent());
         long excavationSources = sources.sources().stream()
                 .filter(source -> source.skillId().equals(CoreSkills.EXCAVATION))
                 .count();
         assertEquals(2, excavationSources);
+        long herbalismSources = sources.sources().stream()
+                .filter(source -> source.skillId().equals(CoreSkills.HERBALISM))
+                .count();
+        assertEquals(3, herbalismSources);
     }
 
 }

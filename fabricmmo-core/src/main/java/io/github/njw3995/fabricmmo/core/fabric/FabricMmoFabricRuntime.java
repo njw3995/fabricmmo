@@ -22,6 +22,18 @@ import io.github.njw3995.fabricmmo.core.skill.excavation.ExcavationSettings;
 import io.github.njw3995.fabricmmo.core.skill.excavation.ExcavationTreasureTable;
 import io.github.njw3995.fabricmmo.core.skill.excavation.ExcavationXpDefaults;
 import io.github.njw3995.fabricmmo.core.skill.excavation.PropertiesExcavationAbilityStore;
+import io.github.njw3995.fabricmmo.core.skill.herbalism.CoreHerbalismAbilities;
+import io.github.njw3995.fabricmmo.core.skill.herbalism.HerbalismAbilityController;
+import io.github.njw3995.fabricmmo.core.skill.herbalism.HerbalismAbilityHandler;
+import io.github.njw3995.fabricmmo.core.skill.herbalism.HerbalismAbilityStateView;
+import io.github.njw3995.fabricmmo.core.skill.herbalism.HerbalismBlockBreakHandler;
+import io.github.njw3995.fabricmmo.core.skill.herbalism.HerbalismDropSettings;
+import io.github.njw3995.fabricmmo.core.skill.herbalism.HerbalismFoodHandler;
+import io.github.njw3995.fabricmmo.core.skill.herbalism.HerbalismHylianTreasureTable;
+import io.github.njw3995.fabricmmo.core.skill.herbalism.HerbalismInteractionHandler;
+import io.github.njw3995.fabricmmo.core.skill.herbalism.HerbalismSettings;
+import io.github.njw3995.fabricmmo.core.skill.herbalism.HerbalismXpDefaults;
+import io.github.njw3995.fabricmmo.core.skill.herbalism.PropertiesHerbalismAbilityStore;
 import io.github.njw3995.fabricmmo.core.skill.mining.MiningAbilityController;
 import io.github.njw3995.fabricmmo.core.skill.mining.MiningAbilityHandler;
 import io.github.njw3995.fabricmmo.core.skill.mining.MiningAbilityStateView;
@@ -70,6 +82,11 @@ public final class FabricMmoFabricRuntime {
     private static ExcavationSettings excavationSettings;
     private static ExcavationTreasureTable excavationTreasures;
     private static ExcavationAbilityController excavationAbilityController;
+    private static ConfiguredBlockXpTable herbalismXpTable;
+    private static HerbalismDropSettings herbalismDropSettings;
+    private static HerbalismSettings herbalismSettings;
+    private static HerbalismHylianTreasureTable herbalismTreasures;
+    private static HerbalismAbilityController herbalismAbilityController;
     private static Path serverWorldRoot;
     private static WorldBlacklist worldBlacklist;
     private static ProgressionSettings progressionSettings;
@@ -89,6 +106,7 @@ public final class FabricMmoFabricRuntime {
         Path miningAbilityDirectory = resolveMiningAbilityDirectory(worldRoot);
         Path woodcuttingAbilityDirectory = resolveWoodcuttingAbilityDirectory(worldRoot);
         Path excavationAbilityDirectory = resolveExcavationAbilityDirectory(worldRoot);
+        Path herbalismAbilityDirectory = resolveHerbalismAbilityDirectory(worldRoot);
         Path configDirectory = FabricLoader.getInstance().getConfigDir().resolve("fabricmmo");
         Path experienceFile = configDirectory.resolve("experience.yml");
         Path configFile = configDirectory.resolve("config.yml");
@@ -103,6 +121,7 @@ public final class FabricMmoFabricRuntime {
         MiningAbilityController newAbilityController = null;
         WoodcuttingAbilityController newWoodcuttingAbilityController = null;
         ExcavationAbilityController newExcavationAbilityController = null;
+        HerbalismAbilityController newHerbalismAbilityController = null;
         try {
             ProgressionSettings progressionSettings = ProgressionSettings.load(
                     configFile, experienceFile);
@@ -125,6 +144,13 @@ public final class FabricMmoFabricRuntime {
                     configFile, advancedFile, skillRanksFile);
             ExcavationTreasureTable newExcavationTreasures = ExcavationTreasureTable.load(
                     treasuresFile);
+            ConfiguredBlockXpTable newHerbalismXpTable = ConfiguredBlockXpTable.load(
+                    experienceFile, "Herbalism", HerbalismXpDefaults.values());
+            HerbalismDropSettings newHerbalismDropSettings = HerbalismDropSettings.load(configFile);
+            HerbalismSettings newHerbalismSettings = HerbalismSettings.load(
+                    configFile, advancedFile, skillRanksFile, experienceFile);
+            HerbalismHylianTreasureTable newHerbalismTreasures =
+                    HerbalismHylianTreasureTable.load(treasuresFile);
             newAbilityController = new MiningAbilityController(
                     new PropertiesMiningAbilityStore(miningAbilityDirectory), Clock.systemUTC());
             newWoodcuttingAbilityController = new WoodcuttingAbilityController(
@@ -132,6 +158,9 @@ public final class FabricMmoFabricRuntime {
                     Clock.systemUTC());
             newExcavationAbilityController = new ExcavationAbilityController(
                     new PropertiesExcavationAbilityStore(excavationAbilityDirectory),
+                    Clock.systemUTC());
+            newHerbalismAbilityController = new HerbalismAbilityController(
+                    new PropertiesHerbalismAbilityStore(herbalismAbilityDirectory),
                     Clock.systemUTC());
             PlacedBlockSettings placedBlockSettings = PlacedBlockSettings.load(persistentDataFile);
             newTracker = placedBlockSettings.regionSystemEnabled()
@@ -164,6 +193,10 @@ public final class FabricMmoFabricRuntime {
                     server, newExcavationAbilityController, newExcavationSettings);
             newRuntime.api().abilityPipeline().registerStateView(
                     CoreExcavationAbilities.GIGA_DRILL_BREAKER, excavationAbilityStates);
+            HerbalismAbilityStateView herbalismAbilityStates = new HerbalismAbilityStateView(
+                    server, newHerbalismAbilityController, newHerbalismSettings);
+            newRuntime.api().abilityPipeline().registerStateView(
+                    CoreHerbalismAbilities.GREEN_TERRA, herbalismAbilityStates);
             SharedServerSystems.start(
                     server,
                     worldRoot,
@@ -180,7 +213,10 @@ public final class FabricMmoFabricRuntime {
                     newWoodcuttingSettings,
                     newWoodcuttingDropSettings,
                     newExcavationAbilityController,
-                    newExcavationSettings);
+                    newExcavationSettings,
+                    newHerbalismAbilityController,
+                    newHerbalismSettings,
+                    newHerbalismDropSettings);
             runtime = newRuntime;
             miningXpTable = newXpTable;
             miningDropSettings = newDropSettings;
@@ -195,23 +231,30 @@ public final class FabricMmoFabricRuntime {
             excavationSettings = newExcavationSettings;
             excavationTreasures = newExcavationTreasures;
             excavationAbilityController = newExcavationAbilityController;
+            herbalismXpTable = newHerbalismXpTable;
+            herbalismDropSettings = newHerbalismDropSettings;
+            herbalismSettings = newHerbalismSettings;
+            herbalismTreasures = newHerbalismTreasures;
+            herbalismAbilityController = newHerbalismAbilityController;
             serverWorldRoot = worldRoot;
             worldBlacklist = newWorldBlacklist;
             FabricMmoFabricRuntime.progressionSettings = progressionSettings;
             playerSessionSettings = new PlayerSessionSettingsService();
             LOGGER.info(
-                    "Started with {} registered skills; player data directory: {}; placed-block directory: {}; Mining ability directory: {}; Woodcutting ability directory: {}; Excavation ability directory: {}",
+                    "Started with {} registered skills; player data directory: {}; placed-block directory: {}; Mining ability directory: {}; Woodcutting ability directory: {}; Excavation ability directory: {}; Herbalism ability directory: {}",
                     runtime.api().skillRegistry().skills().size(),
                     playerDataDirectory,
                     placedBlockDirectory,
                     miningAbilityDirectory,
                     woodcuttingAbilityDirectory,
-                    excavationAbilityDirectory);
+                    excavationAbilityDirectory,
+                    herbalismAbilityDirectory);
         } catch (IOException exception) {
             closeAfterFailedStart(newRuntime, exception);
             closeAfterFailedStart(newAbilityController, exception);
             closeAfterFailedStart(newWoodcuttingAbilityController, exception);
             closeAfterFailedStart(newExcavationAbilityController, exception);
+            closeAfterFailedStart(newHerbalismAbilityController, exception);
             closeAfterFailedStart(newTracker, exception);
             throw new UncheckedIOException("Unable to start FabricMMO persistence", exception);
         } catch (RuntimeException | Error exception) {
@@ -219,6 +262,7 @@ public final class FabricMmoFabricRuntime {
             closeAfterFailedStart(newAbilityController, exception);
             closeAfterFailedStart(newWoodcuttingAbilityController, exception);
             closeAfterFailedStart(newExcavationAbilityController, exception);
+            closeAfterFailedStart(newHerbalismAbilityController, exception);
             closeAfterFailedStart(newTracker, exception);
             throw exception;
         }
@@ -261,6 +305,14 @@ public final class FabricMmoFabricRuntime {
         Objects.requireNonNull(worldRoot, "worldRoot");
         return worldRoot.resolve("fabricmmo")
                 .resolve("excavation-abilities")
+                .toAbsolutePath()
+                .normalize();
+    }
+
+    static Path resolveHerbalismAbilityDirectory(Path worldRoot) {
+        Objects.requireNonNull(worldRoot, "worldRoot");
+        return worldRoot.resolve("fabricmmo")
+                .resolve("herbalism-abilities")
                 .toAbsolutePath()
                 .normalize();
     }
@@ -403,6 +455,54 @@ public final class FabricMmoFabricRuntime {
         }
     }
 
+
+    public static synchronized ConfiguredBlockXpTable herbalismXpTable() {
+        if (herbalismXpTable == null) {
+            throw new IllegalStateException("FabricMMO Herbalism XP configuration is not active");
+        }
+        return herbalismXpTable;
+    }
+
+    public static synchronized int herbalismXpFor(NamespacedId blockId) {
+        return herbalismXpTable().xpFor(blockId);
+    }
+
+    public static synchronized HerbalismDropSettings herbalismDropSettings() {
+        if (herbalismDropSettings == null) {
+            throw new IllegalStateException("FabricMMO Herbalism drop configuration is not active");
+        }
+        return herbalismDropSettings;
+    }
+
+    public static synchronized HerbalismSettings herbalismSettings() {
+        if (herbalismSettings == null) {
+            throw new IllegalStateException("FabricMMO Herbalism settings are not active");
+        }
+        return herbalismSettings;
+    }
+
+    public static synchronized HerbalismHylianTreasureTable herbalismTreasures() {
+        if (herbalismTreasures == null) {
+            throw new IllegalStateException("FabricMMO Herbalism treasures are not active");
+        }
+        return herbalismTreasures;
+    }
+
+    public static synchronized HerbalismAbilityController herbalismAbilities() {
+        if (herbalismAbilityController == null) {
+            throw new IllegalStateException("FabricMMO Herbalism ability runtime is not active");
+        }
+        return herbalismAbilityController;
+    }
+
+    public static synchronized boolean isGreenTerraActive(UUID playerId) {
+        try {
+            return herbalismAbilities().isActive(playerId);
+        } catch (IOException exception) {
+            throw new UncheckedIOException("Unable to read Herbalism ability state", exception);
+        }
+    }
+
     public static synchronized boolean isWorldBlacklisted(ServerWorld world) {
         return worldBlacklist != null && worldBlacklist.isBlacklisted(world);
     }
@@ -463,7 +563,8 @@ public final class FabricMmoFabricRuntime {
                 && placedBlockTracker == null
                 && miningAbilityController == null
                 && woodcuttingAbilityController == null
-                && excavationAbilityController == null) {
+                && excavationAbilityController == null
+                && herbalismAbilityController == null) {
             return;
         }
         SharedServerSystems.stop();
@@ -474,10 +575,15 @@ public final class FabricMmoFabricRuntime {
                 woodcuttingAbilityController;
         ExcavationAbilityController activeExcavationAbilityController =
                 excavationAbilityController;
+        HerbalismAbilityController activeHerbalismAbilityController = herbalismAbilityController;
         MiningBlastRegistry.clear();
         MiningAbilityHandler.reset();
         WoodcuttingAbilityHandler.reset();
         ExcavationAbilityHandler.reset();
+        HerbalismAbilityHandler.reset();
+        HerbalismBlockBreakHandler.reset();
+        HerbalismInteractionHandler.reset();
+        HerbalismFoodHandler.reset();
         runtime = null;
         miningXpTable = null;
         miningDropSettings = null;
@@ -492,6 +598,11 @@ public final class FabricMmoFabricRuntime {
         excavationSettings = null;
         excavationTreasures = null;
         excavationAbilityController = null;
+        herbalismXpTable = null;
+        herbalismDropSettings = null;
+        herbalismSettings = null;
+        herbalismTreasures = null;
+        herbalismAbilityController = null;
         serverWorldRoot = null;
         worldBlacklist = null;
         progressionSettings = null;
@@ -522,6 +633,17 @@ public final class FabricMmoFabricRuntime {
         if (activeExcavationAbilityController != null) {
             try {
                 activeExcavationAbilityController.close();
+            } catch (IOException exception) {
+                if (failure == null) {
+                    failure = exception;
+                } else {
+                    failure.addSuppressed(exception);
+                }
+            }
+        }
+        if (activeHerbalismAbilityController != null) {
+            try {
+                activeHerbalismAbilityController.close();
             } catch (IOException exception) {
                 if (failure == null) {
                     failure = exception;

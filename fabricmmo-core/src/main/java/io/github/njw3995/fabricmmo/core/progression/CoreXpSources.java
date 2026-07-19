@@ -18,6 +18,12 @@ public final class CoreXpSources {
             NamespacedId.parse("fabricmmo:excavation_block_break");
     public static final NamespacedId EXCAVATION_TREASURE =
             NamespacedId.parse("fabricmmo:excavation_treasure");
+    public static final NamespacedId HERBALISM_BLOCK_BREAK =
+            NamespacedId.parse("fabricmmo:herbalism_block_break");
+    public static final NamespacedId HERBALISM_BERRY_HARVEST =
+            NamespacedId.parse("fabricmmo:herbalism_berry_harvest");
+    public static final NamespacedId HERBALISM_HYLIAN_LUCK =
+            NamespacedId.parse("fabricmmo:herbalism_hylian_luck");
 
     private CoreXpSources() {
     }
@@ -47,6 +53,18 @@ public final class CoreXpSources {
                 EXCAVATION_TREASURE,
                 CoreSkills.EXCAVATION,
                 Map.of("upstream", "ExcavationManager#rollAndCollectTreasureDrops")));
+        registrar.registerXpSource(new XpSourceDefinition(
+                HERBALISM_BLOCK_BREAK,
+                CoreSkills.HERBALISM,
+                Map.of("upstream", "HerbalismManager#processHerbalismBlockBreakEvent")));
+        registrar.registerXpSource(new XpSourceDefinition(
+                HERBALISM_BERRY_HARVEST,
+                CoreSkills.HERBALISM,
+                Map.of("upstream", "HerbalismManager#processBerryBushHarvesting")));
+        registrar.registerXpSource(new XpSourceDefinition(
+                HERBALISM_HYLIAN_LUCK,
+                CoreSkills.HERBALISM,
+                Map.of("upstream", "HerbalismManager#processHylianLuck")));
     }
 
     public static void registerCommandSources(

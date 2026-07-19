@@ -6,6 +6,10 @@ import io.github.njw3995.fabricmmo.core.config.DefaultConfigInstaller;
 import io.github.njw3995.fabricmmo.core.permission.FabricCommandPermissionService;
 import io.github.njw3995.fabricmmo.core.skill.excavation.ExcavationAbilityHandler;
 import io.github.njw3995.fabricmmo.core.skill.excavation.ExcavationBlockBreakHandler;
+import io.github.njw3995.fabricmmo.core.skill.herbalism.HerbalismAbilityHandler;
+import io.github.njw3995.fabricmmo.core.skill.herbalism.HerbalismBlockBreakHandler;
+import io.github.njw3995.fabricmmo.core.skill.herbalism.HerbalismFoodHandler;
+import io.github.njw3995.fabricmmo.core.skill.herbalism.HerbalismInteractionHandler;
 import io.github.njw3995.fabricmmo.core.skill.mining.MiningAbilityHandler;
 import io.github.njw3995.fabricmmo.core.skill.mining.MiningBlastHandler;
 import io.github.njw3995.fabricmmo.core.skill.mining.MiningBlockBreakHandler;
@@ -37,6 +41,10 @@ public final class FabricMmoMod implements ModInitializer {
         WoodcuttingAbilityHandler.register();
         ExcavationBlockBreakHandler.register();
         ExcavationAbilityHandler.register();
+        HerbalismBlockBreakHandler.register();
+        HerbalismAbilityHandler.register();
+        HerbalismInteractionHandler.register();
+        HerbalismFoodHandler.register();
         SharedChatHandler.register(permissions);
         ServerTickEvents.END_SERVER_TICK.register(SharedServerSystems::tick);
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {

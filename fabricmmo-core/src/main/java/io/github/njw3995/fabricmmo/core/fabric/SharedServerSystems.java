@@ -45,6 +45,11 @@ import io.github.njw3995.fabricmmo.core.skill.excavation.CoreExcavationAbilities
 import io.github.njw3995.fabricmmo.core.skill.excavation.ExcavationAbilityController;
 import io.github.njw3995.fabricmmo.core.skill.excavation.ExcavationPanelMechanicsProvider;
 import io.github.njw3995.fabricmmo.core.skill.excavation.ExcavationSettings;
+import io.github.njw3995.fabricmmo.core.skill.herbalism.CoreHerbalismAbilities;
+import io.github.njw3995.fabricmmo.core.skill.herbalism.HerbalismAbilityController;
+import io.github.njw3995.fabricmmo.core.skill.herbalism.HerbalismDropSettings;
+import io.github.njw3995.fabricmmo.core.skill.herbalism.HerbalismPanelMechanicsProvider;
+import io.github.njw3995.fabricmmo.core.skill.herbalism.HerbalismSettings;
 import io.github.njw3995.fabricmmo.core.skill.mining.CoreMiningAbilities;
 import io.github.njw3995.fabricmmo.core.skill.mining.MiningAbilityController;
 import io.github.njw3995.fabricmmo.core.skill.mining.MiningDropSettings;
@@ -108,7 +113,10 @@ public final class SharedServerSystems {
             WoodcuttingSettings woodcuttingSettings,
             WoodcuttingDropSettings woodcuttingDropSettings,
             ExcavationAbilityController excavationAbilities,
-            ExcavationSettings excavationSettings) throws IOException {
+            ExcavationSettings excavationSettings,
+            HerbalismAbilityController herbalismAbilities,
+            HerbalismSettings herbalismSettings,
+            HerbalismDropSettings herbalismDropSettings) throws IOException {
         if (state != null) {
             throw new IllegalStateException("Shared FabricMMO systems already active");
         }
@@ -148,7 +156,7 @@ public final class SharedServerSystems {
         boolean skillCommandBlankLines = advancedConfiguration.bool(
                 "Feedback.SkillCommand.BlankLinesAboveHeader", true);
         boolean uiTraceEnabled = FlatYamlConfig.load(configFile)
-                .bool("Debugging.UI_Trace.Enabled", true);
+                .bool("Debugging.UI_Trace.Enabled", false);
         LocaleService locale = LocaleService.loadDefault();
         ScoreboardTipService scoreboardTips = new ScoreboardTipService(
                 dataRoot.resolve("scoreboard-tips.properties"),
@@ -164,7 +172,9 @@ public final class SharedServerSystems {
                 woodcuttingAbilities,
                 woodcuttingSettings,
                 excavationAbilities,
-                excavationSettings);
+                excavationSettings,
+                herbalismAbilities,
+                herbalismSettings);
         SkillPanelCooldownCatalog skillPanelCooldowns = new SkillPanelCooldownCatalog(
                 cooldowns, locale, uiConfiguration.abilityNames());
         SubSkillRankCatalog subSkillRanks = SubSkillRankCatalog.load(
@@ -181,6 +191,9 @@ public final class SharedServerSystems {
                 CoreSkills.EXCAVATION,
                 new ExcavationPanelMechanicsProvider(
                         server, excavationAbilities, excavationSettings, locale));
+        skillPanelMechanics.register(
+                CoreSkills.HERBALISM,
+                new HerbalismPanelMechanicsProvider(server, herbalismSettings, locale));
         DebugDiagnosticsService diagnostics = new DebugDiagnosticsService(server, sessions);
         ProgressionMaintenanceService maintenance = new ProgressionMaintenanceService(
                 progressionStore, playerDataDirectory, mySqlSettings, Clock.systemUTC());
@@ -273,7 +286,9 @@ public final class SharedServerSystems {
             WoodcuttingAbilityController woodcuttingAbilities,
             WoodcuttingSettings woodcuttingSettings,
             ExcavationAbilityController excavationAbilities,
-            ExcavationSettings excavationSettings) {
+            ExcavationSettings excavationSettings,
+            HerbalismAbilityController herbalismAbilities,
+            HerbalismSettings herbalismSettings) {
         AbilityCooldownService cooldowns = new AbilityCooldownService();
         AbilityCooldownService.Provider miningProvider = new AbilityCooldownService.Provider() {
             @Override
@@ -347,6 +362,27 @@ public final class SharedServerSystems {
                     public void reset(UUID playerId) {
                         try {
                             excavationAbilities.reset(playerId);
+                        } catch (IOException exception) {
+                            throw new UncheckedIOException(exception);
+                        }
+                    }
+                });
+        cooldowns.register(CoreHerbalismAbilities.GREEN_TERRA,
+                new AbilityCooldownService.Provider() {
+                    @Override
+                    public int remainingSeconds(UUID playerId) {
+                        try {
+                            return herbalismAbilities.cooldownRemaining(
+                                    playerId, herbalismSettings.greenTerraCooldownSeconds());
+                        } catch (IOException exception) {
+                            throw new UncheckedIOException(exception);
+                        }
+                    }
+
+                    @Override
+                    public void reset(UUID playerId) {
+                        try {
+                            herbalismAbilities.reset(playerId);
                         } catch (IOException exception) {
                             throw new UncheckedIOException(exception);
                         }

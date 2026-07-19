@@ -32,4 +32,21 @@ class NaturalGrowthTrackerTest {
                 "minecraft:exposed_copper",
                 Map.of()));
     }
+
+    @Test
+    void doesNotNaturalizePlayerPlacedSugarCaneWhenItsInternalAgeTicks() {
+        assertFalse(NaturalGrowthTracker.isGrowthTransition(
+                "minecraft:sugar_cane",
+                Map.of("age", 4),
+                false,
+                "minecraft:sugar_cane",
+                Map.of("age", 5)));
+
+        assertTrue(NaturalGrowthTracker.isGrowthTransition(
+                "minecraft:air",
+                Map.of(),
+                true,
+                "minecraft:sugar_cane",
+                Map.of("age", 0)));
+    }
 }
