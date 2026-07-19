@@ -16,11 +16,14 @@ class FabricMmoFabricRuntimeTest {
         Path miningAbilities = FabricMmoFabricRuntime.resolveMiningAbilityDirectory(worldRoot);
         Path woodcuttingAbilities =
                 FabricMmoFabricRuntime.resolveWoodcuttingAbilityDirectory(worldRoot);
+        Path excavationAbilities =
+                FabricMmoFabricRuntime.resolveExcavationAbilityDirectory(worldRoot);
 
         assertTrue(players.isAbsolute());
         assertTrue(placedBlocks.isAbsolute());
         assertTrue(miningAbilities.isAbsolute());
         assertTrue(woodcuttingAbilities.isAbsolute());
+        assertTrue(excavationAbilities.isAbsolute());
         assertEquals(
                 Path.of("world", "fabricmmo", "players").toAbsolutePath().normalize(),
                 players);
@@ -34,5 +37,9 @@ class FabricMmoFabricRuntimeTest {
                 Path.of("world", "fabricmmo", "woodcutting-abilities")
                         .toAbsolutePath().normalize(),
                 woodcuttingAbilities);
+        assertEquals(
+                Path.of("world", "fabricmmo", "excavation-abilities")
+                        .toAbsolutePath().normalize(),
+                excavationAbilities);
     }
 }

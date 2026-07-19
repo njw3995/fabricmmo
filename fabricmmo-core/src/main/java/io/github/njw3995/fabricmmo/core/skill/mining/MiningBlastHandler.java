@@ -129,7 +129,8 @@ public final class MiningBlastHandler {
             }
             if (activation instanceof MiningAbilityController.BlastActivation.Locked locked) {
                 if (settings.abilityMessages()) {
-                    player.sendMessage(MiningMessages.locked("BLAST MINING", locked.requiredLevel()), true);
+                    player.sendMessage(MiningMessages.locked(
+                            Math.max(0, locked.requiredLevel() - level)), true);
                 }
                 return TypedActionResult.success(held, false);
             }

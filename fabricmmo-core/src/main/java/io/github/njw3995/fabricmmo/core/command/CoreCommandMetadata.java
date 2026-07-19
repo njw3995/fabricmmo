@@ -15,6 +15,8 @@ public final class CoreCommandMetadata {
                 PermissionNodes.MCMMO_DESCRIPTION);
         register(registrar, "mcstats", List.of("stats"), PermissionNodes.MCSTATS);
         register(registrar, "mining", List.of(), PermissionNodes.MINING_COMMAND);
+        register(registrar, "woodcutting", List.of(), PermissionNodes.WOODCUTTING_COMMAND);
+        register(registrar, "excavation", List.of(), PermissionNodes.EXCAVATION_COMMAND);
         register(registrar, "addxp", List.of(), PermissionNodes.ADD_XP);
         register(registrar, "mcability", List.of(), PermissionNodes.MCABILITY);
         register(registrar, "mccooldown", List.of("mccooldowns"), PermissionNodes.MCCOOLDOWN);

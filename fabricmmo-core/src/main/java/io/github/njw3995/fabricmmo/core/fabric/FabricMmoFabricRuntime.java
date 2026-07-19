@@ -14,6 +14,14 @@ import io.github.njw3995.fabricmmo.core.progression.ProgressionSettings;
 import io.github.njw3995.fabricmmo.core.persistence.MySqlSettings;
 import io.github.njw3995.fabricmmo.core.player.PlayerSessionSettingsService;
 import io.github.njw3995.fabricmmo.core.runtime.FabricMmoServerRuntime;
+import io.github.njw3995.fabricmmo.core.skill.excavation.CoreExcavationAbilities;
+import io.github.njw3995.fabricmmo.core.skill.excavation.ExcavationAbilityController;
+import io.github.njw3995.fabricmmo.core.skill.excavation.ExcavationAbilityHandler;
+import io.github.njw3995.fabricmmo.core.skill.excavation.ExcavationAbilityStateView;
+import io.github.njw3995.fabricmmo.core.skill.excavation.ExcavationSettings;
+import io.github.njw3995.fabricmmo.core.skill.excavation.ExcavationTreasureTable;
+import io.github.njw3995.fabricmmo.core.skill.excavation.ExcavationXpDefaults;
+import io.github.njw3995.fabricmmo.core.skill.excavation.PropertiesExcavationAbilityStore;
 import io.github.njw3995.fabricmmo.core.skill.mining.MiningAbilityController;
 import io.github.njw3995.fabricmmo.core.skill.mining.MiningAbilityHandler;
 import io.github.njw3995.fabricmmo.core.skill.mining.MiningAbilityStateView;
@@ -58,6 +66,10 @@ public final class FabricMmoFabricRuntime {
     private static WoodcuttingDropSettings woodcuttingDropSettings;
     private static WoodcuttingSettings woodcuttingSettings;
     private static WoodcuttingAbilityController woodcuttingAbilityController;
+    private static ConfiguredBlockXpTable excavationXpTable;
+    private static ExcavationSettings excavationSettings;
+    private static ExcavationTreasureTable excavationTreasures;
+    private static ExcavationAbilityController excavationAbilityController;
     private static Path serverWorldRoot;
     private static WorldBlacklist worldBlacklist;
     private static ProgressionSettings progressionSettings;
@@ -76,11 +88,13 @@ public final class FabricMmoFabricRuntime {
         Path placedBlockDirectory = resolvePlacedBlockDirectory(worldRoot);
         Path miningAbilityDirectory = resolveMiningAbilityDirectory(worldRoot);
         Path woodcuttingAbilityDirectory = resolveWoodcuttingAbilityDirectory(worldRoot);
+        Path excavationAbilityDirectory = resolveExcavationAbilityDirectory(worldRoot);
         Path configDirectory = FabricLoader.getInstance().getConfigDir().resolve("fabricmmo");
         Path experienceFile = configDirectory.resolve("experience.yml");
         Path configFile = configDirectory.resolve("config.yml");
         Path advancedFile = configDirectory.resolve("advanced.yml");
         Path skillRanksFile = configDirectory.resolve("skillranks.yml");
+        Path treasuresFile = configDirectory.resolve("treasures.yml");
         Path persistentDataFile = configDirectory.resolve("persistent_data.yml");
         Path worldBlacklistFile = configDirectory.resolve("world_blacklist.txt");
 
@@ -88,6 +102,7 @@ public final class FabricMmoFabricRuntime {
         PlacedBlockTracker newTracker = null;
         MiningAbilityController newAbilityController = null;
         WoodcuttingAbilityController newWoodcuttingAbilityController = null;
+        ExcavationAbilityController newExcavationAbilityController = null;
         try {
             ProgressionSettings progressionSettings = ProgressionSettings.load(
                     configFile, experienceFile);
@@ -104,10 +119,19 @@ public final class FabricMmoFabricRuntime {
                     configFile, advancedFile, skillRanksFile);
             WoodcuttingSettings newWoodcuttingSettings = WoodcuttingSettings.load(
                     configFile, advancedFile, skillRanksFile, experienceFile);
+            ConfiguredBlockXpTable newExcavationXpTable = ConfiguredBlockXpTable.load(
+                    experienceFile, "Excavation", ExcavationXpDefaults.values());
+            ExcavationSettings newExcavationSettings = ExcavationSettings.load(
+                    configFile, advancedFile, skillRanksFile);
+            ExcavationTreasureTable newExcavationTreasures = ExcavationTreasureTable.load(
+                    treasuresFile);
             newAbilityController = new MiningAbilityController(
                     new PropertiesMiningAbilityStore(miningAbilityDirectory), Clock.systemUTC());
             newWoodcuttingAbilityController = new WoodcuttingAbilityController(
                     new PropertiesWoodcuttingAbilityStore(woodcuttingAbilityDirectory),
+                    Clock.systemUTC());
+            newExcavationAbilityController = new ExcavationAbilityController(
+                    new PropertiesExcavationAbilityStore(excavationAbilityDirectory),
                     Clock.systemUTC());
             PlacedBlockSettings placedBlockSettings = PlacedBlockSettings.load(persistentDataFile);
             newTracker = placedBlockSettings.regionSystemEnabled()
@@ -136,6 +160,10 @@ public final class FabricMmoFabricRuntime {
                     server, newWoodcuttingAbilityController, newWoodcuttingSettings);
             newRuntime.api().abilityPipeline().registerStateView(
                     CoreWoodcuttingAbilities.TREE_FELLER, woodcuttingAbilityStates);
+            ExcavationAbilityStateView excavationAbilityStates = new ExcavationAbilityStateView(
+                    server, newExcavationAbilityController, newExcavationSettings);
+            newRuntime.api().abilityPipeline().registerStateView(
+                    CoreExcavationAbilities.GIGA_DRILL_BREAKER, excavationAbilityStates);
             SharedServerSystems.start(
                     server,
                     worldRoot,
@@ -150,7 +178,9 @@ public final class FabricMmoFabricRuntime {
                     newDropSettings,
                     newWoodcuttingAbilityController,
                     newWoodcuttingSettings,
-                    newWoodcuttingDropSettings);
+                    newWoodcuttingDropSettings,
+                    newExcavationAbilityController,
+                    newExcavationSettings);
             runtime = newRuntime;
             miningXpTable = newXpTable;
             miningDropSettings = newDropSettings;
@@ -161,27 +191,34 @@ public final class FabricMmoFabricRuntime {
             woodcuttingDropSettings = newWoodcuttingDropSettings;
             woodcuttingSettings = newWoodcuttingSettings;
             woodcuttingAbilityController = newWoodcuttingAbilityController;
+            excavationXpTable = newExcavationXpTable;
+            excavationSettings = newExcavationSettings;
+            excavationTreasures = newExcavationTreasures;
+            excavationAbilityController = newExcavationAbilityController;
             serverWorldRoot = worldRoot;
             worldBlacklist = newWorldBlacklist;
             FabricMmoFabricRuntime.progressionSettings = progressionSettings;
             playerSessionSettings = new PlayerSessionSettingsService();
             LOGGER.info(
-                    "Started with {} registered skills; player data directory: {}; placed-block directory: {}; Mining ability directory: {}; Woodcutting ability directory: {}",
+                    "Started with {} registered skills; player data directory: {}; placed-block directory: {}; Mining ability directory: {}; Woodcutting ability directory: {}; Excavation ability directory: {}",
                     runtime.api().skillRegistry().skills().size(),
                     playerDataDirectory,
                     placedBlockDirectory,
                     miningAbilityDirectory,
-                    woodcuttingAbilityDirectory);
+                    woodcuttingAbilityDirectory,
+                    excavationAbilityDirectory);
         } catch (IOException exception) {
             closeAfterFailedStart(newRuntime, exception);
             closeAfterFailedStart(newAbilityController, exception);
             closeAfterFailedStart(newWoodcuttingAbilityController, exception);
+            closeAfterFailedStart(newExcavationAbilityController, exception);
             closeAfterFailedStart(newTracker, exception);
             throw new UncheckedIOException("Unable to start FabricMMO persistence", exception);
         } catch (RuntimeException | Error exception) {
             closeAfterFailedStart(newRuntime, exception);
             closeAfterFailedStart(newAbilityController, exception);
             closeAfterFailedStart(newWoodcuttingAbilityController, exception);
+            closeAfterFailedStart(newExcavationAbilityController, exception);
             closeAfterFailedStart(newTracker, exception);
             throw exception;
         }
@@ -216,6 +253,14 @@ public final class FabricMmoFabricRuntime {
         Objects.requireNonNull(worldRoot, "worldRoot");
         return worldRoot.resolve("fabricmmo")
                 .resolve("woodcutting-abilities")
+                .toAbsolutePath()
+                .normalize();
+    }
+
+    static Path resolveExcavationAbilityDirectory(Path worldRoot) {
+        Objects.requireNonNull(worldRoot, "worldRoot");
+        return worldRoot.resolve("fabricmmo")
+                .resolve("excavation-abilities")
                 .toAbsolutePath()
                 .normalize();
     }
@@ -318,6 +363,46 @@ public final class FabricMmoFabricRuntime {
         }
     }
 
+    public static synchronized ConfiguredBlockXpTable excavationXpTable() {
+        if (excavationXpTable == null) {
+            throw new IllegalStateException("FabricMMO Excavation XP configuration is not active");
+        }
+        return excavationXpTable;
+    }
+
+    public static synchronized int excavationXpFor(NamespacedId blockId) {
+        return excavationXpTable().xpFor(blockId);
+    }
+
+    public static synchronized ExcavationSettings excavationSettings() {
+        if (excavationSettings == null) {
+            throw new IllegalStateException("FabricMMO Excavation settings are not active");
+        }
+        return excavationSettings;
+    }
+
+    public static synchronized ExcavationTreasureTable excavationTreasures() {
+        if (excavationTreasures == null) {
+            throw new IllegalStateException("FabricMMO Excavation treasures are not active");
+        }
+        return excavationTreasures;
+    }
+
+    public static synchronized ExcavationAbilityController excavationAbilities() {
+        if (excavationAbilityController == null) {
+            throw new IllegalStateException("FabricMMO Excavation ability runtime is not active");
+        }
+        return excavationAbilityController;
+    }
+
+    public static synchronized boolean isGigaDrillBreakerActive(UUID playerId) {
+        try {
+            return excavationAbilities().isActive(playerId);
+        } catch (IOException exception) {
+            throw new UncheckedIOException("Unable to read Excavation ability state", exception);
+        }
+    }
+
     public static synchronized boolean isWorldBlacklisted(ServerWorld world) {
         return worldBlacklist != null && worldBlacklist.isBlacklisted(world);
     }
@@ -377,7 +462,8 @@ public final class FabricMmoFabricRuntime {
         if (runtime == null
                 && placedBlockTracker == null
                 && miningAbilityController == null
-                && woodcuttingAbilityController == null) {
+                && woodcuttingAbilityController == null
+                && excavationAbilityController == null) {
             return;
         }
         SharedServerSystems.stop();
@@ -386,9 +472,12 @@ public final class FabricMmoFabricRuntime {
         MiningAbilityController activeAbilityController = miningAbilityController;
         WoodcuttingAbilityController activeWoodcuttingAbilityController =
                 woodcuttingAbilityController;
+        ExcavationAbilityController activeExcavationAbilityController =
+                excavationAbilityController;
         MiningBlastRegistry.clear();
         MiningAbilityHandler.reset();
         WoodcuttingAbilityHandler.reset();
+        ExcavationAbilityHandler.reset();
         runtime = null;
         miningXpTable = null;
         miningDropSettings = null;
@@ -399,6 +488,10 @@ public final class FabricMmoFabricRuntime {
         woodcuttingDropSettings = null;
         woodcuttingSettings = null;
         woodcuttingAbilityController = null;
+        excavationXpTable = null;
+        excavationSettings = null;
+        excavationTreasures = null;
+        excavationAbilityController = null;
         serverWorldRoot = null;
         worldBlacklist = null;
         progressionSettings = null;
@@ -418,6 +511,17 @@ public final class FabricMmoFabricRuntime {
         if (activeWoodcuttingAbilityController != null) {
             try {
                 activeWoodcuttingAbilityController.close();
+            } catch (IOException exception) {
+                if (failure == null) {
+                    failure = exception;
+                } else {
+                    failure.addSuppressed(exception);
+                }
+            }
+        }
+        if (activeExcavationAbilityController != null) {
+            try {
+                activeExcavationAbilityController.close();
             } catch (IOException exception) {
                 if (failure == null) {
                     failure = exception;

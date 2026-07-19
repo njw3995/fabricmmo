@@ -181,7 +181,7 @@ public final class MiningAbilityHandler {
                 message(player, settings, MiningMessages.pickaxeLowered());
             } else if (result == MiningAbilityController.SuperBreakerPreparation.LOCKED) {
                 message(player, settings, MiningMessages.locked(
-                        "SUPER BREAKER", settings.superBreakerUnlockLevel()));
+                        Math.max(0, settings.superBreakerUnlockLevel() - level)));
             } else if (result instanceof MiningAbilityController.SuperBreakerPreparation.Cooldown cooldown) {
                 message(player, settings, MiningMessages.cooldown("Super Breaker", cooldown.secondsRemaining()));
                 sound(player, SoundEvents.ENTITY_VILLAGER_NO, 1.7F);

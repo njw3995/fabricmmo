@@ -129,10 +129,9 @@ final class InformationCommands {
             return SharedCommandUtil.error(source, "That skill is not registered.");
         }
         SkillPanelService.Panel panel = systems.skillPanels()
-                .panel(player.getUuid(), definition.orElseThrow());
-        systems.scoreboards().show(player,
-                Text.literal(skillName.toUpperCase(java.util.Locale.ROOT)),
-                panel.scoreboardLines(), -1);
+                .panel(source, player.getUuid(), definition.orElseThrow());
+        systems.scoreboards().showValues(player,
+                panel.scoreboardTitle(), panel.scoreboardRows(), -1);
         systems.scoreboards().keep(player.getUuid());
         return SharedCommandUtil.success(source,
                 LegacyText.strip(systems.locale().text("Commands.Scoreboard.Keep")));
@@ -145,10 +144,9 @@ final class InformationCommands {
         var definition = SharedCommandUtil.skill(skillName, true);
         if (definition.isEmpty()) return SharedCommandUtil.error(source, "That skill is not registered.");
         SkillPanelService.Panel panel = SharedCommandUtil.systems().skillPanels()
-                .panel(player.getUuid(), definition.orElseThrow());
+                .panel(source, player.getUuid(), definition.orElseThrow());
         CommandUiDisplay.skill(source,
-                Text.literal(skillName.toUpperCase(java.util.Locale.ROOT)),
-                panel.chatLines(), panel.scoreboardLines());
+                panel.scoreboardTitle(), panel.chatLines(), panel.scoreboardRows());
         return 1;
     }
 

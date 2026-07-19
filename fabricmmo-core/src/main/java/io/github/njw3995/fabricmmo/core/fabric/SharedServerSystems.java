@@ -16,9 +16,13 @@ import io.github.njw3995.fabricmmo.core.chat.ChatSettings;
 import io.github.njw3995.fabricmmo.core.chat.ChatStateService;
 import io.github.njw3995.fabricmmo.core.command.StatsTextFormatter;
 import io.github.njw3995.fabricmmo.core.diagnostic.DebugDiagnosticsService;
+import io.github.njw3995.fabricmmo.core.diagnostic.UiTraceLogger;
+import io.github.njw3995.fabricmmo.core.config.FlatYamlConfig;
 import io.github.njw3995.fabricmmo.core.info.SkillGuideCatalog;
+import io.github.njw3995.fabricmmo.core.info.SkillPanelCooldownCatalog;
 import io.github.njw3995.fabricmmo.core.info.SkillPanelMechanicsCatalog;
 import io.github.njw3995.fabricmmo.core.info.SkillPanelService;
+import io.github.njw3995.fabricmmo.core.info.SubSkillRankCatalog;
 import io.github.njw3995.fabricmmo.core.leaderboard.LeaderboardService;
 import io.github.njw3995.fabricmmo.core.locale.LocaleService;
 import io.github.njw3995.fabricmmo.core.party.ItemWeightSettings;
@@ -37,6 +41,10 @@ import io.github.njw3995.fabricmmo.core.progression.ProgressionFormula;
 import io.github.njw3995.fabricmmo.core.progression.ProgressionSettings;
 import io.github.njw3995.fabricmmo.core.session.PlayerSessionStateService;
 import io.github.njw3995.fabricmmo.core.skill.CoreSkills;
+import io.github.njw3995.fabricmmo.core.skill.excavation.CoreExcavationAbilities;
+import io.github.njw3995.fabricmmo.core.skill.excavation.ExcavationAbilityController;
+import io.github.njw3995.fabricmmo.core.skill.excavation.ExcavationPanelMechanicsProvider;
+import io.github.njw3995.fabricmmo.core.skill.excavation.ExcavationSettings;
 import io.github.njw3995.fabricmmo.core.skill.mining.CoreMiningAbilities;
 import io.github.njw3995.fabricmmo.core.skill.mining.MiningAbilityController;
 import io.github.njw3995.fabricmmo.core.skill.mining.MiningDropSettings;
@@ -98,7 +106,9 @@ public final class SharedServerSystems {
             MiningDropSettings miningDropSettings,
             WoodcuttingAbilityController woodcuttingAbilities,
             WoodcuttingSettings woodcuttingSettings,
-            WoodcuttingDropSettings woodcuttingDropSettings) throws IOException {
+            WoodcuttingDropSettings woodcuttingDropSettings,
+            ExcavationAbilityController excavationAbilities,
+            ExcavationSettings excavationSettings) throws IOException {
         if (state != null) {
             throw new IllegalStateException("Shared FabricMMO systems already active");
         }
@@ -130,8 +140,15 @@ public final class SharedServerSystems {
         PlayerSessionStateService sessions = new PlayerSessionStateService();
         PlayerUiSettingsService uiSettings = new PlayerUiSettingsService(
                 new InMemoryPlayerUiSettingsStore());
+        Path configFile = configDirectory.resolve("config.yml");
+        FlatYamlConfig advancedConfiguration = FlatYamlConfig.load(
+                configDirectory.resolve("advanced.yml"));
         UiSettings uiConfiguration = UiSettings.load(
-                configDirectory.resolve("config.yml"), configDirectory.resolve("experience.yml"));
+                configFile, configDirectory.resolve("experience.yml"));
+        boolean skillCommandBlankLines = advancedConfiguration.bool(
+                "Feedback.SkillCommand.BlankLinesAboveHeader", true);
+        boolean uiTraceEnabled = FlatYamlConfig.load(configFile)
+                .bool("Debugging.UI_Trace.Enabled", true);
         LocaleService locale = LocaleService.loadDefault();
         ScoreboardTipService scoreboardTips = new ScoreboardTipService(
                 dataRoot.resolve("scoreboard-tips.properties"),
@@ -142,15 +159,28 @@ public final class SharedServerSystems {
         XpBossBarService xpBars = new XpBossBarService(
                 api, locale, progressionSettings, uiConfiguration);
         AbilityCooldownService cooldowns = cooldowns(
-                miningAbilities, miningSettings, woodcuttingAbilities, woodcuttingSettings);
+                miningAbilities,
+                miningSettings,
+                woodcuttingAbilities,
+                woodcuttingSettings,
+                excavationAbilities,
+                excavationSettings);
+        SkillPanelCooldownCatalog skillPanelCooldowns = new SkillPanelCooldownCatalog(
+                cooldowns, locale, uiConfiguration.abilityNames());
+        SubSkillRankCatalog subSkillRanks = SubSkillRankCatalog.load(
+                configDirectory.resolve("skillranks.yml"), progressionSettings.mode());
         SkillPanelMechanicsCatalog skillPanelMechanics = new SkillPanelMechanicsCatalog();
         skillPanelMechanics.register(
                 CoreSkills.MINING,
-                new MiningPanelMechanicsProvider(server, miningSettings, miningDropSettings));
+                new MiningPanelMechanicsProvider(server, miningSettings, miningDropSettings, locale));
         skillPanelMechanics.register(
                 CoreSkills.WOODCUTTING,
                 new WoodcuttingPanelMechanicsProvider(
-                        server, woodcuttingSettings, woodcuttingDropSettings));
+                        server, woodcuttingSettings, woodcuttingDropSettings, locale));
+        skillPanelMechanics.register(
+                CoreSkills.EXCAVATION,
+                new ExcavationPanelMechanicsProvider(
+                        server, excavationAbilities, excavationSettings, locale));
         DebugDiagnosticsService diagnostics = new DebugDiagnosticsService(server, sessions);
         ProgressionMaintenanceService maintenance = new ProgressionMaintenanceService(
                 progressionStore, playerDataDirectory, mySqlSettings, Clock.systemUTC());
@@ -188,7 +218,15 @@ public final class SharedServerSystems {
                         CoreSkills.primarySkillIds().stream().sorted().toList()),
                 locale,
                 new SkillGuideCatalog(locale),
-                new SkillPanelService(api, skillPanelMechanics),
+                new SkillPanelService(
+                        api,
+                        skillPanelMechanics,
+                        subSkillRanks,
+                        permissions,
+                        skillPanelCooldowns,
+                        locale,
+                        uiConfiguration.rainbows(),
+                        skillCommandBlankLines),
                 new ExperienceConversionService(
                         progressionStore,
                         progressionSettings,
@@ -200,6 +238,12 @@ public final class SharedServerSystems {
                 scheduledMaintenance,
                 new ArrayList<>());
         state = newState;
+        UiTraceLogger.configure(uiTraceEnabled);
+        UiTraceLogger.configuration(
+                uiConfiguration.scoreboardsEnabled(),
+                uiConfiguration.rainbows(),
+                uiConfiguration.abilityNames(),
+                skillCommandBlankLines);
         PartyXpRuntime.install(partyGameplay::distributeXp);
         XpRateRuntime.install(xpRates);
         registerEvents(newState, partySettings);
@@ -227,7 +271,9 @@ public final class SharedServerSystems {
             MiningAbilityController miningAbilities,
             MiningSettings miningSettings,
             WoodcuttingAbilityController woodcuttingAbilities,
-            WoodcuttingSettings woodcuttingSettings) {
+            WoodcuttingSettings woodcuttingSettings,
+            ExcavationAbilityController excavationAbilities,
+            ExcavationSettings excavationSettings) {
         AbilityCooldownService cooldowns = new AbilityCooldownService();
         AbilityCooldownService.Provider miningProvider = new AbilityCooldownService.Provider() {
             @Override
@@ -280,6 +326,27 @@ public final class SharedServerSystems {
                     public void reset(UUID playerId) {
                         try {
                             woodcuttingAbilities.reset(playerId);
+                        } catch (IOException exception) {
+                            throw new UncheckedIOException(exception);
+                        }
+                    }
+                });
+        cooldowns.register(CoreExcavationAbilities.GIGA_DRILL_BREAKER,
+                new AbilityCooldownService.Provider() {
+                    @Override
+                    public int remainingSeconds(UUID playerId) {
+                        try {
+                            return excavationAbilities.cooldownRemaining(
+                                    playerId, excavationSettings.gigaDrillCooldownSeconds());
+                        } catch (IOException exception) {
+                            throw new UncheckedIOException(exception);
+                        }
+                    }
+
+                    @Override
+                    public void reset(UUID playerId) {
+                        try {
+                            excavationAbilities.reset(playerId);
                         } catch (IOException exception) {
                             throw new UncheckedIOException(exception);
                         }
@@ -462,6 +529,7 @@ public final class SharedServerSystems {
         state = null;
         XpRateRuntime.clear();
         PartyXpRuntime.clear();
+        UiTraceLogger.clear();
         if (current == null) {
             return;
         }

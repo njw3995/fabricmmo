@@ -71,7 +71,8 @@ public final class WoodcuttingMessages {
             String skillName = SharedServerSystems.require().locale()
                     .text("Overhaul.Name.Woodcutting");
             return LegacyText.parse(SharedServerSystems.require().locale()
-                    .text("Skills.AbilityGateRequirementFail", levelsRequired, skillName));
+                    .text("Skills.AbilityGateRequirementFail",
+                            Integer.toString(levelsRequired), skillName));
         }
         return Text.literal("You require ").formatted(Formatting.GRAY)
                 .append(Text.literal(Integer.toString(levelsRequired)).formatted(Formatting.YELLOW))

@@ -1,5 +1,6 @@
 package io.github.njw3995.fabricmmo.core.config;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.nio.file.Files;
@@ -17,12 +18,36 @@ class DefaultConfigInstallerTest {
         DefaultConfigInstaller.installMissingDefaults(directory);
 
         String updated = Files.readString(existing);
-        assertTrue(updated.startsWith("admin-value: keep\n"));
+        assertEquals("admin-value: keep", Files.readAllLines(existing).get(0));
         assertTrue(updated.contains("Scoreboard:"));
         assertTrue(updated.contains("  UseScoreboards: false"));
         for (String fileName : DefaultConfigInstaller.allFiles()) {
             assertTrue(Files.isRegularFile(directory.resolve(fileName)), fileName);
         }
         assertTrue(Files.isDirectory(directory.resolve("locales")));
+    }
+
+    @Test
+    void recursivelyAddsNewSkillDefaultsAndCreatesBackup(@TempDir Path directory)
+            throws Exception {
+        Path experience = directory.resolve("experience.yml");
+        Files.writeString(experience, """
+                Experience_Values:
+                  Mining:
+                    Coal_Ore: 9999
+                """);
+
+        DefaultConfigInstaller.installMissingDefaults(directory);
+
+        String updated = Files.readString(experience);
+        assertTrue(updated.contains("Coal_Ore: 9999"));
+        assertTrue(updated.contains("  Excavation:"));
+        assertTrue(updated.contains("    Sand: 40"));
+        assertTrue(Files.isRegularFile(directory.resolve("experience.yml.pre-update.bak")));
+        assertEquals("""
+                Experience_Values:
+                  Mining:
+                    Coal_Ore: 9999
+                """, Files.readString(directory.resolve("experience.yml.pre-update.bak")));
     }
 }

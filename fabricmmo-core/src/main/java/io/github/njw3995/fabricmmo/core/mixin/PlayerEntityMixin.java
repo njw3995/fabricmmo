@@ -1,5 +1,6 @@
 package io.github.njw3995.fabricmmo.core.mixin;
 
+import io.github.njw3995.fabricmmo.core.skill.excavation.ExcavationAbilityHandler;
 import io.github.njw3995.fabricmmo.core.skill.mining.MiningAbilityHandler;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -22,6 +23,7 @@ abstract class PlayerEntityMixin {
             CallbackInfoReturnable<ItemEntity> callback) {
         if ((Object) this instanceof ServerPlayerEntity serverPlayer) {
             MiningAbilityHandler.restoreDroppedTool(serverPlayer, stack);
+            ExcavationAbilityHandler.restoreDroppedTool(serverPlayer, stack);
         }
     }
 }

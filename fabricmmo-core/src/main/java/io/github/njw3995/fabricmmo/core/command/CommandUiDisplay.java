@@ -1,5 +1,6 @@
 package io.github.njw3995.fabricmmo.core.command;
 
+import io.github.njw3995.fabricmmo.core.ui.ScoreboardValueLine;
 import io.github.njw3995.fabricmmo.core.ui.UiSettings;
 import java.util.List;
 import net.minecraft.server.command.ServerCommandSource;
@@ -46,20 +47,49 @@ final class CommandUiDisplay {
         }
     }
 
+
+    static void configuredValues(
+            ServerCommandSource source,
+            UiSettings.BoardType type,
+            Text boardTitle,
+            List<Text> chatLines,
+            List<ScoreboardValueLine> boardLines) {
+        UiSettings ui = SharedCommandUtil.systems().uiConfiguration();
+        UiSettings.Board settings = ui.board(type);
+        boolean useBoard = settings.enabled()
+                && ui.scoreboardsEnabled()
+                && source.getEntity() instanceof ServerPlayerEntity;
+        boolean useChat = !useBoard || settings.print();
+        if (useChat) {
+            chatLines.forEach(source::sendMessage);
+        }
+        if (useBoard) {
+            ServerPlayerEntity player = (ServerPlayerEntity) source.getEntity();
+            SharedCommandUtil.systems().scoreboards().showValues(
+                    player, boardTitle, sidebarValueLines(boardLines), settings.displaySeconds());
+        }
+    }
+
     static void skill(
             ServerCommandSource source,
             Text boardTitle,
             List<Text> chatLines,
-            List<Text> boardLines) {
+            List<ScoreboardValueLine> boardLines) {
         chatLines.forEach(source::sendMessage);
         UiSettings.Board settings = SharedCommandUtil.systems().uiConfiguration()
                 .board(UiSettings.BoardType.SKILL);
         if (settings.enabled()
                 && SharedCommandUtil.systems().uiConfiguration().scoreboardsEnabled()
                 && source.getEntity() instanceof ServerPlayerEntity player) {
-            SharedCommandUtil.systems().scoreboards().show(
-                    player, boardTitle, sidebarLines(boardLines), settings.displaySeconds());
+            SharedCommandUtil.systems().scoreboards().showValues(
+                    player, boardTitle, sidebarValueLines(boardLines), settings.displaySeconds());
         }
+    }
+
+    private static List<ScoreboardValueLine> sidebarValueLines(List<ScoreboardValueLine> lines) {
+        return lines.size() <= SIDEBAR_LINE_LIMIT
+                ? List.copyOf(lines)
+                : List.copyOf(lines.subList(0, SIDEBAR_LINE_LIMIT));
     }
 
     private static List<Text> sidebarLines(List<Text> lines) {

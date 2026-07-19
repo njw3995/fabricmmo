@@ -1,5 +1,6 @@
 package io.github.njw3995.fabricmmo.core.mixin;
 
+import io.github.njw3995.fabricmmo.core.skill.excavation.ExcavationBlockBreakHandler;
 import io.github.njw3995.fabricmmo.core.skill.mining.MiningBlockBreakHandler;
 import io.github.njw3995.fabricmmo.core.skill.woodcutting.WoodcuttingBlockBreakHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -28,5 +29,6 @@ abstract class ServerPlayerInteractionManagerMixin {
             CallbackInfoReturnable<Boolean> callback) {
         MiningBlockBreakHandler.finishBlockBreak(world, player, pos);
         WoodcuttingBlockBreakHandler.finishBlockBreak(world, player, pos);
+        ExcavationBlockBreakHandler.finishBlockBreak(world, player, pos);
     }
 }

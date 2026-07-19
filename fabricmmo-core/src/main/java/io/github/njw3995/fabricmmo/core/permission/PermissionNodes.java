@@ -43,6 +43,13 @@ public final class PermissionNodes {
     public static final String WOODCUTTING_LEAF_BLOWER =
             "mcmmo.ability.woodcutting.leafblower";
     public static final String WOODCUTTING_LUCKY = "mcmmo.perks.lucky.woodcutting";
+    public static final String EXCAVATION = "mcmmo.skills.excavation";
+    public static final String EXCAVATION_COMMAND = "mcmmo.commands.excavation";
+    public static final String EXCAVATION_GIGA_DRILL_BREAKER =
+            "mcmmo.ability.excavation.gigadrillbreaker";
+    public static final String EXCAVATION_ARCHAEOLOGY =
+            "mcmmo.ability.excavation.archaeology";
+    public static final String EXCAVATION_LUCKY = "mcmmo.perks.lucky.excavation";
     public static final String XP_CUSTOM_ALL = "mcmmo.perks.xp.customboost.all";
     public static final String XP_QUADRUPLE_ALL = "mcmmo.perks.xp.quadruple.all";
     public static final String XP_TRIPLE_ALL = "mcmmo.perks.xp.triple.all";

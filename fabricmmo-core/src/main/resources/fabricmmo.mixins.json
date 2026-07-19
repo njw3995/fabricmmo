@@ -12,6 +12,8 @@
     "PistonHandlerMixin",
     "PlayerEntityMixin",
     "ServerPlayerInteractionManagerMixin",
+    "ServerPlayerEntityUiTraceMixin",
+    "ServerCommandSourceUiTraceMixin",
     "TntEntityMixin",
     "WorldChunkMixin",
     "FluidBlockMixin",

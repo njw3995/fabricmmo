@@ -44,4 +44,20 @@ class CoreXpSourcesTest {
         assertEquals(2, miningSources);
     }
 
+    @Test
+    void registersSeparateExcavationBlockAndTreasureSources() {
+        DefaultSkillRegistry skills = new DefaultSkillRegistry();
+        CoreSkills.registerAll(skills);
+        DefaultXpSourceRegistry sources = new DefaultXpSourceRegistry(skills);
+
+        CoreXpSources.registerDefaults(sources);
+
+        assertTrue(sources.find(CoreXpSources.EXCAVATION_BLOCK_BREAK).isPresent());
+        assertTrue(sources.find(CoreXpSources.EXCAVATION_TREASURE).isPresent());
+        long excavationSources = sources.sources().stream()
+                .filter(source -> source.skillId().equals(CoreSkills.EXCAVATION))
+                .count();
+        assertEquals(2, excavationSources);
+    }
+
 }

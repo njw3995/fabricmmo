@@ -1,5 +1,7 @@
 package io.github.njw3995.fabricmmo.core.skill.mining;
 
+import io.github.njw3995.fabricmmo.core.command.LegacyText;
+import io.github.njw3995.fabricmmo.core.fabric.SharedServerSystems;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -60,9 +62,21 @@ public final class MiningMessages {
                 .formatted(Formatting.RED);
     }
 
-    public static Text locked(String ability, int level) {
-        return Text.literal("LOCKED UNTIL " + level + "+ SKILL (" + ability + ")")
-                .formatted(Formatting.RED);
+    public static Text locked(int levelsRequired) {
+        if (SharedServerSystems.running()) {
+            String skillName = SharedServerSystems.require().locale()
+                    .text("Overhaul.Name.Mining");
+            return LegacyText.parse(SharedServerSystems.require().locale()
+                    .text("Skills.AbilityGateRequirementFail",
+                            Integer.toString(levelsRequired), skillName));
+        }
+        return Text.literal("You require ").formatted(Formatting.GRAY)
+                .append(Text.literal(Integer.toString(levelsRequired))
+                        .formatted(Formatting.YELLOW))
+                .append(Text.literal(" more levels of ").formatted(Formatting.GRAY))
+                .append(Text.literal("Mining").formatted(Formatting.DARK_AQUA))
+                .append(Text.literal(" to use this super ability.")
+                        .formatted(Formatting.GRAY));
     }
 
     public static Text levelUp(int level) {

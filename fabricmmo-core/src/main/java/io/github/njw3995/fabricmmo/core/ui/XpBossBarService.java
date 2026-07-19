@@ -4,6 +4,7 @@ import io.github.njw3995.fabricmmo.api.FabricMmoApi;
 import io.github.njw3995.fabricmmo.api.NamespacedId;
 import io.github.njw3995.fabricmmo.api.progression.ProgressionSnapshot;
 import io.github.njw3995.fabricmmo.core.command.LegacyText;
+import io.github.njw3995.fabricmmo.core.diagnostic.UiTraceLogger;
 import io.github.njw3995.fabricmmo.core.locale.LocaleService;
 import io.github.njw3995.fabricmmo.core.progression.ProgressionSettings;
 import java.util.HashMap;
@@ -59,13 +60,17 @@ public final class XpBossBarService {
             bar = old.bar();
         }
 
+        Text title = bar.getName();
         if (old == null || old.level() != progress.level()
                 || uiSettings.alwaysUpdateXpBarTitles()) {
-            bar.setName(title(progress, earlyGame));
+            title = title(progress, earlyGame);
+            bar.setName(title);
         }
-        bar.setPercent(progress.xpToNextLevel() <= 0 ? 0.0F
+        float percent = progress.xpToNextLevel() <= 0 ? 0.0F
                 : Math.max(0.0F, Math.min(
-                        1.0F, (float) progress.xp() / progress.xpToNextLevel())));
+                        1.0F, (float) progress.xp() / progress.xpToNextLevel()));
+        bar.setPercent(percent);
+        UiTraceLogger.bossBar(player, title, percent, requestedColor, settings.style());
         bars.put(key, new Entry(
                 bar,
                 requestedColor,

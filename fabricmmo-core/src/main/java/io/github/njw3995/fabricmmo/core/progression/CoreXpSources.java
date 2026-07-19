@@ -14,6 +14,10 @@ public final class CoreXpSources {
             NamespacedId.parse("fabricmmo:woodcutting_block_break");
     public static final NamespacedId WOODCUTTING_TREE_FELLER =
             NamespacedId.parse("fabricmmo:woodcutting_tree_feller");
+    public static final NamespacedId EXCAVATION_BLOCK_BREAK =
+            NamespacedId.parse("fabricmmo:excavation_block_break");
+    public static final NamespacedId EXCAVATION_TREASURE =
+            NamespacedId.parse("fabricmmo:excavation_treasure");
 
     private CoreXpSources() {
     }
@@ -35,6 +39,14 @@ public final class CoreXpSources {
                 WOODCUTTING_TREE_FELLER,
                 CoreSkills.WOODCUTTING,
                 Map.of("upstream", "WoodcuttingManager#processTreeFeller")));
+        registrar.registerXpSource(new XpSourceDefinition(
+                EXCAVATION_BLOCK_BREAK,
+                CoreSkills.EXCAVATION,
+                Map.of("upstream", "ExcavationManager#excavationBlockCheck")));
+        registrar.registerXpSource(new XpSourceDefinition(
+                EXCAVATION_TREASURE,
+                CoreSkills.EXCAVATION,
+                Map.of("upstream", "ExcavationManager#rollAndCollectTreasureDrops")));
     }
 
     public static void registerCommandSources(

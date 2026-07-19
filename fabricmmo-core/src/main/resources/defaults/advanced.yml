@@ -1,4 +1,6 @@
 Feedback:
+  SkillCommand:
+    BlankLinesAboveHeader: true
   Events:
     AbilityActivation:
       SendNotificationToOtherPlayers: true

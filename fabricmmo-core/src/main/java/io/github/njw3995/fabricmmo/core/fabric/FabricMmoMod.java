@@ -4,6 +4,8 @@ import io.github.njw3995.fabricmmo.core.command.FabricMmoCommands;
 import io.github.njw3995.fabricmmo.core.chat.SharedChatHandler;
 import io.github.njw3995.fabricmmo.core.config.DefaultConfigInstaller;
 import io.github.njw3995.fabricmmo.core.permission.FabricCommandPermissionService;
+import io.github.njw3995.fabricmmo.core.skill.excavation.ExcavationAbilityHandler;
+import io.github.njw3995.fabricmmo.core.skill.excavation.ExcavationBlockBreakHandler;
 import io.github.njw3995.fabricmmo.core.skill.mining.MiningAbilityHandler;
 import io.github.njw3995.fabricmmo.core.skill.mining.MiningBlastHandler;
 import io.github.njw3995.fabricmmo.core.skill.mining.MiningBlockBreakHandler;
@@ -33,6 +35,8 @@ public final class FabricMmoMod implements ModInitializer {
         MiningAbilityHandler.register();
         WoodcuttingBlockBreakHandler.register();
         WoodcuttingAbilityHandler.register();
+        ExcavationBlockBreakHandler.register();
+        ExcavationAbilityHandler.register();
         SharedChatHandler.register(permissions);
         ServerTickEvents.END_SERVER_TICK.register(SharedServerSystems::tick);
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {

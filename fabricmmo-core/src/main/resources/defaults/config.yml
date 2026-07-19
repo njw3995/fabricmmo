@@ -15,10 +15,12 @@ Abilities:
     Blast_Mining: 60
     Super_Breaker: 240
     Tree_Feller: 240
+    Giga_Drill_Breaker: 240
   Max_Seconds:
     Blast_Mining: 0
     Super_Breaker: 0
     Tree_Feller: 0
+    Giga_Drill_Breaker: 0
   Limits:
     Tree_Feller_Threshold: 1000
   Tools:
@@ -257,3 +259,8 @@ MySQL:
     Port: 3306
     Address: localhost
     allowPublicKeyRetrieval: true
+
+# TEMPORARY: remove after upstream UI parity verification is complete.
+Debugging:
+  UI_Trace:
+    Enabled: true

@@ -1,7 +1,7 @@
 package io.github.njw3995.fabricmmo.core.skill.woodcutting;
 
-import io.github.njw3995.fabricmmo.api.progression.ProgressionMode;
 import io.github.njw3995.fabricmmo.core.info.SkillPanelMechanicsProvider;
+import io.github.njw3995.fabricmmo.core.locale.LocaleService;
 import io.github.njw3995.fabricmmo.core.permission.FabricCommandPermissionService;
 import io.github.njw3995.fabricmmo.core.permission.PermissionNodes;
 import java.util.ArrayList;
@@ -12,27 +12,31 @@ import java.util.UUID;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 
-/** Upstream-shaped Woodcutting mechanic rows for the shared skill command panel. */
+/** Exact mcMMO 2.3.000 Woodcutting statsDisplay rows. */
 public final class WoodcuttingPanelMechanicsProvider implements SkillPanelMechanicsProvider {
     private final MinecraftServer server;
     private final WoodcuttingSettings settings;
     private final WoodcuttingDropSettings drops;
+    private final LocaleService locale;
     private final FabricCommandPermissionService permissions =
             new FabricCommandPermissionService();
 
     public WoodcuttingPanelMechanicsProvider(
             WoodcuttingSettings settings,
-            WoodcuttingDropSettings drops) {
-        this(null, settings, drops);
+            WoodcuttingDropSettings drops,
+            LocaleService locale) {
+        this(null, settings, drops, locale);
     }
 
     public WoodcuttingPanelMechanicsProvider(
             MinecraftServer server,
             WoodcuttingSettings settings,
-            WoodcuttingDropSettings drops) {
+            WoodcuttingDropSettings drops,
+            LocaleService locale) {
         this.server = server;
         this.settings = Objects.requireNonNull(settings, "settings");
         this.drops = Objects.requireNonNull(drops, "drops");
+        this.locale = Objects.requireNonNull(locale, "locale");
     }
 
     @Override
@@ -48,67 +52,59 @@ public final class WoodcuttingPanelMechanicsProvider implements SkillPanelMechan
                 : 0;
         ArrayList<MechanicRow> rows = new ArrayList<>();
 
-        if (!inspectPermissions || allowed(
-                player, PermissionNodes.WOODCUTTING_TREE_FELLER, true)) {
+        if (drops.harvestLumberUnlocked(level, settings.progressionMode())
+                && (!inspectPermissions || allowed(
+                        player, PermissionNodes.WOODCUTTING_HARVEST_LUMBER, true))) {
+            rows.add(new MechanicRow(
+                    locale.text("Woodcutting.SubSkill.HarvestLumber.Stat"),
+                    chance(
+                            level,
+                            drops.harvestLumberMaxLevel(settings.progressionMode()),
+                            drops.harvestLumberChanceMaxPercent(),
+                            lucky)));
+        }
+        if (drops.cleanCutsUnlocked(level, settings.progressionMode())
+                && (!inspectPermissions || allowed(
+                        player, PermissionNodes.WOODCUTTING_CLEAN_CUTS, true))) {
+            rows.add(new MechanicRow(
+                    locale.text("Woodcutting.SubSkill.CleanCuts.Stat"),
+                    chance(
+                            level,
+                            drops.cleanCutsMaxLevel(settings.progressionMode()),
+                            drops.cleanCutsChanceMaxPercent(),
+                            lucky)));
+        }
+        boolean treeFellerUnlocked = level >= settings.treeFellerUnlockLevel();
+        if (treeFellerUnlocked
+                && level >= settings.knockOnWoodRankOneLevel()
+                && (!inspectPermissions || (allowed(
+                        player, PermissionNodes.WOODCUTTING_TREE_FELLER, true)
+                        && allowed(player, PermissionNodes.WOODCUTTING_KNOCK_ON_WOOD, true)))) {
+            String lootKey = level >= settings.knockOnWoodRankTwoLevel()
+                    ? "Woodcutting.SubSkill.KnockOnWood.Loot.Rank2"
+                    : "Woodcutting.SubSkill.KnockOnWood.Loot.Normal";
+            rows.add(new MechanicRow(
+                    locale.text("Woodcutting.SubSkill.KnockOnWood.Stat"),
+                    locale.text(lootKey)));
+        }
+        if (level >= settings.leafBlowerUnlockLevel()
+                && (!inspectPermissions || allowed(
+                        player, PermissionNodes.WOODCUTTING_LEAF_BLOWER, true))) {
+            rows.add(new MechanicRow(
+                    locale.text("Woodcutting.Ability.0"),
+                    locale.text("Woodcutting.Ability.1")));
+        }
+        if (treeFellerUnlocked
+                && (!inspectPermissions || allowed(
+                        player, PermissionNodes.WOODCUTTING_TREE_FELLER, true))) {
             int baseDuration = settings.treeFellerDurationSeconds(level);
+            String value = Integer.toString(baseDuration);
+            if (enduranceBonus > 0) {
+                value += locale.text("Perks.ActivationTime.Bonus", baseDuration + enduranceBonus);
+            }
             rows.add(new MechanicRow(
-                    "Tree Feller",
-                    level >= settings.treeFellerUnlockLevel()
-                            ? enduranceBonus > 0
-                                    ? baseDuration + " seconds ("
-                                            + (baseDuration + enduranceBonus)
-                                            + "s with Endurance Perk)"
-                                    : baseDuration + " seconds"
-                            : "Locked until level " + settings.treeFellerUnlockLevel()));
-        }
-        if (!inspectPermissions || allowed(
-                player, PermissionNodes.WOODCUTTING_HARVEST_LUMBER, true)) {
-            rows.add(new MechanicRow(
-                    "Harvest Lumber",
-                    drops.harvestLumberUnlocked(level, settings.progressionMode())
-                            ? chance(
-                                    level,
-                                    drops.harvestLumberMaxLevel(settings.progressionMode()),
-                                    drops.harvestLumberChanceMaxPercent(),
-                                    lucky)
-                            : "Locked until level " + unlock(
-                                    settings.progressionMode(),
-                                    drops.harvestLumberUnlockStandard(),
-                                    drops.harvestLumberUnlockRetro())));
-        }
-        if (!inspectPermissions || allowed(
-                player, PermissionNodes.WOODCUTTING_CLEAN_CUTS, true)) {
-            rows.add(new MechanicRow(
-                    "Clean Cuts",
-                    drops.cleanCutsUnlocked(level, settings.progressionMode())
-                            ? chance(
-                                    level,
-                                    drops.cleanCutsMaxLevel(settings.progressionMode()),
-                                    drops.cleanCutsChanceMaxPercent(),
-                                    lucky)
-                            : "Locked until level " + unlock(
-                                    settings.progressionMode(),
-                                    drops.cleanCutsUnlockStandard(),
-                                    drops.cleanCutsUnlockRetro())));
-        }
-        if (!inspectPermissions || allowed(
-                player, PermissionNodes.WOODCUTTING_KNOCK_ON_WOOD, true)) {
-            rows.add(new MechanicRow(
-                    "Knock on Wood",
-                    level >= settings.knockOnWoodRankTwoLevel()
-                            ? "Rank 2: standard tree loot and experience orbs"
-                            : level >= settings.knockOnWoodRankOneLevel()
-                                    ? "Rank 1: standard tree loot"
-                                    : "Locked until level "
-                                            + settings.knockOnWoodRankOneLevel()));
-        }
-        if (!inspectPermissions || allowed(
-                player, PermissionNodes.WOODCUTTING_LEAF_BLOWER, true)) {
-            rows.add(new MechanicRow(
-                    "Leaf Blower",
-                    level >= settings.leafBlowerUnlockLevel()
-                            ? "Blow away leaves"
-                            : "Locked until level " + settings.leafBlowerUnlockLevel()));
+                    locale.text("Woodcutting.SubSkill.TreeFeller.Stat"),
+                    value));
         }
         return List.copyOf(rows);
     }
@@ -120,27 +116,21 @@ public final class WoodcuttingPanelMechanicsProvider implements SkillPanelMechan
         return permissions.hasPermission(player.getCommandSource(), permission, fallback);
     }
 
-    private static int unlock(
-            ProgressionMode mode,
-            int standard,
-            int retro) {
-        return mode == ProgressionMode.RETRO ? retro : standard;
-    }
-
-    private static String chance(
+    private String chance(
             int level,
             int maxLevel,
             double maximum,
             boolean lucky) {
         double base = WoodcuttingProbability.chance(level, maxLevel, maximum, false);
-        if (!lucky) {
-            return percent(base);
+        String value = formatProbability(base);
+        if (lucky) {
+            double luckyChance = WoodcuttingProbability.chance(level, maxLevel, maximum, true);
+            value += locale.text("Perks.Lucky.Bonus", formatProbability(luckyChance));
         }
-        double luckyChance = WoodcuttingProbability.chance(level, maxLevel, maximum, true);
-        return percent(base) + " (" + percent(luckyChance) + " with Lucky Perk)";
+        return value;
     }
 
-    private static String percent(double probability) {
-        return String.format(Locale.ROOT, "%.2f%%", probability * 100.0D);
+    private static String formatProbability(double probability) {
+        return String.format(Locale.US, "%.2f%%", probability * 100.0D);
     }
 }

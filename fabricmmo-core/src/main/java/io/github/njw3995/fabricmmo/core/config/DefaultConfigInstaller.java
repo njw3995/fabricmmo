@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -33,6 +34,13 @@ public final class DefaultConfigInstaller {
             "itemweights.yml",
             "world_blacklist.txt");
     public static final List<String> FABRIC_ONLY_FILES = List.of("fabric.yml", "addons.yml");
+    private static final Set<String> RECURSIVE_MERGE_FILES = Set.of(
+            "config.yml",
+            "experience.yml",
+            "advanced.yml",
+            "skillranks.yml",
+            "fabric.yml",
+            "addons.yml");
 
     private DefaultConfigInstaller() {
     }
@@ -43,7 +51,9 @@ public final class DefaultConfigInstaller {
             Path target = configDirectory.resolve(fileName);
             String resourceName = "/defaults/" + fileName;
             if (Files.exists(target)) {
-                if (fileName.endsWith(".yml")) {
+                if (RECURSIVE_MERGE_FILES.contains(fileName)) {
+                    mergeMissingYamlDefaults(target, resourceName);
+                } else if (fileName.endsWith(".yml")) {
                     appendMissingTopLevelSections(target, resourceName);
                 }
                 continue;
@@ -56,6 +66,30 @@ public final class DefaultConfigInstaller {
             }
         }
         Files.createDirectories(configDirectory.resolve("locales"));
+    }
+
+
+    private static void mergeMissingYamlDefaults(Path target, String resourceName)
+            throws IOException {
+        List<String> existing = Files.readAllLines(target, StandardCharsets.UTF_8);
+        List<String> defaults;
+        try (InputStream input = DefaultConfigInstaller.class.getResourceAsStream(resourceName)) {
+            if (input == null) {
+                throw new IOException("Missing packaged config default " + resourceName);
+            }
+            defaults = new String(input.readAllBytes(), StandardCharsets.UTF_8).lines().toList();
+        }
+        YamlDefaultsMerger.MergeResult merged = YamlDefaultsMerger.merge(existing, defaults);
+        if (!merged.changed()) {
+            return;
+        }
+        Path backup = target.resolveSibling(target.getFileName() + ".pre-update.bak");
+        Files.copy(target, backup, StandardCopyOption.REPLACE_EXISTING,
+                StandardCopyOption.COPY_ATTRIBUTES);
+        String content = String.join(System.lineSeparator(), merged.lines())
+                + System.lineSeparator();
+        Files.writeString(target, content, StandardCharsets.UTF_8,
+                StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
     }
 
     private static void appendMissingTopLevelSections(Path target, String resourceName)
