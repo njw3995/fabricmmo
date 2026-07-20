@@ -9,6 +9,7 @@ import io.github.njw3995.fabricmmo.core.permission.PermissionNodes;
 import io.github.njw3995.fabricmmo.core.progression.CoreXpSources;
 import io.github.njw3995.fabricmmo.core.progression.PlayerProgressionContext;
 import io.github.njw3995.fabricmmo.core.skill.CoreSkills;
+import io.github.njw3995.fabricmmo.core.skill.excavation.ExcavationAbilityHandler;
 import io.github.njw3995.fabricmmo.core.skill.mining.MiningAbilityHandler;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import java.util.ArrayList;
@@ -257,6 +258,7 @@ public final class UtilityAnvilInteractionHandler {
 
         // Upstream removes temporary ability enchantments before reading or rewriting enchants.
         MiningAbilityHandler.removeTemporaryToolBuffForRepair(player, item);
+        ExcavationAbilityHandler.prepareToolForUtilityAnvil(player);
         int oldDamage = item.getDamage();
         if (oldDamage <= 0) {
             message(player, "Repair.Skills.FullDurability");
@@ -388,6 +390,7 @@ public final class UtilityAnvilInteractionHandler {
             return;
         }
         MiningAbilityHandler.removeTemporaryToolBuffForRepair(player, item);
+        ExcavationAbilityHandler.prepareToolForUtilityAnvil(player);
         int level = level(player, CoreSkills.SALVAGE);
         if (level < definition.minimumLevel()) {
             message(player, "Salvage.Skills.Adept.Level",
