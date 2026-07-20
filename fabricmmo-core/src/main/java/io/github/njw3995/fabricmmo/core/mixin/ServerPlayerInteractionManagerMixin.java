@@ -4,10 +4,15 @@ import io.github.njw3995.fabricmmo.core.skill.excavation.ExcavationBlockBreakHan
 import io.github.njw3995.fabricmmo.core.skill.herbalism.HerbalismBlockBreakHandler;
 import io.github.njw3995.fabricmmo.core.skill.mining.MiningBlockBreakHandler;
 import io.github.njw3995.fabricmmo.core.skill.woodcutting.WoodcuttingBlockBreakHandler;
+import io.github.njw3995.fabricmmo.core.skill.repair.UtilityAnvilConfirmationService;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.network.ServerPlayerInteractionManager;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -23,6 +28,19 @@ abstract class ServerPlayerInteractionManagerMixin {
     @Shadow
     @Final
     protected ServerPlayerEntity player;
+
+    @Inject(method = "interactItem", at = @At("HEAD"), cancellable = true)
+    private void fabricmmo$blockPendingAnvilItemUse(
+            ServerPlayerEntity interactingPlayer,
+            World interactionWorld,
+            ItemStack stack,
+            Hand hand,
+            CallbackInfoReturnable<ActionResult> callback) {
+        if (UtilityAnvilConfirmationService.global()
+                .blocksItemUse(interactingPlayer.getUuid(), stack)) {
+            callback.setReturnValue(ActionResult.FAIL);
+        }
+    }
 
     @Inject(method = "tryBreakBlock", at = @At("RETURN"))
     private void fabricmmo$finishMiningBlockBreak(

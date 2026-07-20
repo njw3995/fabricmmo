@@ -2,6 +2,7 @@ package io.github.njw3995.fabricmmo.core.mixin;
 
 import io.github.njw3995.fabricmmo.core.block.BlockPlacementCapture;
 import io.github.njw3995.fabricmmo.core.fabric.FabricMmoFabricRuntime;
+import io.github.njw3995.fabricmmo.core.skill.repair.UtilityAnvilInteractionHandler;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -39,6 +40,13 @@ public abstract class BlockItemMixin {
                 || !(context.getPlayer() instanceof ServerPlayerEntity)) {
             return;
         }
-        BlockPlacementCapture.finish(callback.getReturnValue().isAccepted());
+        boolean accepted = callback.getReturnValue().isAccepted();
+        BlockPlacementCapture.finish(accepted);
+        if (accepted
+                && FabricMmoFabricRuntime.running()
+                && context.getWorld() instanceof ServerWorld world
+                && context.getPlayer() instanceof ServerPlayerEntity player) {
+            UtilityAnvilInteractionHandler.onBlockPlaced(player, world, context.getBlockPos());
+        }
     }
 }

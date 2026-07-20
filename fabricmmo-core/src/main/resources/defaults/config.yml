@@ -65,8 +65,19 @@ Skills:
     Detonator_Name: FLINT_AND_STEEL
   Repair:
     Level_Cap: 0
+    Anvil_Messages: true
+    Anvil_Placed_Sounds: true
+    Anvil_Use_Sounds: true
+    Anvil_Material: IRON_BLOCK
+    Use_Enchanted_Materials: false
+    Confirm_Required: true
   Salvage:
     Level_Cap: 0
+    Anvil_Messages: true
+    Anvil_Placed_Sounds: true
+    Anvil_Use_Sounds: true
+    Anvil_Material: GOLD_BLOCK
+    Confirm_Required: true
   Smelting:
     Level_Cap: 0
   Swords:
@@ -283,6 +294,20 @@ Bonus_Drops:
     Spruce_Log: true
     Mangrove_Wood: true
     Mangrove_Log: true
+
+  Smelting:
+    Iron_Ingot: true
+    Gold_Ingot: true
+    Emerald: true
+    Diamond: true
+    Lapis_Lazuli: true
+    Coal: true
+    Nether_Quartz: true
+    Quartz: true
+    Redstone: true
+    Deepslate: true
+    Copper_Ingot: true
+    Netherite_Scrap: true
 
 # Shared mcMMO 2.3.000 command, party, scoreboard, and storage defaults.
 Party:

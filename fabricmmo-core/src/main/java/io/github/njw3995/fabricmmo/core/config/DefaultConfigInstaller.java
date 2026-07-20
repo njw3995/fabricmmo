@@ -29,6 +29,7 @@ public final class DefaultConfigInstaller {
             "potions.yml",
             "level_up_commands.yml",
             "persistent_data.yml",
+            "custom_item_support.yml",
             "chat.yml",
             "party.yml",
             "itemweights.yml",
@@ -36,12 +37,15 @@ public final class DefaultConfigInstaller {
     public static final List<String> FABRIC_ONLY_FILES = List.of("fabric.yml", "addons.yml");
     private static final Set<String> EMPTY_PLACEHOLDER_FILES = Set.of(
             "fishing_treasures.yml",
+            "repair.vanilla.yml",
+            "salvage.vanilla.yml",
             "sounds.yml");
     private static final Set<String> RECURSIVE_MERGE_FILES = Set.of(
             "config.yml",
             "experience.yml",
             "advanced.yml",
             "skillranks.yml",
+            "custom_item_support.yml",
             "fabric.yml",
             "addons.yml");
 

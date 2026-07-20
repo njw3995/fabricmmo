@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import io.github.njw3995.fabricmmo.api.NamespacedId;
 import io.github.njw3995.fabricmmo.api.event.LevelChangedEvent;
+import io.github.njw3995.fabricmmo.api.event.XpPreAwardEvent;
 import io.github.njw3995.fabricmmo.api.progression.XpAwardRequest;
 import io.github.njw3995.fabricmmo.api.progression.XpAwardResult;
 import io.github.njw3995.fabricmmo.core.bootstrap.FabricMmoBootstrap;
@@ -117,6 +118,59 @@ class DefaultProgressionServiceTest {
         assertEquals(5, api.progression().query(player, CoreSkills.SMELTING).level());
         assertEquals(0, api.progression().query(player, CoreSkills.SMELTING).xp());
         assertEquals(5, api.progression().queryAll(player).get(CoreSkills.SMELTING).level());
+    }
+
+    @Test
+    void directChildXpSplitsEvenlyAcrossParentsAndFiresChildPreEvent() {
+        var api = FabricMmoBootstrap.create(new InMemoryProgressionStore(), ignored -> { });
+        UUID player = UUID.randomUUID();
+        AtomicInteger childPreEvents = new AtomicInteger();
+        AtomicInteger parentPreEvents = new AtomicInteger();
+        api.events().subscribe(XpPreAwardEvent.class, event -> {
+            if (event.request().skillId().equals(CoreSkills.SMELTING)) {
+                childPreEvents.incrementAndGet();
+                event.multiplier(2.0D);
+            } else if (event.request().skillId().equals(CoreSkills.MINING)
+                    || event.request().skillId().equals(CoreSkills.REPAIR)) {
+                parentPreEvents.incrementAndGet();
+            }
+        });
+
+        XpAwardResult result = api.progression().award(new XpAwardRequest(
+                player,
+                CoreSkills.SMELTING,
+                CoreXpSources.SMELTING_FURNACE,
+                500,
+                Map.of()));
+
+        assertEquals(XpAwardResult.Status.APPLIED, result.status());
+        assertEquals(1, childPreEvents.get());
+        assertEquals(2, parentPreEvents.get());
+        assertEquals(551, api.progression().query(player, CoreSkills.MINING).xp());
+        assertEquals(551, api.progression().query(player, CoreSkills.REPAIR).xp());
+        assertEquals(0, api.progression().query(player, CoreSkills.SMELTING).xp());
+    }
+
+    @Test
+    void childXpCancellationDoesNotMutateParents() {
+        var api = FabricMmoBootstrap.create(new InMemoryProgressionStore(), ignored -> { });
+        UUID player = UUID.randomUUID();
+        api.events().subscribe(XpPreAwardEvent.class, event -> {
+            if (event.request().skillId().equals(CoreSkills.SMELTING)) {
+                event.cancel();
+            }
+        });
+
+        XpAwardResult result = api.progression().award(new XpAwardRequest(
+                player,
+                CoreSkills.SMELTING,
+                CoreXpSources.SMELTING_FURNACE,
+                500,
+                Map.of()));
+
+        assertEquals(XpAwardResult.Status.CANCELLED, result.status());
+        assertEquals(0, api.progression().query(player, CoreSkills.MINING).xp());
+        assertEquals(0, api.progression().query(player, CoreSkills.REPAIR).xp());
     }
 
     @Test

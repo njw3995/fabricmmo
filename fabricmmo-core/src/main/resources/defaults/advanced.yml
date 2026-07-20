@@ -182,6 +182,82 @@ Skills:
         Rank_6: 3.0
         Rank_7: 4.0
         Rank_8: 4.0
+  Repair:
+    RepairMastery:
+      MaxBonusPercentage: 200.0
+      MaxBonusLevel:
+        Standard: 100
+        RetroMode: 1000
+    SuperRepair:
+      ChanceMax: 100.0
+      MaxBonusLevel:
+        Standard: 100
+        RetroMode: 1000
+    ArcaneForging:
+      May_Lose_Enchants: true
+      MaxEnchantLevel: 5
+      Keep_Enchants_Chance:
+        Rank_1: 10.0
+        Rank_2: 20.0
+        Rank_3: 30.0
+        Rank_4: 40.0
+        Rank_5: 50.0
+        Rank_6: 50.0
+        Rank_7: 60.0
+        Rank_8: 60.0
+      Downgrades_Enabled: true
+      Downgrades_Chance:
+        Rank_1: 75.0
+        Rank_2: 50.0
+        Rank_3: 40.0
+        Rank_4: 30.0
+        Rank_5: 25.0
+        Rank_6: 20.0
+        Rank_7: 15.0
+        Rank_8: 10.0
+  Salvage:
+    ArcaneSalvage:
+      EnchantLossEnabled: true
+      EnchantDowngradeEnabled: true
+      MaxEnchantLevel: 5
+      ExtractFullEnchant:
+        Rank_1: 2.5
+        Rank_2: 5.0
+        Rank_3: 7.5
+        Rank_4: 10.0
+        Rank_5: 12.5
+        Rank_6: 17.5
+        Rank_7: 25.0
+        Rank_8: 32.5
+      ExtractPartialEnchant:
+        Rank_1: 2.0
+        Rank_2: 2.5
+        Rank_3: 5.0
+        Rank_4: 7.5
+        Rank_5: 10.0
+        Rank_6: 12.5
+        Rank_7: 15.0
+        Rank_8: 17.5
+  Smelting:
+    SecondSmelt:
+      ChanceMax: 50.0
+      MaxBonusLevel:
+        Standard: 100
+        RetroMode: 1000
+    FluxMining:
+      Chance: 33.0
+      MaxBonusLevel:
+        Standard: 100
+        RetroMode: 1000
+    VanillaXPMultiplier:
+      Rank_1: 1
+      Rank_2: 2
+      Rank_3: 3
+      Rank_4: 3
+      Rank_5: 4
+      Rank_6: 4
+      Rank_7: 5
+      Rank_8: 5
   Swords:
     Stab:
       Base_Damage: 1.0

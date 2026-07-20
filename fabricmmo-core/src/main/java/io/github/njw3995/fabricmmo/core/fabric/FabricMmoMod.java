@@ -16,6 +16,7 @@ import io.github.njw3995.fabricmmo.core.skill.fishing.FishingRuntimeHandler;
 import io.github.njw3995.fabricmmo.core.skill.mining.MiningAbilityHandler;
 import io.github.njw3995.fabricmmo.core.skill.mining.MiningBlastHandler;
 import io.github.njw3995.fabricmmo.core.skill.mining.MiningBlockBreakHandler;
+import io.github.njw3995.fabricmmo.core.skill.repair.UtilityAnvilInteractionHandler;
 import io.github.njw3995.fabricmmo.core.skill.swords.SwordsAbilityHandler;
 import io.github.njw3995.fabricmmo.core.skill.swords.SwordsRuntimeHandler;
 import io.github.njw3995.fabricmmo.core.skill.woodcutting.WoodcuttingAbilityHandler;
@@ -52,6 +53,7 @@ public final class FabricMmoMod implements ModInitializer {
         HerbalismInteractionHandler.register();
         HerbalismFoodHandler.register();
         FishingFoodHandler.register();
+        UtilityAnvilInteractionHandler.register();
         SwordsAbilityHandler.register();
         SharedChatHandler.register(permissions);
         ServerTickEvents.END_SERVER_TICK.register(SharedServerSystems::tick);

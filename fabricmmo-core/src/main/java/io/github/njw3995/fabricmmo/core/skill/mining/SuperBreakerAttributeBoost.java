@@ -108,6 +108,23 @@ final class SuperBreakerAttributeBoost {
         }
     }
 
+    static synchronized boolean restoreForRepair(
+            ServerPlayerEntity player,
+            ItemStack repairedStack) {
+        RegistryEntry<Enchantment> efficiency = efficiency(player);
+        BoostedTool existing = BOOSTED_TOOLS.get(player.getUuid());
+        boolean changed = false;
+        if (existing != null && existing.stack() == repairedStack) {
+            BOOSTED_TOOLS.remove(player.getUuid());
+            changed |= restoreTrackedStack(existing);
+        }
+        changed |= restoreMarkedStack(repairedStack, efficiency);
+        if (changed) {
+            syncInventory(player);
+        }
+        return changed;
+    }
+
     static synchronized void cleanupInventory(ServerPlayerEntity player) {
         RegistryEntry<Enchantment> efficiency = efficiency(player);
         BoostedTool existing = BOOSTED_TOOLS.remove(player.getUuid());

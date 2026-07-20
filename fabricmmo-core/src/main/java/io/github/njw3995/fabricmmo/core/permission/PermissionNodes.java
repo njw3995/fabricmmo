@@ -80,6 +80,26 @@ public final class PermissionNodes {
     public static final String FISHING_VANILLA_XP_BOOST =
             "mcmmo.ability.fishing.vanillaxpboost";
     public static final String FISHING_LUCKY = "mcmmo.perks.lucky.fishing";
+    public static final String REPAIR = "mcmmo.skills.repair";
+    public static final String REPAIR_COMMAND = "mcmmo.commands.repair";
+    public static final String REPAIR_MASTERY = "mcmmo.ability.repair.repairmastery";
+    public static final String REPAIR_SUPER_REPAIR = "mcmmo.ability.repair.superrepair";
+    public static final String REPAIR_ARCANE_FORGING = "mcmmo.ability.repair.arcaneforging";
+    public static final String REPAIR_LUCKY = "mcmmo.perks.lucky.repair";
+    public static final String REPAIR_ENCHANT_BYPASS = "mcmmo.perks.bypass.repairenchant";
+    public static final String ARCANE_BYPASS = "mcmmo.bypass.arcanebypass";
+    public static final String SALVAGE = "mcmmo.skills.salvage";
+    public static final String SALVAGE_COMMAND = "mcmmo.commands.salvage";
+    public static final String SALVAGE_SCRAP_COLLECTOR = "mcmmo.ability.salvage.scrapcollector";
+    public static final String SALVAGE_ARCANE = "mcmmo.ability.salvage.arcanesalvage";
+    public static final String SALVAGE_LUCKY = "mcmmo.perks.lucky.salvage";
+    public static final String SALVAGE_ENCHANT_BYPASS = "mcmmo.perks.bypass.salvageenchant";
+    public static final String SMELTING = "mcmmo.skills.smelting";
+    public static final String SMELTING_COMMAND = "mcmmo.commands.smelting";
+    public static final String SMELTING_FUEL_EFFICIENCY = "mcmmo.ability.smelting.fuelefficiency";
+    public static final String SMELTING_SECOND_SMELT = "mcmmo.ability.smelting.secondsmelt";
+    public static final String SMELTING_VANILLA_XP = "mcmmo.ability.smelting.vanillaxpboost";
+    public static final String SMELTING_LUCKY = "mcmmo.perks.lucky.smelting";
     public static final String SWORDS = "mcmmo.skills.swords";
     public static final String SWORDS_COMMAND = "mcmmo.commands.swords";
     public static final String SWORDS_SERRATED_STRIKES =
