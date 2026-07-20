@@ -43,6 +43,8 @@ import io.github.njw3995.fabricmmo.core.session.PlayerSessionStateService;
 import io.github.njw3995.fabricmmo.core.skill.CoreSkills;
 import io.github.njw3995.fabricmmo.core.skill.acrobatics.AcrobaticsPanelMechanicsProvider;
 import io.github.njw3995.fabricmmo.core.skill.acrobatics.AcrobaticsSettings;
+import io.github.njw3995.fabricmmo.core.skill.alchemy.AlchemyPanelMechanicsProvider;
+import io.github.njw3995.fabricmmo.core.skill.alchemy.AlchemySettings;
 import io.github.njw3995.fabricmmo.core.skill.excavation.CoreExcavationAbilities;
 import io.github.njw3995.fabricmmo.core.skill.excavation.ExcavationAbilityController;
 import io.github.njw3995.fabricmmo.core.skill.excavation.ExcavationPanelMechanicsProvider;
@@ -69,6 +71,8 @@ import io.github.njw3995.fabricmmo.core.skill.swords.CoreSwordsAbilities;
 import io.github.njw3995.fabricmmo.core.skill.swords.SwordsAbilityController;
 import io.github.njw3995.fabricmmo.core.skill.swords.SwordsPanelMechanicsProvider;
 import io.github.njw3995.fabricmmo.core.skill.swords.SwordsSettings;
+import io.github.njw3995.fabricmmo.core.skill.taming.TamingPanelMechanicsProvider;
+import io.github.njw3995.fabricmmo.core.skill.taming.TamingSettings;
 import io.github.njw3995.fabricmmo.core.teleport.PartyTeleportService;
 import io.github.njw3995.fabricmmo.core.ui.InMemoryPlayerUiSettingsStore;
 import io.github.njw3995.fabricmmo.core.ui.PlayerScoreboardService;
@@ -130,7 +134,9 @@ public final class SharedServerSystems {
             FishingSettings fishingSettings,
             FishingTreasureTable fishingTreasures,
             SwordsAbilityController swordsAbilities,
-            SwordsSettings swordsSettings) throws IOException {
+            SwordsSettings swordsSettings,
+            TamingSettings tamingSettings,
+            AlchemySettings alchemySettings) throws IOException {
         if (state != null) {
             throw new IllegalStateException("Shared FabricMMO systems already active");
         }
@@ -219,6 +225,12 @@ public final class SharedServerSystems {
         skillPanelMechanics.register(
                 CoreSkills.SWORDS,
                 new SwordsPanelMechanicsProvider(server, swordsSettings, locale));
+        skillPanelMechanics.register(
+                CoreSkills.TAMING,
+                new TamingPanelMechanicsProvider(tamingSettings, locale));
+        skillPanelMechanics.register(
+                CoreSkills.ALCHEMY,
+                new AlchemyPanelMechanicsProvider(server, alchemySettings, locale));
         DebugDiagnosticsService diagnostics = new DebugDiagnosticsService(server, sessions);
         ProgressionMaintenanceService maintenance = new ProgressionMaintenanceService(
                 progressionStore, playerDataDirectory, mySqlSettings, Clock.systemUTC());

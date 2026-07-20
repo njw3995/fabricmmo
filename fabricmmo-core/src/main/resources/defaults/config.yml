@@ -37,6 +37,12 @@ Skills:
     XP_After_Teleport_Cooldown: 5
     Level_Cap: 0
   Alchemy:
+    # Allow hoppers to transfer ingredients and brew Rank 1 Alchemy potions.
+    Enabled_for_Hoppers: true
+    # Prevent hoppers from transferring ingredients into brewing stands.
+    Prevent_Hopper_Transfer_Ingredients: false
+    # Prevent hoppers from transferring potion bottles into brewing stands.
+    Prevent_Hopper_Transfer_Bottles: false
     Level_Cap: 0
   Archery:
     Level_Cap: 0
@@ -74,7 +80,33 @@ Skills:
     Enabled_For_PVE: true
     Level_Cap: 0
   Taming:
+    Enabled_For_PVP: true
+    Enabled_For_PVE: true
     Level_Cap: 0
+    Call_Of_The_Wild:
+      # Item_Material: item required to summon the pet. Legacy mcMMO names and namespaced IDs are accepted.
+      # Item_Amount: number of items required per activation.
+      # Summon_Amount: pets summoned per activation.
+      # Summon_Length: summon lifetime in seconds.
+      # Per_Player_Limit: maximum active summons of this type per player.
+      Wolf:
+        Item_Material: BONE
+        Item_Amount: 10
+        Summon_Amount: 1
+        Summon_Length: 240
+        Per_Player_Limit: 2
+      Ocelot:
+        Item_Material: COD
+        Item_Amount: 10
+        Summon_Amount: 1
+        Summon_Length: 240
+        Per_Player_Limit: 1
+      Horse:
+        Item_Material: APPLE
+        Item_Amount: 10
+        Summon_Amount: 1
+        Summon_Length: 240
+        Per_Player_Limit: 1
   Tridents:
     Level_Cap: 0
   Unarmed:
