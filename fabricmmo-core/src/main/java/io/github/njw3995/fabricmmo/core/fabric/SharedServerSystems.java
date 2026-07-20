@@ -65,6 +65,10 @@ import io.github.njw3995.fabricmmo.core.skill.woodcutting.WoodcuttingAbilityCont
 import io.github.njw3995.fabricmmo.core.skill.woodcutting.WoodcuttingDropSettings;
 import io.github.njw3995.fabricmmo.core.skill.woodcutting.WoodcuttingPanelMechanicsProvider;
 import io.github.njw3995.fabricmmo.core.skill.woodcutting.WoodcuttingSettings;
+import io.github.njw3995.fabricmmo.core.skill.swords.CoreSwordsAbilities;
+import io.github.njw3995.fabricmmo.core.skill.swords.SwordsAbilityController;
+import io.github.njw3995.fabricmmo.core.skill.swords.SwordsPanelMechanicsProvider;
+import io.github.njw3995.fabricmmo.core.skill.swords.SwordsSettings;
 import io.github.njw3995.fabricmmo.core.teleport.PartyTeleportService;
 import io.github.njw3995.fabricmmo.core.ui.InMemoryPlayerUiSettingsStore;
 import io.github.njw3995.fabricmmo.core.ui.PlayerScoreboardService;
@@ -124,7 +128,9 @@ public final class SharedServerSystems {
             HerbalismSettings herbalismSettings,
             HerbalismDropSettings herbalismDropSettings,
             FishingSettings fishingSettings,
-            FishingTreasureTable fishingTreasures) throws IOException {
+            FishingTreasureTable fishingTreasures,
+            SwordsAbilityController swordsAbilities,
+            SwordsSettings swordsSettings) throws IOException {
         if (state != null) {
             throw new IllegalStateException("Shared FabricMMO systems already active");
         }
@@ -182,7 +188,9 @@ public final class SharedServerSystems {
                 excavationAbilities,
                 excavationSettings,
                 herbalismAbilities,
-                herbalismSettings);
+                herbalismSettings,
+                swordsAbilities,
+                swordsSettings);
         SkillPanelCooldownCatalog skillPanelCooldowns = new SkillPanelCooldownCatalog(
                 cooldowns, locale, uiConfiguration.abilityNames());
         SubSkillRankCatalog subSkillRanks = SubSkillRankCatalog.load(
@@ -208,6 +216,9 @@ public final class SharedServerSystems {
         skillPanelMechanics.register(
                 CoreSkills.FISHING,
                 new FishingPanelMechanicsProvider(server, fishingSettings, fishingTreasures, locale));
+        skillPanelMechanics.register(
+                CoreSkills.SWORDS,
+                new SwordsPanelMechanicsProvider(server, swordsSettings, locale));
         DebugDiagnosticsService diagnostics = new DebugDiagnosticsService(server, sessions);
         ProgressionMaintenanceService maintenance = new ProgressionMaintenanceService(
                 progressionStore, playerDataDirectory, mySqlSettings, Clock.systemUTC());
@@ -302,7 +313,9 @@ public final class SharedServerSystems {
             ExcavationAbilityController excavationAbilities,
             ExcavationSettings excavationSettings,
             HerbalismAbilityController herbalismAbilities,
-            HerbalismSettings herbalismSettings) {
+            HerbalismSettings herbalismSettings,
+            SwordsAbilityController swordsAbilities,
+            SwordsSettings swordsSettings) {
         AbilityCooldownService cooldowns = new AbilityCooldownService();
         AbilityCooldownService.Provider miningProvider = new AbilityCooldownService.Provider() {
             @Override
@@ -397,6 +410,27 @@ public final class SharedServerSystems {
                     public void reset(UUID playerId) {
                         try {
                             herbalismAbilities.reset(playerId);
+                        } catch (IOException exception) {
+                            throw new UncheckedIOException(exception);
+                        }
+                    }
+                });
+        cooldowns.register(CoreSwordsAbilities.SERRATED_STRIKES,
+                new AbilityCooldownService.Provider() {
+                    @Override
+                    public int remainingSeconds(UUID playerId) {
+                        try {
+                            return swordsAbilities.cooldownRemaining(
+                                    playerId, swordsSettings.serratedCooldownSeconds());
+                        } catch (IOException exception) {
+                            throw new UncheckedIOException(exception);
+                        }
+                    }
+
+                    @Override
+                    public void reset(UUID playerId) {
+                        try {
+                            swordsAbilities.reset(playerId);
                         } catch (IOException exception) {
                             throw new UncheckedIOException(exception);
                         }

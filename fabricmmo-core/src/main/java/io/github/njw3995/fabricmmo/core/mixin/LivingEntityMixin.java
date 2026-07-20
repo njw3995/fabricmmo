@@ -4,12 +4,14 @@ import io.github.njw3995.fabricmmo.core.fabric.FabricMmoFabricRuntime;
 import io.github.njw3995.fabricmmo.core.skill.acrobatics.AcrobaticsRuntimeHandler;
 import io.github.njw3995.fabricmmo.core.skill.mining.MiningBlastDamage;
 import io.github.njw3995.fabricmmo.core.skill.mining.MiningBlastRegistry;
+import io.github.njw3995.fabricmmo.core.skill.swords.SwordsRuntimeHandler;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.TntEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
@@ -17,6 +19,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(LivingEntity.class)
 abstract class LivingEntityMixin {
+    @Shadow protected float lastDamageTaken;
+
     @ModifyVariable(
             method = "damage(Lnet/minecraft/entity/damage/DamageSource;F)Z",
             at = @At("HEAD"),
@@ -27,9 +31,17 @@ abstract class LivingEntityMixin {
             return damage;
         }
         LivingEntity victim = (LivingEntity) (Object) this;
-        float modified = victim instanceof ServerPlayerEntity player
+        // Bukkit does not fire the upstream combat handler for invulnerable hits, and mcMMO
+        // also explicitly rejects vanilla's half-window repeated-damage immunity.
+        if (victim.isInvulnerableTo(source)
+                || (victim.timeUntilRegen > 10 && damage <= lastDamageTaken)) {
+            return damage;
+        }
+        float defensiveModified = victim instanceof ServerPlayerEntity player
                 ? AcrobaticsRuntimeHandler.modifyCombatDamage(player, source, damage)
                 : damage;
+        float modified = SwordsRuntimeHandler.modifyAttackDamage(
+                victim, source, defensiveModified);
         if (!(source.getSource() instanceof TntEntity tnt)) {
             return modified;
         }
@@ -57,10 +69,24 @@ abstract class LivingEntityMixin {
             DamageSource source,
             float damage,
             CallbackInfoReturnable<Float> callback) {
-        if ((Object) this instanceof ServerPlayerEntity player) {
-            callback.setReturnValue(AcrobaticsRuntimeHandler.modifyFallDamage(
-                    player, source, callback.getReturnValueF()));
+        LivingEntity victim = (LivingEntity) (Object) this;
+        float modified = callback.getReturnValueF();
+        if (victim instanceof ServerPlayerEntity player) {
+            modified = AcrobaticsRuntimeHandler.modifyFallDamage(player, source, modified);
         }
+        SwordsRuntimeHandler.damageMitigated(victim, source, modified);
+        callback.setReturnValue(modified);
+    }
+
+    @Inject(
+            method = "damage(Lnet/minecraft/entity/damage/DamageSource;F)Z",
+            at = @At("RETURN"))
+    private void fabricmmo$finishSwordsDamage(
+            DamageSource source,
+            float damage,
+            CallbackInfoReturnable<Boolean> callback) {
+        SwordsRuntimeHandler.damageFinished(
+                (LivingEntity) (Object) this, source, Boolean.TRUE.equals(callback.getReturnValue()));
     }
 
 }

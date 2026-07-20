@@ -80,6 +80,17 @@ public final class PermissionNodes {
     public static final String FISHING_VANILLA_XP_BOOST =
             "mcmmo.ability.fishing.vanillaxpboost";
     public static final String FISHING_LUCKY = "mcmmo.perks.lucky.fishing";
+    public static final String SWORDS = "mcmmo.skills.swords";
+    public static final String SWORDS_COMMAND = "mcmmo.commands.swords";
+    public static final String SWORDS_SERRATED_STRIKES =
+            "mcmmo.ability.swords.serratedstrikes";
+    public static final String SWORDS_COUNTER_ATTACK =
+            "mcmmo.ability.swords.counterattack";
+    public static final String SWORDS_RUPTURE = "mcmmo.ability.swords.rupture";
+    public static final String SWORDS_STAB = "mcmmo.ability.swords.stab";
+    public static final String SWORDS_LIMIT_BREAK = "mcmmo.ability.swords.swordslimitbreak";
+    public static final String SWORDS_LUCKY = "mcmmo.perks.lucky.swords";
+    public static final String PARTY_FRIENDLY_FIRE = "mcmmo.party.friendlyfire";
     public static final String XP_CUSTOM_ALL = "mcmmo.perks.xp.customboost.all";
     public static final String XP_QUADRUPLE_ALL = "mcmmo.perks.xp.quadruple.all";
     public static final String XP_TRIPLE_ALL = "mcmmo.perks.xp.triple.all";

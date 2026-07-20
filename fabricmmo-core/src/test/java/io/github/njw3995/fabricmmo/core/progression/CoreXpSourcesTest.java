@@ -83,4 +83,19 @@ class CoreXpSourcesTest {
         assertEquals(2, acrobaticsSources);
     }
 
+    @Test
+    void registersSwordsCombatSource() {
+        DefaultSkillRegistry skills = new DefaultSkillRegistry();
+        CoreSkills.registerAll(skills);
+        DefaultXpSourceRegistry sources = new DefaultXpSourceRegistry(skills);
+
+        CoreXpSources.registerDefaults(sources);
+
+        assertTrue(sources.find(CoreXpSources.SWORDS_COMBAT).isPresent());
+        long swordsSources = sources.sources().stream()
+                .filter(source -> source.skillId().equals(CoreSkills.SWORDS))
+                .count();
+        assertEquals(1, swordsSources);
+    }
+
 }
