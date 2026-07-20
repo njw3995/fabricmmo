@@ -2,7 +2,28 @@ Feedback:
   SkillCommand:
     BlankLinesAboveHeader: true
   ActionBarNotifications:
+    AbilityOff:
+      Enabled: true
+      SendCopyOfMessageToChat: false
+    RequirementsNotMet:
+      Enabled: true
+      SendCopyOfMessageToChat: false
+    AbilityCoolDown:
+      Enabled: true
+      SendCopyOfMessageToChat: false
+    ToolReady:
+      Enabled: true
+      SendCopyOfMessageToChat: false
     SubSkillInteraction:
+      Enabled: true
+      SendCopyOfMessageToChat: false
+    SuperAbilityInteraction:
+      Enabled: true
+      SendCopyOfMessageToChat: false
+    SuperAbilityAlertOthers:
+      Enabled: true
+      SendCopyOfMessageToChat: true
+    AbilityRefreshed:
       Enabled: true
       SendCopyOfMessageToChat: false
   Events:
@@ -13,6 +34,10 @@ Feedback:
 Skills:
   General:
     StartingLevel: 0
+    Attack_Cooldown:
+      Adjust_Skills_For_Attack_Cooldown: true
+    LimitBreak:
+      AllowPVE: false
     Ability:
       Length:
         Standard:
@@ -157,6 +182,51 @@ Skills:
         Rank_6: 3.0
         Rank_7: 4.0
         Rank_8: 4.0
+  Swords:
+    Stab:
+      Base_Damage: 1.0
+      Per_Rank_Multiplier: 1.5
+    Rupture:
+      Rupture_Mechanics:
+        Chance_To_Apply_On_Hit:
+          Rank_1: 15
+          Rank_2: 33
+          Rank_3: 40
+          Rank_4: 66
+        Duration_In_Seconds:
+          Against_Players: 5
+          Against_Mobs: 5
+        Tick_Interval_Damage:
+          Against_Players:
+            Rank_1: 0.1
+            Rank_2: 0.15
+            Rank_3: 0.2
+            Rank_4: 0.3
+          Against_Mobs:
+            Rank_1: 0.5
+            Rank_2: 0.75
+            Rank_3: 0.9
+            Rank_4: 1
+        Explosion_Damage:
+          Against_Players:
+            Rank_1: 10
+            Rank_2: 20
+            Rank_3: 30
+            Rank_4: 40
+          Against_Mobs:
+            Rank_1: 10
+            Rank_2: 20
+            Rank_3: 30
+            Rank_4: 40
+    CounterAttack:
+      ChanceMax: 30.0
+      MaxBonusLevel:
+        Standard: 100
+        RetroMode: 1000
+      DamageModifier: 2.0
+    SerratedStrikes:
+      DamageModifier: 4.0
+      BleedTicks: 5
   Woodcutting:
     TreeFeller:
       Knock_On_Wood:

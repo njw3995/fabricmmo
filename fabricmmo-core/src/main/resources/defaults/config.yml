@@ -17,12 +17,14 @@ Abilities:
     Tree_Feller: 240
     Giga_Drill_Breaker: 240
     Green_Terra: 240
+    Serrated_Strikes: 240
   Max_Seconds:
     Blast_Mining: 0
     Super_Breaker: 0
     Tree_Feller: 0
     Giga_Drill_Breaker: 0
     Green_Terra: 0
+    Serrated_Strikes: 0
   Limits:
     Tree_Feller_Threshold: 1000
   Tools:
@@ -68,6 +70,8 @@ Skills:
   Smelting:
     Level_Cap: 0
   Swords:
+    Enabled_For_PVP: true
+    Enabled_For_PVE: true
     Level_Cap: 0
   Taming:
     Level_Cap: 0
@@ -384,4 +388,5 @@ Debugging:
     Enabled: false
 
 Particles:
+  Bleed: true
   Dodge: true

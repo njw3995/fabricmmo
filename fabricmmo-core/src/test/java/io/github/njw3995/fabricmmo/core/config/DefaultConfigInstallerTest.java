@@ -43,6 +43,10 @@ class DefaultConfigInstallerTest {
         assertTrue(updated.contains("Coal_Ore: 9999"));
         assertTrue(updated.contains("  Excavation:"));
         assertTrue(updated.contains("    Sand: 40"));
+        assertTrue(updated.contains("  Combat:"));
+        assertTrue(updated.contains("      Creeper: 4.0"));
+        assertTrue(updated.contains("    XPCeiling:"));
+        assertTrue(updated.contains("      Damage_Limit: 100"));
         assertTrue(Files.isRegularFile(directory.resolve("experience.yml.pre-update.bak")));
         assertEquals("""
                 Experience_Values:

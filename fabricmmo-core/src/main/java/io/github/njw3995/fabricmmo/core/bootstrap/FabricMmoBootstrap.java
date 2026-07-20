@@ -21,6 +21,7 @@ import io.github.njw3995.fabricmmo.core.skill.excavation.CoreExcavationAbilities
 import io.github.njw3995.fabricmmo.core.skill.herbalism.CoreHerbalismAbilities;
 import io.github.njw3995.fabricmmo.core.skill.fishing.CoreFishingAbilities;
 import io.github.njw3995.fabricmmo.core.skill.mining.CoreMiningAbilities;
+import io.github.njw3995.fabricmmo.core.skill.swords.CoreSwordsAbilities;
 import io.github.njw3995.fabricmmo.core.skill.woodcutting.CoreWoodcuttingAbilities;
 import io.github.njw3995.fabricmmo.core.ui.DefaultUiMetadataRegistry;
 import java.time.Clock;
@@ -71,6 +72,7 @@ public final class FabricMmoBootstrap {
         CoreExcavationAbilities.registerAll(abilities);
         CoreHerbalismAbilities.registerAll(abilities);
         CoreFishingAbilities.registerAll(abilities);
+        CoreSwordsAbilities.registerAll(abilities);
         AbilityPipeline abilityPipeline = new AbilityPipeline(abilities, events, clock);
         DefaultConfigRegistry configs = new DefaultConfigRegistry();
         DefaultCommandMetadataRegistry commands = new DefaultCommandMetadataRegistry();
