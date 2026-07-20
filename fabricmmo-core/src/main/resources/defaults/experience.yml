@@ -3,6 +3,8 @@
 EarlyGameBoost:
   Enabled: true
 ExploitFix:
+  Acrobatics: true
+  AcrobaticsDodgeXpFarming: true
   Fishing: true
   LavaStoneAndCobbleFarming: true
   PistonCheating: true
@@ -158,6 +160,11 @@ Diminished_Returns:
     Woodcutting: 20000
   Time_Interval: 10
 Experience_Values:
+  Acrobatics:
+    Dodge: 800
+    Roll: 600
+    Fall: 600
+    FeatherFall_Multiplier: 2.0
   # Minecraft 1.21.1-applicable Mining values. Later Cinnabar/Sulfur content is excluded.
   Mining:
     Sculk: 4

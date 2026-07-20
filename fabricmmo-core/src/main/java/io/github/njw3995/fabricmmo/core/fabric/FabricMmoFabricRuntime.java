@@ -14,6 +14,8 @@ import io.github.njw3995.fabricmmo.core.progression.ProgressionSettings;
 import io.github.njw3995.fabricmmo.core.persistence.MySqlSettings;
 import io.github.njw3995.fabricmmo.core.player.PlayerSessionSettingsService;
 import io.github.njw3995.fabricmmo.core.runtime.FabricMmoServerRuntime;
+import io.github.njw3995.fabricmmo.core.skill.acrobatics.AcrobaticsRuntimeHandler;
+import io.github.njw3995.fabricmmo.core.skill.acrobatics.AcrobaticsSettings;
 import io.github.njw3995.fabricmmo.core.skill.excavation.CoreExcavationAbilities;
 import io.github.njw3995.fabricmmo.core.skill.excavation.ExcavationAbilityController;
 import io.github.njw3995.fabricmmo.core.skill.excavation.ExcavationAbilityHandler;
@@ -75,6 +77,7 @@ import org.slf4j.LoggerFactory;
 public final class FabricMmoFabricRuntime {
     private static final Logger LOGGER = LoggerFactory.getLogger("FabricMMO");
     private static FabricMmoServerRuntime runtime;
+    private static AcrobaticsSettings acrobaticsSettings;
     private static MiningXpTable miningXpTable;
     private static MiningDropSettings miningDropSettings;
     private static PlacedBlockTracker placedBlockTracker;
@@ -124,6 +127,7 @@ public final class FabricMmoFabricRuntime {
         Path skillRanksFile = configDirectory.resolve("skillranks.yml");
         Path treasuresFile = configDirectory.resolve("treasures.yml");
         Path fishingTreasuresFile = configDirectory.resolve("fishing_treasures.yml");
+        Path soundsFile = configDirectory.resolve("sounds.yml");
         Path persistentDataFile = configDirectory.resolve("persistent_data.yml");
         Path worldBlacklistFile = configDirectory.resolve("world_blacklist.txt");
 
@@ -136,6 +140,8 @@ public final class FabricMmoFabricRuntime {
         try {
             ProgressionSettings progressionSettings = ProgressionSettings.load(
                     configFile, experienceFile);
+            AcrobaticsSettings newAcrobaticsSettings = AcrobaticsSettings.load(
+                    configFile, advancedFile, skillRanksFile, experienceFile, soundsFile);
             WorldBlacklist newWorldBlacklist = WorldBlacklist.load(worldBlacklistFile, worldRoot);
             MiningXpTable newXpTable = MiningXpTable.loadConfigured(experienceFile);
             MiningDropSettings newDropSettings = MiningDropSettings.load(
@@ -224,6 +230,7 @@ public final class FabricMmoFabricRuntime {
                     newRuntime.store(),
                     mySqlSettings,
                     progressionSettings,
+                    newAcrobaticsSettings,
                     newAbilityController,
                     newMiningSettings,
                     newDropSettings,
@@ -238,6 +245,7 @@ public final class FabricMmoFabricRuntime {
                     newFishingSettings,
                     newFishingTreasures);
             runtime = newRuntime;
+            acrobaticsSettings = newAcrobaticsSettings;
             miningXpTable = newXpTable;
             miningDropSettings = newDropSettings;
             placedBlockTracker = newTracker;
@@ -348,6 +356,13 @@ public final class FabricMmoFabricRuntime {
         return runtime.api();
     }
 
+
+    public static synchronized AcrobaticsSettings acrobaticsSettings() {
+        if (acrobaticsSettings == null) {
+            throw new IllegalStateException("FabricMMO Acrobatics settings are not active");
+        }
+        return acrobaticsSettings;
+    }
 
     public static synchronized PlayerSessionSettingsService playerSessionSettings() {
         if (playerSessionSettings == null) {
@@ -638,7 +653,9 @@ public final class FabricMmoFabricRuntime {
         HerbalismFoodHandler.reset();
         FishingFoodHandler.reset();
         FishingRuntimeHandler.reset();
+        AcrobaticsRuntimeHandler.clear();
         runtime = null;
+        acrobaticsSettings = null;
         miningXpTable = null;
         miningDropSettings = null;
         placedBlockTracker = null;

@@ -34,6 +34,9 @@ public final class DefaultConfigInstaller {
             "itemweights.yml",
             "world_blacklist.txt");
     public static final List<String> FABRIC_ONLY_FILES = List.of("fabric.yml", "addons.yml");
+    private static final Set<String> EMPTY_PLACEHOLDER_FILES = Set.of(
+            "fishing_treasures.yml",
+            "sounds.yml");
     private static final Set<String> RECURSIVE_MERGE_FILES = Set.of(
             "config.yml",
             "experience.yml",
@@ -51,7 +54,7 @@ public final class DefaultConfigInstaller {
             Path target = configDirectory.resolve(fileName);
             String resourceName = "/defaults/" + fileName;
             if (Files.exists(target)) {
-                if (isEmptyFishingTreasurePlaceholder(fileName, target)) {
+                if (isEmptyPackagedPlaceholder(fileName, target)) {
                     replacePlaceholderWithDefault(target, resourceName);
                 } else if (RECURSIVE_MERGE_FILES.contains(fileName)) {
                     mergeMissingYamlDefaults(target, resourceName);
@@ -71,9 +74,9 @@ public final class DefaultConfigInstaller {
     }
 
 
-    private static boolean isEmptyFishingTreasurePlaceholder(String fileName, Path target)
+    private static boolean isEmptyPackagedPlaceholder(String fileName, Path target)
             throws IOException {
-        return fileName.equals("fishing_treasures.yml")
+        return EMPTY_PLACEHOLDER_FILES.contains(fileName)
                 && Files.readString(target, StandardCharsets.UTF_8).trim().equals("{}");
     }
 

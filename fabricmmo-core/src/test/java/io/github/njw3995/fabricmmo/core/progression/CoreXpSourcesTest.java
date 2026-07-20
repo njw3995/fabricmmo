@@ -67,4 +67,20 @@ class CoreXpSourcesTest {
         assertEquals(3, herbalismSources);
     }
 
+    @Test
+    void registersAcrobaticsFallAndDodgeSources() {
+        DefaultSkillRegistry skills = new DefaultSkillRegistry();
+        CoreSkills.registerAll(skills);
+        DefaultXpSourceRegistry sources = new DefaultXpSourceRegistry(skills);
+
+        CoreXpSources.registerDefaults(sources);
+
+        assertTrue(sources.find(CoreXpSources.ACROBATICS_FALL).isPresent());
+        assertTrue(sources.find(CoreXpSources.ACROBATICS_DODGE).isPresent());
+        long acrobaticsSources = sources.sources().stream()
+                .filter(source -> source.skillId().equals(CoreSkills.ACROBATICS))
+                .count();
+        assertEquals(2, acrobaticsSources);
+    }
+
 }

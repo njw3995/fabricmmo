@@ -1,6 +1,10 @@
 Feedback:
   SkillCommand:
     BlankLinesAboveHeader: true
+  ActionBarNotifications:
+    SubSkillInteraction:
+      Enabled: true
+      SendCopyOfMessageToChat: false
   Events:
     AbilityActivation:
       SendNotificationToOtherPlayers: true
@@ -18,6 +22,21 @@ Skills:
           CapLevel: 1000
           IncreaseLevel: 50
       EnchantBuff: 5
+  Acrobatics:
+    Dodge:
+      ChanceMax: 20.0
+      MaxBonusLevel:
+        Standard: 100
+        RetroMode: 1000
+      DamageModifier: 2.0
+    Roll:
+      ChanceMax: 100.0
+      MaxBonusLevel:
+        Standard: 100
+        RetroMode: 1000
+      DamageThreshold: 7.0
+    GracefulRoll:
+      DamageThreshold: 14.0
   Fishing:
     ShakeChance:
       Rank_1: 15.0

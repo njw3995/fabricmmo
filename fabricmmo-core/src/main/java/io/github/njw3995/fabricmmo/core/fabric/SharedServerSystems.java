@@ -41,6 +41,8 @@ import io.github.njw3995.fabricmmo.core.progression.ProgressionFormula;
 import io.github.njw3995.fabricmmo.core.progression.ProgressionSettings;
 import io.github.njw3995.fabricmmo.core.session.PlayerSessionStateService;
 import io.github.njw3995.fabricmmo.core.skill.CoreSkills;
+import io.github.njw3995.fabricmmo.core.skill.acrobatics.AcrobaticsPanelMechanicsProvider;
+import io.github.njw3995.fabricmmo.core.skill.acrobatics.AcrobaticsSettings;
 import io.github.njw3995.fabricmmo.core.skill.excavation.CoreExcavationAbilities;
 import io.github.njw3995.fabricmmo.core.skill.excavation.ExcavationAbilityController;
 import io.github.njw3995.fabricmmo.core.skill.excavation.ExcavationPanelMechanicsProvider;
@@ -109,6 +111,7 @@ public final class SharedServerSystems {
             ManagedProgressionStore progressionStore,
             MySqlSettings mySqlSettings,
             ProgressionSettings progressionSettings,
+            AcrobaticsSettings acrobaticsSettings,
             MiningAbilityController miningAbilities,
             MiningSettings miningSettings,
             MiningDropSettings miningDropSettings,
@@ -185,6 +188,9 @@ public final class SharedServerSystems {
         SubSkillRankCatalog subSkillRanks = SubSkillRankCatalog.load(
                 configDirectory.resolve("skillranks.yml"), progressionSettings.mode());
         SkillPanelMechanicsCatalog skillPanelMechanics = new SkillPanelMechanicsCatalog();
+        skillPanelMechanics.register(
+                CoreSkills.ACROBATICS,
+                new AcrobaticsPanelMechanicsProvider(server, acrobaticsSettings, locale));
         skillPanelMechanics.register(
                 CoreSkills.MINING,
                 new MiningPanelMechanicsProvider(server, miningSettings, miningDropSettings, locale));

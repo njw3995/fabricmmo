@@ -8,6 +8,10 @@ import io.github.njw3995.fabricmmo.core.skill.CoreSkills;
 import java.util.Map;
 
 public final class CoreXpSources {
+    public static final NamespacedId ACROBATICS_FALL =
+            NamespacedId.parse("fabricmmo:acrobatics_fall");
+    public static final NamespacedId ACROBATICS_DODGE =
+            NamespacedId.parse("fabricmmo:acrobatics_dodge");
     public static final NamespacedId MINING_BLOCK_BREAK = NamespacedId.parse("fabricmmo:mining_block_break");
     public static final NamespacedId MINING_BLAST = NamespacedId.parse("fabricmmo:mining_blast");
     public static final NamespacedId WOODCUTTING_BLOCK_BREAK =
@@ -33,6 +37,14 @@ public final class CoreXpSources {
     }
 
     public static void registerDefaults(XpSourceRegistrar registrar) {
+        registrar.registerXpSource(new XpSourceDefinition(
+                ACROBATICS_FALL,
+                CoreSkills.ACROBATICS,
+                Map.of("upstream", "Roll#rollCheck")));
+        registrar.registerXpSource(new XpSourceDefinition(
+                ACROBATICS_DODGE,
+                CoreSkills.ACROBATICS,
+                Map.of("upstream", "AcrobaticsManager#dodgeCheck")));
         registrar.registerXpSource(new XpSourceDefinition(
                 MINING_BLOCK_BREAK,
                 CoreSkills.MINING,

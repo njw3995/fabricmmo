@@ -66,4 +66,21 @@ class DefaultConfigInstallerTest {
         assertEquals("{}\n", Files.readString(
                 directory.resolve("fishing_treasures.yml.pre-update.bak")));
     }
+
+    @Test
+    void replacesLegacyEmptySoundsPlaceholderWithBackup(@TempDir Path directory)
+            throws Exception {
+        Path sounds = directory.resolve("sounds.yml");
+        Files.writeString(sounds, "{}\n");
+
+        DefaultConfigInstaller.installMissingDefaults(directory);
+
+        String installed = Files.readString(sounds);
+        assertTrue(installed.contains("Sounds:"));
+        assertTrue(installed.contains("ROLL_ACTIVATED:"));
+        assertTrue(installed.contains("Pitch: 0.7"));
+        assertEquals("{}\n", Files.readString(
+                directory.resolve("sounds.yml.pre-update.bak")));
+    }
+
 }

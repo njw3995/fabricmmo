@@ -1,6 +1,11 @@
 package io.github.njw3995.fabricmmo.core.permission;
 
 public final class PermissionNodes {
+    public static final String ACROBATICS = "mcmmo.skills.acrobatics";
+    public static final String ACROBATICS_COMMAND = "mcmmo.commands.acrobatics";
+    public static final String ACROBATICS_ROLL = "mcmmo.ability.acrobatics.roll";
+    public static final String ACROBATICS_DODGE = "mcmmo.ability.acrobatics.dodge";
+    public static final String ACROBATICS_LUCKY = "mcmmo.perks.lucky.acrobatics";
     public static final String FABRICMMO_ROOT = "fabricmmo.commands.fabricmmo";
     public static final String MCABILITY = "mcmmo.commands.mcability";
     public static final String MCABILITY_OTHERS = "mcmmo.commands.mcability.others";

@@ -4,6 +4,7 @@ import io.github.njw3995.fabricmmo.core.command.FabricMmoCommands;
 import io.github.njw3995.fabricmmo.core.chat.SharedChatHandler;
 import io.github.njw3995.fabricmmo.core.config.DefaultConfigInstaller;
 import io.github.njw3995.fabricmmo.core.permission.FabricCommandPermissionService;
+import io.github.njw3995.fabricmmo.core.skill.acrobatics.AcrobaticsRuntimeHandler;
 import io.github.njw3995.fabricmmo.core.skill.excavation.ExcavationAbilityHandler;
 import io.github.njw3995.fabricmmo.core.skill.excavation.ExcavationBlockBreakHandler;
 import io.github.njw3995.fabricmmo.core.skill.herbalism.HerbalismAbilityHandler;
@@ -28,6 +29,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.fabricmc.loader.api.FabricLoader;
 
@@ -57,8 +59,11 @@ public final class FabricMmoMod implements ModInitializer {
         });
         ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> {
             FishingRuntimeHandler.playerDisconnected(handler.player.getUuid());
+            AcrobaticsRuntimeHandler.playerDisconnected(handler.player.getUuid());
             SharedServerSystems.playerDisconnected(handler.player);
         });
+        ServerPlayerEvents.AFTER_RESPAWN.register((oldPlayer, newPlayer, alive) ->
+                AcrobaticsRuntimeHandler.playerRespawned(newPlayer.getUuid()));
         ServerLivingEntityEvents.ALLOW_DAMAGE.register((entity, source, amount) -> {
             if (entity instanceof ServerPlayerEntity player) {
                 boolean godMode = SharedServerSystems.godMode(player.getUuid());

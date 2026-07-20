@@ -29,6 +29,10 @@ Abilities:
     Durability_Loss: 1
 Skills:
   Acrobatics:
+    Enabled_For_PVP: true
+    Enabled_For_PVE: true
+    Prevent_Dodge_Lightning: false
+    XP_After_Teleport_Cooldown: 5
     Level_Cap: 0
   Alchemy:
     Level_Cap: 0
@@ -378,3 +382,6 @@ MySQL:
 Debugging:
   UI_Trace:
     Enabled: false
+
+Particles:
+  Dodge: true

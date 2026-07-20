@@ -16,6 +16,7 @@ import io.github.njw3995.fabricmmo.core.progression.ProgressionSettings;
 import io.github.njw3995.fabricmmo.core.protection.AllowAllProtectionService;
 import io.github.njw3995.fabricmmo.core.registry.DefaultSkillRegistry;
 import io.github.njw3995.fabricmmo.core.skill.CoreSkills;
+import io.github.njw3995.fabricmmo.core.skill.acrobatics.CoreAcrobaticsAbilities;
 import io.github.njw3995.fabricmmo.core.skill.excavation.CoreExcavationAbilities;
 import io.github.njw3995.fabricmmo.core.skill.herbalism.CoreHerbalismAbilities;
 import io.github.njw3995.fabricmmo.core.skill.fishing.CoreFishingAbilities;
@@ -64,6 +65,7 @@ public final class FabricMmoBootstrap {
         DefaultXpSourceRegistry xpSources = new DefaultXpSourceRegistry(skills);
         CoreXpSources.registerDefaults(xpSources);
         DefaultAbilityRegistry abilities = new DefaultAbilityRegistry(skills);
+        CoreAcrobaticsAbilities.registerAll(abilities);
         CoreMiningAbilities.registerAll(abilities);
         CoreWoodcuttingAbilities.registerAll(abilities);
         CoreExcavationAbilities.registerAll(abilities);
