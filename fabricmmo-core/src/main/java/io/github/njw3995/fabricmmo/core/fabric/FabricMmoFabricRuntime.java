@@ -10,12 +10,21 @@ import io.github.njw3995.fabricmmo.core.block.PlacedBlockTracker;
 import io.github.njw3995.fabricmmo.core.block.RegionPlacedBlockTracker;
 import io.github.njw3995.fabricmmo.core.block.TrackedWorld;
 import io.github.njw3995.fabricmmo.core.config.WorldBlacklist;
+import io.github.njw3995.fabricmmo.core.combat.MobHealthbarService;
+import io.github.njw3995.fabricmmo.core.combat.MobHealthbarSettings;
 import io.github.njw3995.fabricmmo.core.progression.ProgressionSettings;
 import io.github.njw3995.fabricmmo.core.persistence.MySqlSettings;
 import io.github.njw3995.fabricmmo.core.player.PlayerSessionSettingsService;
 import io.github.njw3995.fabricmmo.core.runtime.FabricMmoServerRuntime;
 import io.github.njw3995.fabricmmo.core.skill.acrobatics.AcrobaticsRuntimeHandler;
 import io.github.njw3995.fabricmmo.core.skill.acrobatics.AcrobaticsSettings;
+import io.github.njw3995.fabricmmo.core.skill.axes.AxesAbilityController;
+import io.github.njw3995.fabricmmo.core.skill.axes.AxesAbilityHandler;
+import io.github.njw3995.fabricmmo.core.skill.axes.AxesAbilityStateView;
+import io.github.njw3995.fabricmmo.core.skill.axes.AxesRuntimeHandler;
+import io.github.njw3995.fabricmmo.core.skill.axes.AxesSettings;
+import io.github.njw3995.fabricmmo.core.skill.axes.CoreAxesAbilities;
+import io.github.njw3995.fabricmmo.core.skill.axes.PropertiesAxesAbilityStore;
 import io.github.njw3995.fabricmmo.core.skill.excavation.CoreExcavationAbilities;
 import io.github.njw3995.fabricmmo.core.skill.excavation.ExcavationAbilityController;
 import io.github.njw3995.fabricmmo.core.skill.excavation.ExcavationAbilityHandler;
@@ -36,6 +45,8 @@ import io.github.njw3995.fabricmmo.core.skill.herbalism.HerbalismInteractionHand
 import io.github.njw3995.fabricmmo.core.skill.herbalism.HerbalismSettings;
 import io.github.njw3995.fabricmmo.core.skill.herbalism.HerbalismXpDefaults;
 import io.github.njw3995.fabricmmo.core.skill.herbalism.PropertiesHerbalismAbilityStore;
+import io.github.njw3995.fabricmmo.core.skill.maces.MacesRuntimeHandler;
+import io.github.njw3995.fabricmmo.core.skill.maces.MacesSettings;
 import io.github.njw3995.fabricmmo.core.skill.mining.MiningAbilityController;
 import io.github.njw3995.fabricmmo.core.skill.mining.MiningAbilityHandler;
 import io.github.njw3995.fabricmmo.core.skill.mining.MiningAbilityStateView;
@@ -68,6 +79,13 @@ import io.github.njw3995.fabricmmo.core.skill.swords.SwordsAbilityHandler;
 import io.github.njw3995.fabricmmo.core.skill.swords.SwordsAbilityStateView;
 import io.github.njw3995.fabricmmo.core.skill.swords.SwordsRuntimeHandler;
 import io.github.njw3995.fabricmmo.core.skill.swords.SwordsSettings;
+import io.github.njw3995.fabricmmo.core.skill.unarmed.CoreUnarmedAbilities;
+import io.github.njw3995.fabricmmo.core.skill.unarmed.PropertiesUnarmedAbilityStore;
+import io.github.njw3995.fabricmmo.core.skill.unarmed.UnarmedAbilityController;
+import io.github.njw3995.fabricmmo.core.skill.unarmed.UnarmedAbilityHandler;
+import io.github.njw3995.fabricmmo.core.skill.unarmed.UnarmedAbilityStateView;
+import io.github.njw3995.fabricmmo.core.skill.unarmed.UnarmedRuntimeHandler;
+import io.github.njw3995.fabricmmo.core.skill.unarmed.UnarmedSettings;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Path;
@@ -109,6 +127,12 @@ public final class FabricMmoFabricRuntime {
     private static FishingTreasureTable fishingTreasures;
     private static FishingAntiExploitTracker fishingAntiExploit;
     private static CombatXpSettings combatXpSettings;
+    private static MobHealthbarSettings mobHealthbarSettings;
+    private static MacesSettings macesSettings;
+    private static AxesSettings axesSettings;
+    private static AxesAbilityController axesAbilityController;
+    private static UnarmedSettings unarmedSettings;
+    private static UnarmedAbilityController unarmedAbilityController;
     private static SwordsSettings swordsSettings;
     private static SwordsAbilityController swordsAbilityController;
     private static Path serverWorldRoot;
@@ -132,6 +156,8 @@ public final class FabricMmoFabricRuntime {
         Path excavationAbilityDirectory = resolveExcavationAbilityDirectory(worldRoot);
         Path herbalismAbilityDirectory = resolveHerbalismAbilityDirectory(worldRoot);
         Path swordsAbilityDirectory = resolveSwordsAbilityDirectory(worldRoot);
+        Path axesAbilityDirectory = resolveAxesAbilityDirectory(worldRoot);
+        Path unarmedAbilityDirectory = resolveUnarmedAbilityDirectory(worldRoot);
         Path configDirectory = FabricLoader.getInstance().getConfigDir().resolve("fabricmmo");
         Path experienceFile = configDirectory.resolve("experience.yml");
         Path configFile = configDirectory.resolve("config.yml");
@@ -150,6 +176,8 @@ public final class FabricMmoFabricRuntime {
         ExcavationAbilityController newExcavationAbilityController = null;
         HerbalismAbilityController newHerbalismAbilityController = null;
         SwordsAbilityController newSwordsAbilityController = null;
+        AxesAbilityController newAxesAbilityController = null;
+        UnarmedAbilityController newUnarmedAbilityController = null;
         try {
             ProgressionSettings progressionSettings = ProgressionSettings.load(
                     configFile, experienceFile);
@@ -189,7 +217,14 @@ public final class FabricMmoFabricRuntime {
             FishingAntiExploitTracker newFishingAntiExploit = new FishingAntiExploitTracker(
                     newFishingSettings.exploitMoveRange(), newFishingSettings.overFishLimit());
             CombatXpSettings newCombatXpSettings = CombatXpSettings.load(experienceFile);
+            MobHealthbarSettings newMobHealthbarSettings = MobHealthbarSettings.load(configFile);
             SwordsSettings newSwordsSettings = SwordsSettings.load(
+                    configFile, advancedFile, skillRanksFile, soundsFile);
+            AxesSettings newAxesSettings = AxesSettings.load(
+                    configFile, advancedFile, skillRanksFile, soundsFile);
+            UnarmedSettings newUnarmedSettings = UnarmedSettings.load(
+                    configFile, advancedFile, skillRanksFile, soundsFile);
+            MacesSettings newMacesSettings = MacesSettings.load(
                     configFile, advancedFile, skillRanksFile, soundsFile);
             newAbilityController = new MiningAbilityController(
                     new PropertiesMiningAbilityStore(miningAbilityDirectory), Clock.systemUTC());
@@ -204,6 +239,10 @@ public final class FabricMmoFabricRuntime {
                     Clock.systemUTC());
             newSwordsAbilityController = new SwordsAbilityController(
                     new PropertiesSwordsAbilityStore(swordsAbilityDirectory), Clock.systemUTC());
+            newAxesAbilityController = new AxesAbilityController(
+                    new PropertiesAxesAbilityStore(axesAbilityDirectory), Clock.systemUTC());
+            newUnarmedAbilityController = new UnarmedAbilityController(
+                    new PropertiesUnarmedAbilityStore(unarmedAbilityDirectory), Clock.systemUTC());
             PlacedBlockSettings placedBlockSettings = PlacedBlockSettings.load(persistentDataFile);
             newTracker = placedBlockSettings.regionSystemEnabled()
                     ? new RegionPlacedBlockTracker(placedBlockDirectory)
@@ -243,6 +282,14 @@ public final class FabricMmoFabricRuntime {
                     server, newSwordsAbilityController, newSwordsSettings);
             newRuntime.api().abilityPipeline().registerStateView(
                     CoreSwordsAbilities.SERRATED_STRIKES, swordsAbilityStates);
+            AxesAbilityStateView axesAbilityStates = new AxesAbilityStateView(
+                    server, newAxesAbilityController, newAxesSettings);
+            newRuntime.api().abilityPipeline().registerStateView(
+                    CoreAxesAbilities.SKULL_SPLITTER, axesAbilityStates);
+            UnarmedAbilityStateView unarmedAbilityStates = new UnarmedAbilityStateView(
+                    server, newUnarmedAbilityController, newUnarmedSettings);
+            newRuntime.api().abilityPipeline().registerStateView(
+                    CoreUnarmedAbilities.BERSERK, unarmedAbilityStates);
             SharedServerSystems.start(
                     server,
                     worldRoot,
@@ -267,7 +314,12 @@ public final class FabricMmoFabricRuntime {
                     newFishingSettings,
                     newFishingTreasures,
                     newSwordsAbilityController,
-                    newSwordsSettings);
+                    newSwordsSettings,
+                    newAxesAbilityController,
+                    newAxesSettings,
+                    newUnarmedAbilityController,
+                    newUnarmedSettings,
+                    newMacesSettings);
             runtime = newRuntime;
             acrobaticsSettings = newAcrobaticsSettings;
             miningXpTable = newXpTable;
@@ -293,14 +345,20 @@ public final class FabricMmoFabricRuntime {
             fishingTreasures = newFishingTreasures;
             fishingAntiExploit = newFishingAntiExploit;
             combatXpSettings = newCombatXpSettings;
+            mobHealthbarSettings = newMobHealthbarSettings;
             swordsSettings = newSwordsSettings;
             swordsAbilityController = newSwordsAbilityController;
+            axesSettings = newAxesSettings;
+            axesAbilityController = newAxesAbilityController;
+            unarmedSettings = newUnarmedSettings;
+            unarmedAbilityController = newUnarmedAbilityController;
+            macesSettings = newMacesSettings;
             serverWorldRoot = worldRoot;
             worldBlacklist = newWorldBlacklist;
             FabricMmoFabricRuntime.progressionSettings = progressionSettings;
             playerSessionSettings = new PlayerSessionSettingsService();
             LOGGER.info(
-                    "Started with {} registered skills; player data directory: {}; placed-block directory: {}; Mining ability directory: {}; Woodcutting ability directory: {}; Excavation ability directory: {}; Herbalism ability directory: {}; Swords ability directory: {}",
+                    "Started with {} registered skills; player data directory: {}; placed-block directory: {}; Mining ability directory: {}; Woodcutting ability directory: {}; Excavation ability directory: {}; Herbalism ability directory: {}; Swords ability directory: {}; Axes ability directory: {}; Unarmed ability directory: {}",
                     runtime.api().skillRegistry().skills().size(),
                     playerDataDirectory,
                     placedBlockDirectory,
@@ -308,7 +366,9 @@ public final class FabricMmoFabricRuntime {
                     woodcuttingAbilityDirectory,
                     excavationAbilityDirectory,
                     herbalismAbilityDirectory,
-                    swordsAbilityDirectory);
+                    swordsAbilityDirectory,
+                    axesAbilityDirectory,
+                    unarmedAbilityDirectory);
         } catch (IOException exception) {
             closeAfterFailedStart(newRuntime, exception);
             closeAfterFailedStart(newAbilityController, exception);
@@ -316,6 +376,8 @@ public final class FabricMmoFabricRuntime {
             closeAfterFailedStart(newExcavationAbilityController, exception);
             closeAfterFailedStart(newHerbalismAbilityController, exception);
             closeAfterFailedStart(newSwordsAbilityController, exception);
+            closeAfterFailedStart(newAxesAbilityController, exception);
+            closeAfterFailedStart(newUnarmedAbilityController, exception);
             closeAfterFailedStart(newTracker, exception);
             throw new UncheckedIOException("Unable to start FabricMMO persistence", exception);
         } catch (RuntimeException | Error exception) {
@@ -325,6 +387,8 @@ public final class FabricMmoFabricRuntime {
             closeAfterFailedStart(newExcavationAbilityController, exception);
             closeAfterFailedStart(newHerbalismAbilityController, exception);
             closeAfterFailedStart(newSwordsAbilityController, exception);
+            closeAfterFailedStart(newAxesAbilityController, exception);
+            closeAfterFailedStart(newUnarmedAbilityController, exception);
             closeAfterFailedStart(newTracker, exception);
             throw exception;
         }
@@ -615,6 +679,48 @@ public final class FabricMmoFabricRuntime {
         return combatXpSettings;
     }
 
+    public static synchronized MobHealthbarSettings mobHealthbarSettings() {
+        if (mobHealthbarSettings == null) {
+            throw new IllegalStateException("FabricMMO mob-healthbar settings are not active");
+        }
+        return mobHealthbarSettings;
+    }
+
+    public static synchronized AxesSettings axesSettings() {
+        if (axesSettings == null) {
+            throw new IllegalStateException("FabricMMO Axes settings are not active");
+        }
+        return axesSettings;
+    }
+
+    public static synchronized AxesAbilityController axesAbilities() {
+        if (axesAbilityController == null) {
+            throw new IllegalStateException("FabricMMO Axes ability runtime is not active");
+        }
+        return axesAbilityController;
+    }
+
+    public static synchronized UnarmedSettings unarmedSettings() {
+        if (unarmedSettings == null) {
+            throw new IllegalStateException("FabricMMO Unarmed settings are not active");
+        }
+        return unarmedSettings;
+    }
+
+    public static synchronized UnarmedAbilityController unarmedAbilities() {
+        if (unarmedAbilityController == null) {
+            throw new IllegalStateException("FabricMMO Unarmed ability runtime is not active");
+        }
+        return unarmedAbilityController;
+    }
+
+    public static synchronized MacesSettings macesSettings() {
+        if (macesSettings == null) {
+            throw new IllegalStateException("FabricMMO Maces settings are not active");
+        }
+        return macesSettings;
+    }
+
     public static synchronized SwordsSettings swordsSettings() {
         if (swordsSettings == null) {
             throw new IllegalStateException("FabricMMO Swords settings are not active");
@@ -691,7 +797,9 @@ public final class FabricMmoFabricRuntime {
                 && woodcuttingAbilityController == null
                 && excavationAbilityController == null
                 && herbalismAbilityController == null
-                && swordsAbilityController == null) {
+                && swordsAbilityController == null
+                && axesAbilityController == null
+                && unarmedAbilityController == null) {
             return;
         }
         SharedServerSystems.stop();
@@ -704,6 +812,8 @@ public final class FabricMmoFabricRuntime {
                 excavationAbilityController;
         HerbalismAbilityController activeHerbalismAbilityController = herbalismAbilityController;
         SwordsAbilityController activeSwordsAbilityController = swordsAbilityController;
+        AxesAbilityController activeAxesAbilityController = axesAbilityController;
+        UnarmedAbilityController activeUnarmedAbilityController = unarmedAbilityController;
         MiningBlastRegistry.clear();
         MiningAbilityHandler.reset();
         WoodcuttingAbilityHandler.reset();
@@ -717,6 +827,12 @@ public final class FabricMmoFabricRuntime {
         AcrobaticsRuntimeHandler.clear();
         SwordsAbilityHandler.reset();
         SwordsRuntimeHandler.reset();
+        AxesAbilityHandler.reset();
+        AxesRuntimeHandler.reset();
+        UnarmedAbilityHandler.reset();
+        UnarmedRuntimeHandler.reset();
+        MacesRuntimeHandler.reset();
+        MobHealthbarService.reset();
         runtime = null;
         acrobaticsSettings = null;
         miningXpTable = null;
@@ -742,8 +858,14 @@ public final class FabricMmoFabricRuntime {
         fishingTreasures = null;
         fishingAntiExploit = null;
         combatXpSettings = null;
+        mobHealthbarSettings = null;
         swordsSettings = null;
         swordsAbilityController = null;
+        axesSettings = null;
+        axesAbilityController = null;
+        unarmedSettings = null;
+        unarmedAbilityController = null;
+        macesSettings = null;
         serverWorldRoot = null;
         worldBlacklist = null;
         progressionSettings = null;
@@ -804,6 +926,28 @@ public final class FabricMmoFabricRuntime {
                 }
             }
         }
+        if (activeAxesAbilityController != null) {
+            try {
+                activeAxesAbilityController.close();
+            } catch (IOException exception) {
+                if (failure == null) {
+                    failure = exception;
+                } else {
+                    failure.addSuppressed(exception);
+                }
+            }
+        }
+        if (activeUnarmedAbilityController != null) {
+            try {
+                activeUnarmedAbilityController.close();
+            } catch (IOException exception) {
+                if (failure == null) {
+                    failure = exception;
+                } else {
+                    failure.addSuppressed(exception);
+                }
+            }
+        }
         if (activeTracker != null) {
             activeTracker.close();
         }
@@ -822,6 +966,14 @@ public final class FabricMmoFabricRuntime {
             throw new UncheckedIOException("Unable to stop FabricMMO persistence", failure);
         }
         LOGGER.info("Stopped FabricMMO server runtime");
+    }
+
+    private static Path resolveAxesAbilityDirectory(Path worldRoot) {
+        return worldRoot.resolve("fabricmmo").resolve("axes-abilities");
+    }
+
+    private static Path resolveUnarmedAbilityDirectory(Path worldRoot) {
+        return worldRoot.resolve("fabricmmo").resolve("unarmed-abilities");
     }
 
     private static PlacedBlockTracker requirePlacedBlockTracker() {

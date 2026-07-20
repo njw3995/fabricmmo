@@ -1,6 +1,7 @@
 package io.github.njw3995.fabricmmo.core.mixin;
 
 import io.github.njw3995.fabricmmo.core.fabric.SharedServerSystems;
+import io.github.njw3995.fabricmmo.core.skill.unarmed.UnarmedRuntimeHandler;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -11,6 +12,15 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ItemEntity.class)
 abstract class ItemEntityMixin {
+    @Inject(method = "onPlayerCollision", at = @At("HEAD"), cancellable = true)
+    private void fabricmmo$protectDisarmedItem(PlayerEntity player, CallbackInfo callback) {
+        if (player instanceof ServerPlayerEntity serverPlayer
+                && !UnarmedRuntimeHandler.mayPickUpDisarmedItem(
+                        (ItemEntity) (Object) this, serverPlayer)) {
+            callback.cancel();
+        }
+    }
+
     @Inject(
             method = "onPlayerCollision",
             at = @At(

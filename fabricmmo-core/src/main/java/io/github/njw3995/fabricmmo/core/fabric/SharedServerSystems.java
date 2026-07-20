@@ -43,6 +43,10 @@ import io.github.njw3995.fabricmmo.core.session.PlayerSessionStateService;
 import io.github.njw3995.fabricmmo.core.skill.CoreSkills;
 import io.github.njw3995.fabricmmo.core.skill.acrobatics.AcrobaticsPanelMechanicsProvider;
 import io.github.njw3995.fabricmmo.core.skill.acrobatics.AcrobaticsSettings;
+import io.github.njw3995.fabricmmo.core.skill.axes.AxesAbilityController;
+import io.github.njw3995.fabricmmo.core.skill.axes.AxesPanelMechanicsProvider;
+import io.github.njw3995.fabricmmo.core.skill.axes.AxesSettings;
+import io.github.njw3995.fabricmmo.core.skill.axes.CoreAxesAbilities;
 import io.github.njw3995.fabricmmo.core.skill.excavation.CoreExcavationAbilities;
 import io.github.njw3995.fabricmmo.core.skill.excavation.ExcavationAbilityController;
 import io.github.njw3995.fabricmmo.core.skill.excavation.ExcavationPanelMechanicsProvider;
@@ -55,6 +59,8 @@ import io.github.njw3995.fabricmmo.core.skill.fishing.FishingPanelMechanicsProvi
 import io.github.njw3995.fabricmmo.core.skill.fishing.FishingSettings;
 import io.github.njw3995.fabricmmo.core.skill.fishing.FishingTreasureTable;
 import io.github.njw3995.fabricmmo.core.skill.herbalism.HerbalismSettings;
+import io.github.njw3995.fabricmmo.core.skill.maces.MacesPanelMechanicsProvider;
+import io.github.njw3995.fabricmmo.core.skill.maces.MacesSettings;
 import io.github.njw3995.fabricmmo.core.skill.mining.CoreMiningAbilities;
 import io.github.njw3995.fabricmmo.core.skill.mining.MiningAbilityController;
 import io.github.njw3995.fabricmmo.core.skill.mining.MiningDropSettings;
@@ -69,6 +75,10 @@ import io.github.njw3995.fabricmmo.core.skill.swords.CoreSwordsAbilities;
 import io.github.njw3995.fabricmmo.core.skill.swords.SwordsAbilityController;
 import io.github.njw3995.fabricmmo.core.skill.swords.SwordsPanelMechanicsProvider;
 import io.github.njw3995.fabricmmo.core.skill.swords.SwordsSettings;
+import io.github.njw3995.fabricmmo.core.skill.unarmed.CoreUnarmedAbilities;
+import io.github.njw3995.fabricmmo.core.skill.unarmed.UnarmedAbilityController;
+import io.github.njw3995.fabricmmo.core.skill.unarmed.UnarmedPanelMechanicsProvider;
+import io.github.njw3995.fabricmmo.core.skill.unarmed.UnarmedSettings;
 import io.github.njw3995.fabricmmo.core.teleport.PartyTeleportService;
 import io.github.njw3995.fabricmmo.core.ui.InMemoryPlayerUiSettingsStore;
 import io.github.njw3995.fabricmmo.core.ui.PlayerScoreboardService;
@@ -130,7 +140,12 @@ public final class SharedServerSystems {
             FishingSettings fishingSettings,
             FishingTreasureTable fishingTreasures,
             SwordsAbilityController swordsAbilities,
-            SwordsSettings swordsSettings) throws IOException {
+            SwordsSettings swordsSettings,
+            AxesAbilityController axesAbilities,
+            AxesSettings axesSettings,
+            UnarmedAbilityController unarmedAbilities,
+            UnarmedSettings unarmedSettings,
+            MacesSettings macesSettings) throws IOException {
         if (state != null) {
             throw new IllegalStateException("Shared FabricMMO systems already active");
         }
@@ -190,7 +205,11 @@ public final class SharedServerSystems {
                 herbalismAbilities,
                 herbalismSettings,
                 swordsAbilities,
-                swordsSettings);
+                swordsSettings,
+                axesAbilities,
+                axesSettings,
+                unarmedAbilities,
+                unarmedSettings);
         SkillPanelCooldownCatalog skillPanelCooldowns = new SkillPanelCooldownCatalog(
                 cooldowns, locale, uiConfiguration.abilityNames());
         SubSkillRankCatalog subSkillRanks = SubSkillRankCatalog.load(
@@ -219,6 +238,15 @@ public final class SharedServerSystems {
         skillPanelMechanics.register(
                 CoreSkills.SWORDS,
                 new SwordsPanelMechanicsProvider(server, swordsSettings, locale));
+        skillPanelMechanics.register(
+                CoreSkills.AXES,
+                new AxesPanelMechanicsProvider(server, axesSettings, locale));
+        skillPanelMechanics.register(
+                CoreSkills.UNARMED,
+                new UnarmedPanelMechanicsProvider(server, unarmedSettings, locale));
+        skillPanelMechanics.register(
+                CoreSkills.MACES,
+                new MacesPanelMechanicsProvider(server, macesSettings, locale));
         DebugDiagnosticsService diagnostics = new DebugDiagnosticsService(server, sessions);
         ProgressionMaintenanceService maintenance = new ProgressionMaintenanceService(
                 progressionStore, playerDataDirectory, mySqlSettings, Clock.systemUTC());
@@ -315,7 +343,11 @@ public final class SharedServerSystems {
             HerbalismAbilityController herbalismAbilities,
             HerbalismSettings herbalismSettings,
             SwordsAbilityController swordsAbilities,
-            SwordsSettings swordsSettings) {
+            SwordsSettings swordsSettings,
+            AxesAbilityController axesAbilities,
+            AxesSettings axesSettings,
+            UnarmedAbilityController unarmedAbilities,
+            UnarmedSettings unarmedSettings) {
         AbilityCooldownService cooldowns = new AbilityCooldownService();
         AbilityCooldownService.Provider miningProvider = new AbilityCooldownService.Provider() {
             @Override
@@ -431,6 +463,48 @@ public final class SharedServerSystems {
                     public void reset(UUID playerId) {
                         try {
                             swordsAbilities.reset(playerId);
+                        } catch (IOException exception) {
+                            throw new UncheckedIOException(exception);
+                        }
+                    }
+                });
+        cooldowns.register(CoreAxesAbilities.SKULL_SPLITTER,
+                new AbilityCooldownService.Provider() {
+                    @Override
+                    public int remainingSeconds(UUID playerId) {
+                        try {
+                            return axesAbilities.cooldownRemaining(
+                                    playerId, axesSettings.skullSplitterCooldownSeconds());
+                        } catch (IOException exception) {
+                            throw new UncheckedIOException(exception);
+                        }
+                    }
+
+                    @Override
+                    public void reset(UUID playerId) {
+                        try {
+                            axesAbilities.reset(playerId);
+                        } catch (IOException exception) {
+                            throw new UncheckedIOException(exception);
+                        }
+                    }
+                });
+        cooldowns.register(CoreUnarmedAbilities.BERSERK,
+                new AbilityCooldownService.Provider() {
+                    @Override
+                    public int remainingSeconds(UUID playerId) {
+                        try {
+                            return unarmedAbilities.cooldownRemaining(
+                                    playerId, unarmedSettings.berserkCooldownSeconds());
+                        } catch (IOException exception) {
+                            throw new UncheckedIOException(exception);
+                        }
+                    }
+
+                    @Override
+                    public void reset(UUID playerId) {
+                        try {
+                            unarmedAbilities.reset(playerId);
                         } catch (IOException exception) {
                             throw new UncheckedIOException(exception);
                         }
