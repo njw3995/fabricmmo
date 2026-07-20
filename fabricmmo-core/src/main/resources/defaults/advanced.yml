@@ -62,6 +62,30 @@ Skills:
       DamageThreshold: 7.0
     GracefulRoll:
       DamageThreshold: 14.0
+  Archery:
+    SkillShot:
+      RankDamageMultiplier: 10.0
+      MaxDamage: 9.0
+    Daze:
+      ChanceMax: 50.0
+      MaxBonusLevel:
+        Standard: 100
+        RetroMode: 1000
+      BonusDamage: 4.0
+    ArrowRetrieval:
+      ChanceMax: 100.0
+      MaxBonusLevel:
+        Standard: 100
+        RetroMode: 1000
+    ForceMultiplier: 2.0
+  Crossbows:
+    PoweredShot:
+      RankDamageMultiplier: 10.0
+      MaxDamage: 9.0
+  Tridents:
+    Impale:
+      Base_Damage: 1.0
+      Rank_Damage_Multiplier: 0.5
   Fishing:
     ShakeChance:
       Rank_1: 15.0

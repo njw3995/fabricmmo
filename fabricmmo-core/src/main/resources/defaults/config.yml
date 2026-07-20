@@ -39,10 +39,14 @@ Skills:
   Alchemy:
     Level_Cap: 0
   Archery:
+    Enabled_For_PVP: true
+    Enabled_For_PVE: true
     Level_Cap: 0
   Axes:
     Level_Cap: 0
   Crossbows:
+    Enabled_For_PVP: true
+    Enabled_For_PVE: true
     Level_Cap: 0
   Excavation:
     Level_Cap: 0
@@ -76,6 +80,8 @@ Skills:
   Taming:
     Level_Cap: 0
   Tridents:
+    Enabled_For_PVP: true
+    Enabled_For_PVE: true
     Level_Cap: 0
   Unarmed:
     Level_Cap: 0

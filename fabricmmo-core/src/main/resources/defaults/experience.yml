@@ -261,6 +261,8 @@ Experience_Values:
     Roll: 600
     Fall: 600
     FeatherFall_Multiplier: 2.0
+  Archery:
+    Distance_Multiplier: 0.025
   # Minecraft 1.21.1-applicable Mining values. Later Cinnabar/Sulfur content is excluded.
   Mining:
     Sculk: 4

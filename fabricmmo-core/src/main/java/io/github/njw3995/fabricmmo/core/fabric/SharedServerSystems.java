@@ -42,6 +42,10 @@ import io.github.njw3995.fabricmmo.core.progression.ProgressionSettings;
 import io.github.njw3995.fabricmmo.core.session.PlayerSessionStateService;
 import io.github.njw3995.fabricmmo.core.skill.CoreSkills;
 import io.github.njw3995.fabricmmo.core.skill.acrobatics.AcrobaticsPanelMechanicsProvider;
+import io.github.njw3995.fabricmmo.core.skill.archery.ArcheryPanelMechanicsProvider;
+import io.github.njw3995.fabricmmo.core.skill.archery.ArcherySettings;
+import io.github.njw3995.fabricmmo.core.skill.crossbows.CrossbowsPanelMechanicsProvider;
+import io.github.njw3995.fabricmmo.core.skill.crossbows.CrossbowsSettings;
 import io.github.njw3995.fabricmmo.core.skill.acrobatics.AcrobaticsSettings;
 import io.github.njw3995.fabricmmo.core.skill.excavation.CoreExcavationAbilities;
 import io.github.njw3995.fabricmmo.core.skill.excavation.ExcavationAbilityController;
@@ -68,6 +72,8 @@ import io.github.njw3995.fabricmmo.core.skill.woodcutting.WoodcuttingSettings;
 import io.github.njw3995.fabricmmo.core.skill.swords.CoreSwordsAbilities;
 import io.github.njw3995.fabricmmo.core.skill.swords.SwordsAbilityController;
 import io.github.njw3995.fabricmmo.core.skill.swords.SwordsPanelMechanicsProvider;
+import io.github.njw3995.fabricmmo.core.skill.tridents.TridentsPanelMechanicsProvider;
+import io.github.njw3995.fabricmmo.core.skill.tridents.TridentsSettings;
 import io.github.njw3995.fabricmmo.core.skill.swords.SwordsSettings;
 import io.github.njw3995.fabricmmo.core.teleport.PartyTeleportService;
 import io.github.njw3995.fabricmmo.core.ui.InMemoryPlayerUiSettingsStore;
@@ -129,6 +135,9 @@ public final class SharedServerSystems {
             HerbalismDropSettings herbalismDropSettings,
             FishingSettings fishingSettings,
             FishingTreasureTable fishingTreasures,
+            ArcherySettings archerySettings,
+            CrossbowsSettings crossbowsSettings,
+            TridentsSettings tridentsSettings,
             SwordsAbilityController swordsAbilities,
             SwordsSettings swordsSettings) throws IOException {
         if (state != null) {
@@ -216,6 +225,15 @@ public final class SharedServerSystems {
         skillPanelMechanics.register(
                 CoreSkills.FISHING,
                 new FishingPanelMechanicsProvider(server, fishingSettings, fishingTreasures, locale));
+        skillPanelMechanics.register(
+                CoreSkills.ARCHERY,
+                new ArcheryPanelMechanicsProvider(server, archerySettings, locale));
+        skillPanelMechanics.register(
+                CoreSkills.CROSSBOWS,
+                new CrossbowsPanelMechanicsProvider(server, crossbowsSettings, locale));
+        skillPanelMechanics.register(
+                CoreSkills.TRIDENTS,
+                new TridentsPanelMechanicsProvider(server, tridentsSettings, locale));
         skillPanelMechanics.register(
                 CoreSkills.SWORDS,
                 new SwordsPanelMechanicsProvider(server, swordsSettings, locale));

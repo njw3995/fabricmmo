@@ -4,6 +4,7 @@ import io.github.njw3995.fabricmmo.core.fabric.FabricMmoFabricRuntime;
 import io.github.njw3995.fabricmmo.core.skill.acrobatics.AcrobaticsRuntimeHandler;
 import io.github.njw3995.fabricmmo.core.skill.mining.MiningBlastDamage;
 import io.github.njw3995.fabricmmo.core.skill.mining.MiningBlastRegistry;
+import io.github.njw3995.fabricmmo.core.skill.ranged.RangedCombatRuntimeHandler;
 import io.github.njw3995.fabricmmo.core.skill.swords.SwordsRuntimeHandler;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.TntEntity;
@@ -15,6 +16,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(LivingEntity.class)
@@ -40,8 +42,10 @@ abstract class LivingEntityMixin {
         float defensiveModified = victim instanceof ServerPlayerEntity player
                 ? AcrobaticsRuntimeHandler.modifyCombatDamage(player, source, damage)
                 : damage;
-        float modified = SwordsRuntimeHandler.modifyAttackDamage(
+        float rangedModified = RangedCombatRuntimeHandler.modifyAttackDamage(
                 victim, source, defensiveModified);
+        float modified = SwordsRuntimeHandler.modifyAttackDamage(
+                victim, source, rangedModified);
         if (!(source.getSource() instanceof TntEntity tnt)) {
             return modified;
         }
@@ -85,8 +89,15 @@ abstract class LivingEntityMixin {
             DamageSource source,
             float damage,
             CallbackInfoReturnable<Boolean> callback) {
+        LivingEntity victim = (LivingEntity) (Object) this;
+        RangedCombatRuntimeHandler.damageFinished(
+                victim, source, Boolean.TRUE.equals(callback.getReturnValue()));
         SwordsRuntimeHandler.damageFinished(
-                (LivingEntity) (Object) this, source, Boolean.TRUE.equals(callback.getReturnValue()));
+                victim, source, Boolean.TRUE.equals(callback.getReturnValue()));
     }
 
+    @Inject(method = "onDeath", at = @At("HEAD"))
+    private void fabricmmo$dropRetrievedArrows(DamageSource source, CallbackInfo callback) {
+        RangedCombatRuntimeHandler.entityDied((LivingEntity) (Object) this);
+    }
 }

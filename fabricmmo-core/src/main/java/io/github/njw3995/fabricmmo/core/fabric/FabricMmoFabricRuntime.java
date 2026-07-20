@@ -16,6 +16,8 @@ import io.github.njw3995.fabricmmo.core.player.PlayerSessionSettingsService;
 import io.github.njw3995.fabricmmo.core.runtime.FabricMmoServerRuntime;
 import io.github.njw3995.fabricmmo.core.skill.acrobatics.AcrobaticsRuntimeHandler;
 import io.github.njw3995.fabricmmo.core.skill.acrobatics.AcrobaticsSettings;
+import io.github.njw3995.fabricmmo.core.skill.archery.ArcherySettings;
+import io.github.njw3995.fabricmmo.core.skill.crossbows.CrossbowsSettings;
 import io.github.njw3995.fabricmmo.core.skill.excavation.CoreExcavationAbilities;
 import io.github.njw3995.fabricmmo.core.skill.excavation.ExcavationAbilityController;
 import io.github.njw3995.fabricmmo.core.skill.excavation.ExcavationAbilityHandler;
@@ -67,6 +69,8 @@ import io.github.njw3995.fabricmmo.core.skill.swords.SwordsAbilityController;
 import io.github.njw3995.fabricmmo.core.skill.swords.SwordsAbilityHandler;
 import io.github.njw3995.fabricmmo.core.skill.swords.SwordsAbilityStateView;
 import io.github.njw3995.fabricmmo.core.skill.swords.SwordsRuntimeHandler;
+import io.github.njw3995.fabricmmo.core.skill.ranged.RangedCombatRuntimeHandler;
+import io.github.njw3995.fabricmmo.core.skill.tridents.TridentsSettings;
 import io.github.njw3995.fabricmmo.core.skill.swords.SwordsSettings;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -109,6 +113,9 @@ public final class FabricMmoFabricRuntime {
     private static FishingTreasureTable fishingTreasures;
     private static FishingAntiExploitTracker fishingAntiExploit;
     private static CombatXpSettings combatXpSettings;
+    private static ArcherySettings archerySettings;
+    private static CrossbowsSettings crossbowsSettings;
+    private static TridentsSettings tridentsSettings;
     private static SwordsSettings swordsSettings;
     private static SwordsAbilityController swordsAbilityController;
     private static Path serverWorldRoot;
@@ -189,6 +196,12 @@ public final class FabricMmoFabricRuntime {
             FishingAntiExploitTracker newFishingAntiExploit = new FishingAntiExploitTracker(
                     newFishingSettings.exploitMoveRange(), newFishingSettings.overFishLimit());
             CombatXpSettings newCombatXpSettings = CombatXpSettings.load(experienceFile);
+            ArcherySettings newArcherySettings = ArcherySettings.load(
+                    configFile, advancedFile, skillRanksFile, experienceFile);
+            CrossbowsSettings newCrossbowsSettings = CrossbowsSettings.load(
+                    configFile, advancedFile, skillRanksFile, experienceFile);
+            TridentsSettings newTridentsSettings = TridentsSettings.load(
+                    configFile, advancedFile, skillRanksFile);
             SwordsSettings newSwordsSettings = SwordsSettings.load(
                     configFile, advancedFile, skillRanksFile, soundsFile);
             newAbilityController = new MiningAbilityController(
@@ -266,6 +279,9 @@ public final class FabricMmoFabricRuntime {
                     newHerbalismDropSettings,
                     newFishingSettings,
                     newFishingTreasures,
+                    newArcherySettings,
+                    newCrossbowsSettings,
+                    newTridentsSettings,
                     newSwordsAbilityController,
                     newSwordsSettings);
             runtime = newRuntime;
@@ -293,6 +309,9 @@ public final class FabricMmoFabricRuntime {
             fishingTreasures = newFishingTreasures;
             fishingAntiExploit = newFishingAntiExploit;
             combatXpSettings = newCombatXpSettings;
+            archerySettings = newArcherySettings;
+            crossbowsSettings = newCrossbowsSettings;
+            tridentsSettings = newTridentsSettings;
             swordsSettings = newSwordsSettings;
             swordsAbilityController = newSwordsAbilityController;
             serverWorldRoot = worldRoot;
@@ -615,6 +634,27 @@ public final class FabricMmoFabricRuntime {
         return combatXpSettings;
     }
 
+    public static synchronized ArcherySettings archerySettings() {
+        if (archerySettings == null) {
+            throw new IllegalStateException("FabricMMO Archery settings are not active");
+        }
+        return archerySettings;
+    }
+
+    public static synchronized CrossbowsSettings crossbowsSettings() {
+        if (crossbowsSettings == null) {
+            throw new IllegalStateException("FabricMMO Crossbows settings are not active");
+        }
+        return crossbowsSettings;
+    }
+
+    public static synchronized TridentsSettings tridentsSettings() {
+        if (tridentsSettings == null) {
+            throw new IllegalStateException("FabricMMO Tridents settings are not active");
+        }
+        return tridentsSettings;
+    }
+
     public static synchronized SwordsSettings swordsSettings() {
         if (swordsSettings == null) {
             throw new IllegalStateException("FabricMMO Swords settings are not active");
@@ -717,6 +757,7 @@ public final class FabricMmoFabricRuntime {
         AcrobaticsRuntimeHandler.clear();
         SwordsAbilityHandler.reset();
         SwordsRuntimeHandler.reset();
+        RangedCombatRuntimeHandler.reset();
         runtime = null;
         acrobaticsSettings = null;
         miningXpTable = null;
@@ -742,6 +783,9 @@ public final class FabricMmoFabricRuntime {
         fishingTreasures = null;
         fishingAntiExploit = null;
         combatXpSettings = null;
+        archerySettings = null;
+        crossbowsSettings = null;
+        tridentsSettings = null;
         swordsSettings = null;
         swordsAbilityController = null;
         serverWorldRoot = null;
