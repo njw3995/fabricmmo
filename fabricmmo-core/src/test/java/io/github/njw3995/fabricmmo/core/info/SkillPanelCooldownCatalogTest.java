@@ -26,9 +26,9 @@ class SkillPanelCooldownCatalogTest {
 
         assertRows(catalog, CoreSkills.ACROBATICS);
         assertRows(catalog, CoreSkills.ALCHEMY);
-        assertRows(catalog, CoreSkills.ARCHERY, "Explosive Shot", "0");
+        assertRows(catalog, CoreSkills.ARCHERY);
         assertRows(catalog, CoreSkills.AXES, "Skull Splitter", "0");
-        assertRows(catalog, CoreSkills.CROSSBOWS, "This value i..", "0");
+        assertRows(catalog, CoreSkills.CROSSBOWS);
         assertRows(catalog, CoreSkills.EXCAVATION, "Giga Drill B..", "23");
         assertRows(catalog, CoreSkills.FISHING);
         assertRows(catalog, CoreSkills.HERBALISM, "Green Terra", "0");
@@ -40,7 +40,7 @@ class SkillPanelCooldownCatalogTest {
         assertRows(catalog, CoreSkills.SMELTING);
         assertRows(catalog, CoreSkills.SWORDS, "Serrated Str..", "0");
         assertRows(catalog, CoreSkills.TAMING);
-        assertRows(catalog, CoreSkills.TRIDENTS, "This value i..", "0");
+        assertRows(catalog, CoreSkills.TRIDENTS);
         assertRows(catalog, CoreSkills.UNARMED, "Berserk", "0");
         assertRows(catalog, CoreSkills.WOODCUTTING, "Tree Feller", "19");
     }

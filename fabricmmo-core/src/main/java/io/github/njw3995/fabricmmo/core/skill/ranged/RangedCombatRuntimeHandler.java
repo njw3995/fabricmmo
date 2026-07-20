@@ -61,6 +61,8 @@ public final class RangedCombatRuntimeHandler {
     private static final ThreadLocal<Deque<HitContext>> HIT_CONTEXTS =
             ThreadLocal.withInitial(ArrayDeque::new);
     private static final ConcurrentHashMap<UUID, Long> RESPAWNS = new ConcurrentHashMap<>();
+    private static final RangedRetrievalDeathCoordinator RETRIEVAL_DEATHS =
+            new RangedRetrievalDeathCoordinator();
     private static final long PVP_RESPAWN_COOLDOWN_MILLIS = 5_000L;
     private static long lastCleanupTick;
 
@@ -218,10 +220,22 @@ public final class RangedCombatRuntimeHandler {
             if (contexts.isEmpty()) {
                 HIT_CONTEXTS.remove();
             }
+            if (RETRIEVAL_DEATHS.afterDamage(target.getUuid())) {
+                dropRetrievedArrows(target);
+            }
         }
     }
 
     public static void entityDied(LivingEntity entity) {
+        HitContext active = HIT_CONTEXTS.get().peek();
+        if (!RETRIEVAL_DEATHS.onDeath(
+                entity.getUuid(), active != null && active.targetId().equals(entity.getUuid()))) {
+            return;
+        }
+        dropRetrievedArrows(entity);
+    }
+
+    private static void dropRetrievedArrows(LivingEntity entity) {
         RangedProjectileData.RetrievalState state = RangedProjectileData
                 .removeRetrieval(entity.getUuid()).orElse(null);
         if (state == null
@@ -257,6 +271,7 @@ public final class RangedCombatRuntimeHandler {
     public static void reset() {
         RangedProjectileData.clear();
         RESPAWNS.clear();
+        RETRIEVAL_DEATHS.clear();
         HIT_CONTEXTS.remove();
         lastCleanupTick = 0L;
     }
