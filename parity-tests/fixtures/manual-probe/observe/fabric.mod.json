@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "id": "fabricmmo_taming_alchemy_probe_observe",
+  "version": "1.0.0",
+  "name": "FabricMMO Taming/Alchemy Observe Probe",
+  "description": "Logs Taming and Alchemy API events without modifying them.",
+  "environment": "server",
+  "entrypoints": {
+    "fabricmmo": [
+      "io.github.njw3995.fabricmmo.manualprobe.ObserveProbeEntrypoint"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.18.4",
+    "minecraft": "1.21.1",
+    "java": ">=21",
+    "fabricmmo": "*"
+  }
+}

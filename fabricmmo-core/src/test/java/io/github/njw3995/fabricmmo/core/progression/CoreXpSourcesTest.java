@@ -143,4 +143,21 @@ class CoreXpSourcesTest {
         assertEquals(1, unarmedSources);
     }
 
+    @Test
+    void registersTamingAndAlchemyXpSources() {
+        DefaultSkillRegistry skills = new DefaultSkillRegistry();
+        CoreSkills.registerAll(skills);
+        DefaultXpSourceRegistry sources = new DefaultXpSourceRegistry(skills);
+
+        CoreXpSources.registerDefaults(sources);
+
+        assertTrue(sources.find(CoreXpSources.TAMING_ANIMAL_TAMED).isPresent());
+        assertTrue(sources.find(CoreXpSources.TAMING_PET_COMBAT).isPresent());
+        assertTrue(sources.find(CoreXpSources.ALCHEMY_BREW).isPresent());
+        assertEquals(2, sources.sources().stream()
+                .filter(source -> source.skillId().equals(CoreSkills.TAMING)).count());
+        assertEquals(1, sources.sources().stream()
+                .filter(source -> source.skillId().equals(CoreSkills.ALCHEMY)).count());
+    }
+
 }

@@ -47,6 +47,8 @@ import io.github.njw3995.fabricmmo.core.skill.axes.AxesAbilityController;
 import io.github.njw3995.fabricmmo.core.skill.axes.AxesPanelMechanicsProvider;
 import io.github.njw3995.fabricmmo.core.skill.axes.AxesSettings;
 import io.github.njw3995.fabricmmo.core.skill.axes.CoreAxesAbilities;
+import io.github.njw3995.fabricmmo.core.skill.alchemy.AlchemyPanelMechanicsProvider;
+import io.github.njw3995.fabricmmo.core.skill.alchemy.AlchemySettings;
 import io.github.njw3995.fabricmmo.core.skill.excavation.CoreExcavationAbilities;
 import io.github.njw3995.fabricmmo.core.skill.excavation.ExcavationAbilityController;
 import io.github.njw3995.fabricmmo.core.skill.excavation.ExcavationPanelMechanicsProvider;
@@ -79,6 +81,8 @@ import io.github.njw3995.fabricmmo.core.skill.unarmed.CoreUnarmedAbilities;
 import io.github.njw3995.fabricmmo.core.skill.unarmed.UnarmedAbilityController;
 import io.github.njw3995.fabricmmo.core.skill.unarmed.UnarmedPanelMechanicsProvider;
 import io.github.njw3995.fabricmmo.core.skill.unarmed.UnarmedSettings;
+import io.github.njw3995.fabricmmo.core.skill.taming.TamingPanelMechanicsProvider;
+import io.github.njw3995.fabricmmo.core.skill.taming.TamingSettings;
 import io.github.njw3995.fabricmmo.core.teleport.PartyTeleportService;
 import io.github.njw3995.fabricmmo.core.ui.InMemoryPlayerUiSettingsStore;
 import io.github.njw3995.fabricmmo.core.ui.PlayerScoreboardService;
@@ -145,7 +149,9 @@ public final class SharedServerSystems {
             AxesSettings axesSettings,
             UnarmedAbilityController unarmedAbilities,
             UnarmedSettings unarmedSettings,
-            MacesSettings macesSettings) throws IOException {
+            MacesSettings macesSettings,
+            TamingSettings tamingSettings,
+            AlchemySettings alchemySettings) throws IOException {
         if (state != null) {
             throw new IllegalStateException("Shared FabricMMO systems already active");
         }
@@ -247,6 +253,12 @@ public final class SharedServerSystems {
         skillPanelMechanics.register(
                 CoreSkills.MACES,
                 new MacesPanelMechanicsProvider(server, macesSettings, locale));
+        skillPanelMechanics.register(
+                CoreSkills.TAMING,
+                new TamingPanelMechanicsProvider(tamingSettings, locale));
+        skillPanelMechanics.register(
+                CoreSkills.ALCHEMY,
+                new AlchemyPanelMechanicsProvider(server, alchemySettings, locale));
         DebugDiagnosticsService diagnostics = new DebugDiagnosticsService(server, sessions);
         ProgressionMaintenanceService maintenance = new ProgressionMaintenanceService(
                 progressionStore, playerDataDirectory, mySqlSettings, Clock.systemUTC());

@@ -40,6 +40,12 @@ public final class CoreXpSources {
             NamespacedId.parse("fabricmmo:swords_combat");
     public static final NamespacedId UNARMED_COMBAT =
             NamespacedId.parse("fabricmmo:unarmed_combat");
+    public static final NamespacedId TAMING_ANIMAL_TAMED =
+            NamespacedId.parse("fabricmmo:taming_animal_tamed");
+    public static final NamespacedId TAMING_PET_COMBAT =
+            NamespacedId.parse("fabricmmo:taming_pet_combat");
+    public static final NamespacedId ALCHEMY_BREW =
+            NamespacedId.parse("fabricmmo:alchemy_brew");
 
     private CoreXpSources() {
     }
@@ -113,6 +119,18 @@ public final class CoreXpSources {
                 UNARMED_COMBAT,
                 CoreSkills.UNARMED,
                 Map.of("upstream", "CombatUtils#processUnarmedCombat")));
+        registrar.registerXpSource(new XpSourceDefinition(
+                TAMING_ANIMAL_TAMED,
+                CoreSkills.TAMING,
+                Map.of("upstream", "EntityListener#onEntityTame")));
+        registrar.registerXpSource(new XpSourceDefinition(
+                TAMING_PET_COMBAT,
+                CoreSkills.TAMING,
+                Map.of("upstream", "CombatUtils#processTamingCombat")));
+        registrar.registerXpSource(new XpSourceDefinition(
+                ALCHEMY_BREW,
+                CoreSkills.ALCHEMY,
+                Map.of("upstream", "AlchemyManager#handlePotionBrewSuccesses")));
     }
 
     public static void registerCommandSources(

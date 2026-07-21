@@ -25,6 +25,9 @@ import io.github.njw3995.fabricmmo.core.skill.axes.AxesRuntimeHandler;
 import io.github.njw3995.fabricmmo.core.skill.axes.AxesSettings;
 import io.github.njw3995.fabricmmo.core.skill.axes.CoreAxesAbilities;
 import io.github.njw3995.fabricmmo.core.skill.axes.PropertiesAxesAbilityStore;
+import io.github.njw3995.fabricmmo.core.skill.alchemy.AlchemyPotionConfig;
+import io.github.njw3995.fabricmmo.core.skill.alchemy.AlchemyRuntimeHandler;
+import io.github.njw3995.fabricmmo.core.skill.alchemy.AlchemySettings;
 import io.github.njw3995.fabricmmo.core.skill.excavation.CoreExcavationAbilities;
 import io.github.njw3995.fabricmmo.core.skill.excavation.ExcavationAbilityController;
 import io.github.njw3995.fabricmmo.core.skill.excavation.ExcavationAbilityHandler;
@@ -86,6 +89,9 @@ import io.github.njw3995.fabricmmo.core.skill.unarmed.UnarmedAbilityHandler;
 import io.github.njw3995.fabricmmo.core.skill.unarmed.UnarmedAbilityStateView;
 import io.github.njw3995.fabricmmo.core.skill.unarmed.UnarmedRuntimeHandler;
 import io.github.njw3995.fabricmmo.core.skill.unarmed.UnarmedSettings;
+import io.github.njw3995.fabricmmo.core.skill.taming.TamingSettings;
+import io.github.njw3995.fabricmmo.core.skill.taming.TamingXpTable;
+import io.github.njw3995.fabricmmo.core.skill.taming.TamingRuntimeHandler;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Path;
@@ -135,6 +141,10 @@ public final class FabricMmoFabricRuntime {
     private static UnarmedAbilityController unarmedAbilityController;
     private static SwordsSettings swordsSettings;
     private static SwordsAbilityController swordsAbilityController;
+    private static TamingSettings tamingSettings;
+    private static TamingXpTable tamingXpTable;
+    private static AlchemySettings alchemySettings;
+    private static AlchemyPotionConfig alchemyPotionConfig;
     private static Path serverWorldRoot;
     private static WorldBlacklist worldBlacklist;
     private static ProgressionSettings progressionSettings;
@@ -165,6 +175,7 @@ public final class FabricMmoFabricRuntime {
         Path skillRanksFile = configDirectory.resolve("skillranks.yml");
         Path treasuresFile = configDirectory.resolve("treasures.yml");
         Path fishingTreasuresFile = configDirectory.resolve("fishing_treasures.yml");
+        Path potionsFile = configDirectory.resolve("potions.yml");
         Path soundsFile = configDirectory.resolve("sounds.yml");
         Path persistentDataFile = configDirectory.resolve("persistent_data.yml");
         Path worldBlacklistFile = configDirectory.resolve("world_blacklist.txt");
@@ -226,6 +237,13 @@ public final class FabricMmoFabricRuntime {
                     configFile, advancedFile, skillRanksFile, soundsFile);
             MacesSettings newMacesSettings = MacesSettings.load(
                     configFile, advancedFile, skillRanksFile, soundsFile);
+            TamingSettings newTamingSettings = TamingSettings.load(
+                    configFile, advancedFile, skillRanksFile, experienceFile,
+                    progressionSettings.mode());
+            TamingXpTable newTamingXpTable = TamingXpTable.load(experienceFile);
+            AlchemySettings newAlchemySettings = AlchemySettings.load(
+                    configFile, advancedFile, skillRanksFile, experienceFile, progressionSettings.mode());
+            AlchemyPotionConfig newAlchemyPotionConfig = AlchemyPotionConfig.load(potionsFile);
             newAbilityController = new MiningAbilityController(
                     new PropertiesMiningAbilityStore(miningAbilityDirectory), Clock.systemUTC());
             newWoodcuttingAbilityController = new WoodcuttingAbilityController(
@@ -319,7 +337,9 @@ public final class FabricMmoFabricRuntime {
                     newAxesSettings,
                     newUnarmedAbilityController,
                     newUnarmedSettings,
-                    newMacesSettings);
+                    newMacesSettings,
+                    newTamingSettings,
+                    newAlchemySettings);
             runtime = newRuntime;
             acrobaticsSettings = newAcrobaticsSettings;
             miningXpTable = newXpTable;
@@ -353,6 +373,10 @@ public final class FabricMmoFabricRuntime {
             unarmedSettings = newUnarmedSettings;
             unarmedAbilityController = newUnarmedAbilityController;
             macesSettings = newMacesSettings;
+            tamingSettings = newTamingSettings;
+            tamingXpTable = newTamingXpTable;
+            alchemySettings = newAlchemySettings;
+            alchemyPotionConfig = newAlchemyPotionConfig;
             serverWorldRoot = worldRoot;
             worldBlacklist = newWorldBlacklist;
             FabricMmoFabricRuntime.progressionSettings = progressionSettings;
@@ -735,6 +759,36 @@ public final class FabricMmoFabricRuntime {
         return swordsAbilityController;
     }
 
+
+    public static synchronized TamingSettings tamingSettings() {
+        if (tamingSettings == null) {
+            throw new IllegalStateException("FabricMMO Taming settings are not active");
+        }
+        return tamingSettings;
+    }
+
+    public static synchronized TamingXpTable tamingXpTable() {
+        if (tamingXpTable == null) {
+            throw new IllegalStateException("FabricMMO Taming XP table is not active");
+        }
+        return tamingXpTable;
+    }
+
+
+    public static synchronized AlchemySettings alchemySettings() {
+        if (alchemySettings == null) {
+            throw new IllegalStateException("FabricMMO Alchemy settings are not active");
+        }
+        return alchemySettings;
+    }
+
+    public static synchronized AlchemyPotionConfig alchemyPotionConfig() {
+        if (alchemyPotionConfig == null) {
+            throw new IllegalStateException("FabricMMO Alchemy potion configuration is not active");
+        }
+        return alchemyPotionConfig;
+    }
+
     public static synchronized boolean isWorldBlacklisted(ServerWorld world) {
         return worldBlacklist != null && worldBlacklist.isBlacklisted(world);
     }
@@ -802,6 +856,12 @@ public final class FabricMmoFabricRuntime {
                 && unarmedAbilityController == null) {
             return;
         }
+        MinecraftServer activeServer = SharedServerSystems.running()
+                ? SharedServerSystems.require().server() : null;
+        if (activeServer != null) {
+            AlchemyRuntimeHandler.finishAll(activeServer);
+            TamingRuntimeHandler.reset(activeServer);
+        }
         SharedServerSystems.stop();
         FabricMmoServerRuntime activeRuntime = runtime;
         PlacedBlockTracker activeTracker = placedBlockTracker;
@@ -833,6 +893,7 @@ public final class FabricMmoFabricRuntime {
         UnarmedRuntimeHandler.reset();
         MacesRuntimeHandler.reset();
         MobHealthbarService.reset();
+        AlchemyRuntimeHandler.reset();
         runtime = null;
         acrobaticsSettings = null;
         miningXpTable = null;
@@ -866,6 +927,10 @@ public final class FabricMmoFabricRuntime {
         unarmedSettings = null;
         unarmedAbilityController = null;
         macesSettings = null;
+        tamingSettings = null;
+        tamingXpTable = null;
+        alchemySettings = null;
+        alchemyPotionConfig = null;
         serverWorldRoot = null;
         worldBlacklist = null;
         progressionSettings = null;

@@ -9,6 +9,7 @@ import io.github.njw3995.fabricmmo.core.skill.mining.MiningBlastDamage;
 import io.github.njw3995.fabricmmo.core.skill.mining.MiningBlastRegistry;
 import io.github.njw3995.fabricmmo.core.skill.swords.SwordsRuntimeHandler;
 import io.github.njw3995.fabricmmo.core.skill.unarmed.UnarmedRuntimeHandler;
+import io.github.njw3995.fabricmmo.core.skill.taming.TamingRuntimeHandler;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import net.minecraft.entity.LivingEntity;
@@ -70,8 +71,12 @@ abstract class LivingEntityMixin {
         float defensiveModified = victim instanceof ServerPlayerEntity player
                 ? AcrobaticsRuntimeHandler.modifyCombatDamage(player, source, damage)
                 : damage;
-        float modified = SwordsRuntimeHandler.modifyAttackDamage(
+        float tamingDefended = TamingRuntimeHandler.modifyWolfDefense(
                 victim, source, defensiveModified);
+        float tamingAttack = TamingRuntimeHandler.modifyAttackDamage(
+                victim, source, tamingDefended);
+        float modified = SwordsRuntimeHandler.modifyAttackDamage(
+                victim, source, tamingAttack);
         modified = AxesRuntimeHandler.modifyAttackDamage(victim, source, modified);
         modified = UnarmedRuntimeHandler.modifyAttackDamage(victim, source, modified);
         modified = MacesRuntimeHandler.modifyAttackDamage(victim, source, modified);
@@ -122,20 +127,18 @@ abstract class LivingEntityMixin {
             float damage,
             CallbackInfoReturnable<Boolean> callback) {
         LivingEntity target = (LivingEntity) (Object) this;
+        boolean applied = Boolean.TRUE.equals(callback.getReturnValue());
         try {
-            SwordsRuntimeHandler.damageFinished(
-                    target, source, Boolean.TRUE.equals(callback.getReturnValue()));
-            AxesRuntimeHandler.damageFinished(
-                    target, source, Boolean.TRUE.equals(callback.getReturnValue()));
-            UnarmedRuntimeHandler.damageFinished(
-                    target, source, Boolean.TRUE.equals(callback.getReturnValue()));
-            MacesRuntimeHandler.damageFinished(
-                    target, source, Boolean.TRUE.equals(callback.getReturnValue()));
+            SwordsRuntimeHandler.damageFinished(target, source, applied);
+            AxesRuntimeHandler.damageFinished(target, source, applied);
+            UnarmedRuntimeHandler.damageFinished(target, source, applied);
+            MacesRuntimeHandler.damageFinished(target, source, applied);
+            TamingRuntimeHandler.damageFinished(target, applied);
             DamageFrame frame = FABRICMMO_DAMAGE_FRAMES.get().peekLast();
             if (frame != null
                     && frame.target() == target
                     && frame.source() == source
-                    && Boolean.TRUE.equals(callback.getReturnValue())
+                    && applied
                     && source.getAttacker() instanceof ServerPlayerEntity
                     && frame.healthBefore() - target.getHealth() > 0.0F) {
                 MobHealthbarService.showCurrentHealth(target);

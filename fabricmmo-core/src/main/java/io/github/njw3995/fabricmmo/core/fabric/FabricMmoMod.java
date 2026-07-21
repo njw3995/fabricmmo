@@ -6,6 +6,7 @@ import io.github.njw3995.fabricmmo.core.config.DefaultConfigInstaller;
 import io.github.njw3995.fabricmmo.core.permission.FabricCommandPermissionService;
 import io.github.njw3995.fabricmmo.core.skill.acrobatics.AcrobaticsRuntimeHandler;
 import io.github.njw3995.fabricmmo.core.skill.axes.AxesAbilityHandler;
+import io.github.njw3995.fabricmmo.core.skill.alchemy.AlchemyInteractionHandler;
 import io.github.njw3995.fabricmmo.core.skill.excavation.ExcavationAbilityHandler;
 import io.github.njw3995.fabricmmo.core.skill.excavation.ExcavationBlockBreakHandler;
 import io.github.njw3995.fabricmmo.core.skill.herbalism.HerbalismAbilityHandler;
@@ -20,6 +21,8 @@ import io.github.njw3995.fabricmmo.core.skill.mining.MiningBlockBreakHandler;
 import io.github.njw3995.fabricmmo.core.skill.swords.SwordsAbilityHandler;
 import io.github.njw3995.fabricmmo.core.skill.swords.SwordsRuntimeHandler;
 import io.github.njw3995.fabricmmo.core.skill.unarmed.UnarmedAbilityHandler;
+import io.github.njw3995.fabricmmo.core.skill.taming.TamingInteractionHandler;
+import io.github.njw3995.fabricmmo.core.skill.taming.TamingRuntimeHandler;
 import io.github.njw3995.fabricmmo.core.skill.woodcutting.WoodcuttingAbilityHandler;
 import io.github.njw3995.fabricmmo.core.skill.woodcutting.WoodcuttingBlockBreakHandler;
 import java.io.IOException;
@@ -57,9 +60,12 @@ public final class FabricMmoMod implements ModInitializer {
         SwordsAbilityHandler.register();
         AxesAbilityHandler.register();
         UnarmedAbilityHandler.register();
+        TamingInteractionHandler.register();
+        AlchemyInteractionHandler.register();
         SharedChatHandler.register(permissions);
         ServerTickEvents.END_SERVER_TICK.register(SharedServerSystems::tick);
         ServerTickEvents.END_SERVER_TICK.register(SwordsRuntimeHandler::tick);
+        ServerTickEvents.END_SERVER_TICK.register(TamingRuntimeHandler::tick);
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
             if (SharedServerSystems.running()) {
                 SharedServerSystems.playerJoined(handler.player);
@@ -69,6 +75,7 @@ public final class FabricMmoMod implements ModInitializer {
             FishingRuntimeHandler.playerDisconnected(handler.player.getUuid());
             AcrobaticsRuntimeHandler.playerDisconnected(handler.player.getUuid());
             SwordsRuntimeHandler.playerDisconnected(handler.player.getUuid());
+            TamingRuntimeHandler.playerDisconnected(server, handler.player.getUuid());
             SharedServerSystems.playerDisconnected(handler.player);
         });
         ServerPlayerEvents.AFTER_RESPAWN.register((oldPlayer, newPlayer, alive) -> {
@@ -76,6 +83,9 @@ public final class FabricMmoMod implements ModInitializer {
             SwordsRuntimeHandler.playerRespawned(newPlayer.getUuid());
         });
         ServerLivingEntityEvents.ALLOW_DAMAGE.register((entity, source, amount) -> {
+            if (!TamingRuntimeHandler.allowDamage(entity, source)) {
+                return false;
+            }
             if (entity instanceof ServerPlayerEntity player) {
                 boolean godMode = SharedServerSystems.godMode(player.getUuid());
                 if (!godMode && SharedServerSystems.running()) {

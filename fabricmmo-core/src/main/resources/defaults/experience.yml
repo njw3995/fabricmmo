@@ -13,6 +13,7 @@ ExploitFix:
   LavaStoneAndCobbleFarming: true
   PistonCheating: true
   TreeFellerReducedXP: true
+  COTWBreeding: true
 Fishing_ExploitFix_Options:
   MoveRange: 3
   OverFishLimit: 10
@@ -172,6 +173,14 @@ Diminished_Returns:
     Woodcutting: 20000
   Time_Interval: 10
 Experience_Values:
+  Alchemy:
+    Potion_Brewing:
+      # Stage values match mcMMO 2.3.000 defaults.
+      Stage_1: 666
+      Stage_2: 1111
+      Stage_3: 1750
+      Stage_4: 2250
+      Stage_5: 0
   PVP:
     Rewards: true
   Combat:
@@ -482,6 +491,27 @@ Experience_Values:
     Twisting_Vines_Plant: 10
     Wither_Rose: 500
     Torchflower: 90
+  Taming:
+    Animal_Taming:
+      # Minecraft 1.21.1-applicable entries from mcMMO 2.3.000.
+      Camel: 1300
+      Sniffer: 1500
+      Llama: 1200
+      Wolf: 250
+      Ocelot: 500
+      Horse: 1000
+      Donkey: 1000
+      Mule: 1000
+      Skeleton_Horse: 1000
+      Zombie_Horse: 1000
+      Parrot: 1100
+      Cat: 500
+      Fox: 1000
+      Panda: 1000
+      Bee: 100
+      Goat: 250
+      Axolotl: 600
+      Frog: 900
   Woodcutting:
     Crimson_Hyphae: 50
     Stripped_Crimson_Hyphae: 50
