@@ -8,7 +8,9 @@ import io.github.njw3995.fabricmmo.core.permission.PermissionNodes;
 import io.github.njw3995.fabricmmo.core.skill.CoreSkills;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -31,33 +33,16 @@ public final class UnarmedAbilityHandler {
     private static final FabricCommandPermissionService PERMISSIONS =
             new FabricCommandPermissionService();
     private static final Set<UUID> COOLDOWNS = new HashSet<>();
+    private static final Map<UUID, Integer> EMPTY_HAND_INTERACTION_TICKS = new HashMap<>();
 
     private UnarmedAbilityHandler() { }
 
     public static void register() {
         UseItemCallback.EVENT.register((player, world, hand) -> {
             ItemStack stack = player.getStackInHand(hand);
-            if (hand != Hand.MAIN_HAND || world.isClient()
-                    || !(player instanceof ServerPlayerEntity serverPlayer)
-                    || !FabricMmoFabricRuntime.running()
-                    || FabricMmoFabricRuntime.isWorldBlacklisted(serverPlayer.getServerWorld())
-                    || (SharedServerSystems.running()
-                        && !SharedServerSystems.require().sessions()
-                                .get(serverPlayer.getUuid()).abilityUse())) {
-                return TypedActionResult.pass(stack);
+            if (!world.isClient() && player instanceof ServerPlayerEntity serverPlayer) {
+                attemptPrepare(serverPlayer, hand, stack, false);
             }
-            UnarmedSettings settings = FabricMmoFabricRuntime.unarmedSettings();
-            if (!UnarmedRuntimeHandler.isUnarmed(stack, settings)) {
-                return TypedActionResult.pass(stack);
-            }
-            if (settings.onlyActivateWhenSneaking() && !serverPlayer.isSneaking()) {
-                return TypedActionResult.pass(stack);
-            }
-            if (!allowed(serverPlayer, PermissionNodes.UNARMED, true)
-                    || !allowed(serverPlayer, PermissionNodes.UNARMED_BERSERK, true)) {
-                return TypedActionResult.pass(stack);
-            }
-            prepare(serverPlayer, settings);
             return TypedActionResult.pass(stack);
         });
 
@@ -80,6 +65,7 @@ public final class UnarmedAbilityHandler {
                 throw new UncheckedIOException("Unable to clear Unarmed ability state", exception);
             }
             COOLDOWNS.remove(id);
+            EMPTY_HAND_INTERACTION_TICKS.remove(id);
         });
     }
 
@@ -126,7 +112,50 @@ public final class UnarmedAbilityHandler {
         }
     }
 
-    public static void reset() { COOLDOWNS.clear(); }
+    public static void prepareFromEmptyHandInteraction(
+            ServerPlayerEntity player, Hand hand) {
+        attemptPrepare(player, hand, player.getStackInHand(hand), true);
+    }
+
+    public static void reset() {
+        COOLDOWNS.clear();
+        EMPTY_HAND_INTERACTION_TICKS.clear();
+    }
+
+    private static void attemptPrepare(
+            ServerPlayerEntity player,
+            Hand hand,
+            ItemStack stack,
+            boolean deduplicateEmptyHandPacket) {
+        if (hand != Hand.MAIN_HAND
+                || !FabricMmoFabricRuntime.running()
+                || FabricMmoFabricRuntime.isWorldBlacklisted(player.getServerWorld())
+                || (SharedServerSystems.running()
+                    && !SharedServerSystems.require().sessions()
+                            .get(player.getUuid()).abilityUse())) {
+            return;
+        }
+        UnarmedSettings settings = FabricMmoFabricRuntime.unarmedSettings();
+        if (!UnarmedRuntimeHandler.isUnarmed(stack, settings)) {
+            return;
+        }
+        if (settings.onlyActivateWhenSneaking() && !player.isSneaking()) {
+            return;
+        }
+        if (!allowed(player, PermissionNodes.UNARMED, true)
+                || !allowed(player, PermissionNodes.UNARMED_BERSERK, true)) {
+            return;
+        }
+        if (deduplicateEmptyHandPacket && stack.isEmpty()) {
+            int currentTick = player.getServer().getTicks();
+            Integer previousTick = EMPTY_HAND_INTERACTION_TICKS.put(
+                    player.getUuid(), currentTick);
+            if (previousTick != null && previousTick == currentTick) {
+                return;
+            }
+        }
+        prepare(player, settings);
+    }
 
     private static void prepare(ServerPlayerEntity player, UnarmedSettings settings) {
         int level = FabricMmoFabricRuntime.requireApi().progression()

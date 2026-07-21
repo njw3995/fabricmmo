@@ -17,6 +17,7 @@
     "LivingEntityMixin",
     "PistonHandlerMixin",
     "PlayerEntityMixin",
+    "ServerPlayNetworkHandlerMixin",
     "ServerPlayerInteractionManagerMixin",
     "ServerPlayerEntityUiTraceMixin",
     "ServerCommandSourceUiTraceMixin",
