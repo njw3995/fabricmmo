@@ -61,6 +61,15 @@ import io.github.njw3995.fabricmmo.core.skill.mining.MiningDropSettings;
 import io.github.njw3995.fabricmmo.core.skill.mining.MiningSettings;
 import io.github.njw3995.fabricmmo.core.skill.mining.PropertiesMiningAbilityStore;
 import io.github.njw3995.fabricmmo.core.skill.mining.MiningXpTable;
+import io.github.njw3995.fabricmmo.core.skill.repair.MinecraftUtilityDefinitions;
+import io.github.njw3995.fabricmmo.core.skill.repair.RepairDefinitionTable;
+import io.github.njw3995.fabricmmo.core.skill.repair.RepairSettings;
+import io.github.njw3995.fabricmmo.core.skill.repair.SalvageDefinitionTable;
+import io.github.njw3995.fabricmmo.core.skill.repair.SalvageSettings;
+import io.github.njw3995.fabricmmo.core.skill.repair.UtilityAnvilConfirmationService;
+import io.github.njw3995.fabricmmo.core.skill.repair.UtilityAnvilInteractionHandler;
+import io.github.njw3995.fabricmmo.core.skill.repair.UtilityAnvilSoundSettings;
+import io.github.njw3995.fabricmmo.core.skill.smelting.SmeltingSettings;
 import io.github.njw3995.fabricmmo.core.skill.gathering.ConfiguredBlockXpTable;
 import io.github.njw3995.fabricmmo.core.skill.fishing.FishingAntiExploitTracker;
 import io.github.njw3995.fabricmmo.core.skill.fishing.FishingFoodHandler;
@@ -152,6 +161,11 @@ public final class FabricMmoFabricRuntime {
     private static TamingXpTable tamingXpTable;
     private static AlchemySettings alchemySettings;
     private static AlchemyPotionConfig alchemyPotionConfig;
+    private static RepairSettings repairSettings;
+    private static SalvageSettings salvageSettings;
+    private static SmeltingSettings smeltingSettings;
+    private static MinecraftUtilityDefinitions utilityDefinitions;
+    private static UtilityAnvilSoundSettings utilityAnvilSounds;
     private static Path serverWorldRoot;
     private static WorldBlacklist worldBlacklist;
     private static ProgressionSettings progressionSettings;
@@ -184,6 +198,9 @@ public final class FabricMmoFabricRuntime {
         Path fishingTreasuresFile = configDirectory.resolve("fishing_treasures.yml");
         Path potionsFile = configDirectory.resolve("potions.yml");
         Path soundsFile = configDirectory.resolve("sounds.yml");
+        Path repairFile = configDirectory.resolve("repair.vanilla.yml");
+        Path salvageFile = configDirectory.resolve("salvage.vanilla.yml");
+        Path customItemSupportFile = configDirectory.resolve("custom_item_support.yml");
         Path persistentDataFile = configDirectory.resolve("persistent_data.yml");
         Path worldBlacklistFile = configDirectory.resolve("world_blacklist.txt");
 
@@ -257,6 +274,20 @@ public final class FabricMmoFabricRuntime {
             AlchemySettings newAlchemySettings = AlchemySettings.load(
                     configFile, advancedFile, skillRanksFile, experienceFile, progressionSettings.mode());
             AlchemyPotionConfig newAlchemyPotionConfig = AlchemyPotionConfig.load(potionsFile);
+            RepairSettings newRepairSettings = RepairSettings.load(
+                    configFile, advancedFile, skillRanksFile, experienceFile,
+                    customItemSupportFile);
+            SalvageSettings newSalvageSettings = SalvageSettings.load(
+                    configFile, advancedFile, skillRanksFile, experienceFile,
+                    customItemSupportFile);
+            SmeltingSettings newSmeltingSettings = SmeltingSettings.load(
+                    configFile, advancedFile, skillRanksFile, experienceFile);
+            MinecraftUtilityDefinitions newUtilityDefinitions =
+                    MinecraftUtilityDefinitions.resolve(
+                            RepairDefinitionTable.load(repairFile),
+                            SalvageDefinitionTable.load(salvageFile));
+            UtilityAnvilSoundSettings newUtilityAnvilSounds =
+                    UtilityAnvilSoundSettings.load(soundsFile);
             newAbilityController = new MiningAbilityController(
                     new PropertiesMiningAbilityStore(miningAbilityDirectory), Clock.systemUTC());
             newWoodcuttingAbilityController = new WoodcuttingAbilityController(
@@ -355,7 +386,10 @@ public final class FabricMmoFabricRuntime {
                     newUnarmedSettings,
                     newMacesSettings,
                     newTamingSettings,
-                    newAlchemySettings);
+                    newAlchemySettings,
+                    newRepairSettings,
+                    newSalvageSettings,
+                    newSmeltingSettings);
             runtime = newRuntime;
             acrobaticsSettings = newAcrobaticsSettings;
             miningXpTable = newXpTable;
@@ -396,6 +430,11 @@ public final class FabricMmoFabricRuntime {
             tamingXpTable = newTamingXpTable;
             alchemySettings = newAlchemySettings;
             alchemyPotionConfig = newAlchemyPotionConfig;
+            repairSettings = newRepairSettings;
+            salvageSettings = newSalvageSettings;
+            smeltingSettings = newSmeltingSettings;
+            utilityDefinitions = newUtilityDefinitions;
+            utilityAnvilSounds = newUtilityAnvilSounds;
             serverWorldRoot = worldRoot;
             worldBlacklist = newWorldBlacklist;
             FabricMmoFabricRuntime.progressionSettings = progressionSettings;
@@ -829,6 +868,41 @@ public final class FabricMmoFabricRuntime {
         return alchemyPotionConfig;
     }
 
+    public static synchronized RepairSettings repairSettings() {
+        if (repairSettings == null) {
+            throw new IllegalStateException("FabricMMO Repair settings are not active");
+        }
+        return repairSettings;
+    }
+
+    public static synchronized SalvageSettings salvageSettings() {
+        if (salvageSettings == null) {
+            throw new IllegalStateException("FabricMMO Salvage settings are not active");
+        }
+        return salvageSettings;
+    }
+
+    public static synchronized SmeltingSettings smeltingSettings() {
+        if (smeltingSettings == null) {
+            throw new IllegalStateException("FabricMMO Smelting settings are not active");
+        }
+        return smeltingSettings;
+    }
+
+    public static synchronized MinecraftUtilityDefinitions utilityDefinitions() {
+        if (utilityDefinitions == null) {
+            throw new IllegalStateException("FabricMMO utility item mappings are not active");
+        }
+        return utilityDefinitions;
+    }
+
+    public static synchronized UtilityAnvilSoundSettings utilityAnvilSounds() {
+        if (utilityAnvilSounds == null) {
+            throw new IllegalStateException("FabricMMO utility anvil sounds are not active");
+        }
+        return utilityAnvilSounds;
+    }
+
     public static synchronized boolean isWorldBlacklisted(ServerWorld world) {
         return worldBlacklist != null && worldBlacklist.isBlacklisted(world);
     }
@@ -935,6 +1009,7 @@ public final class FabricMmoFabricRuntime {
         MobHealthbarService.reset();
         AlchemyRuntimeHandler.reset();
         RangedCombatRuntimeHandler.reset();
+        UtilityAnvilInteractionHandler.reset();
         runtime = null;
         acrobaticsSettings = null;
         miningXpTable = null;
@@ -975,6 +1050,11 @@ public final class FabricMmoFabricRuntime {
         tamingXpTable = null;
         alchemySettings = null;
         alchemyPotionConfig = null;
+        repairSettings = null;
+        salvageSettings = null;
+        smeltingSettings = null;
+        utilityDefinitions = null;
+        utilityAnvilSounds = null;
         serverWorldRoot = null;
         worldBlacklist = null;
         progressionSettings = null;

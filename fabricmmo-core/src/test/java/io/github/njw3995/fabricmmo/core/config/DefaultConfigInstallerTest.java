@@ -87,4 +87,44 @@ class DefaultConfigInstallerTest {
                 directory.resolve("sounds.yml.pre-update.bak")));
     }
 
+    @Test
+    void replacesLegacyEmptyRepairAndSalvageMappingsWithoutTouchingCustomMappings(
+            @TempDir Path directory) throws Exception {
+        Path repair = directory.resolve("repair.vanilla.yml");
+        Path salvage = directory.resolve("salvage.vanilla.yml");
+        Files.writeString(repair, "{}\n");
+        Files.writeString(salvage, "Salvageables:\n  CUSTOM_TOOL:\n    MinimumLevel: 7\n");
+
+        DefaultConfigInstaller.installMissingDefaults(directory);
+
+        String installedRepair = Files.readString(repair);
+        assertTrue(installedRepair.contains("Repairables:"));
+        assertTrue(installedRepair.contains("NETHERITE_PICKAXE:"));
+        assertEquals("{}\n", Files.readString(
+                directory.resolve("repair.vanilla.yml.pre-update.bak")));
+        assertEquals("Salvageables:\n  CUSTOM_TOOL:\n    MinimumLevel: 7\n",
+                Files.readString(salvage));
+    }
+
+    @Test
+    void recursivelyMigratesCustomItemSupportWithoutOverwritingAdminChoice(
+            @TempDir Path directory) throws Exception {
+        Path custom = directory.resolve("custom_item_support.yml");
+        Files.writeString(custom, """
+                Custom_Item_Support:
+                  Repair:
+                    Allow_Repair_On_Items_With_Custom_Model_Data: false
+                """);
+
+        DefaultConfigInstaller.installMissingDefaults(directory);
+
+        String updated = Files.readString(custom);
+        assertTrue(updated.contains(
+                "Allow_Repair_On_Items_With_Custom_Model_Data: false"));
+        assertTrue(updated.contains(
+                "Allow_Salvage_On_Items_With_Custom_Model_Data: true"));
+        assertTrue(Files.isRegularFile(
+                directory.resolve("custom_item_support.yml.pre-update.bak")));
+    }
+
 }

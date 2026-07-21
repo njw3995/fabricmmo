@@ -127,6 +127,13 @@ public final class MiningAbilityHandler {
         BLAST_MINING_COOLDOWNS.add(playerId);
     }
 
+    /** Removes the temporary Super Breaker Efficiency marker before Repair reads enchantments. */
+    public static boolean removeTemporaryToolBuffForRepair(
+            ServerPlayerEntity player,
+            ItemStack stack) {
+        return SuperBreakerAttributeBoost.restoreForRepair(player, stack);
+    }
+
     public static void restoreDroppedTool(ServerPlayerEntity player, ItemStack stack) {
         if (FabricMmoFabricRuntime.running()) {
             SuperBreakerAttributeBoost.restoreDroppedStack(player, stack);

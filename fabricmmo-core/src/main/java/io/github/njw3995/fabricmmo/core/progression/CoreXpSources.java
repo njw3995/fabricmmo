@@ -52,6 +52,10 @@ public final class CoreXpSources {
             NamespacedId.parse("fabricmmo:taming_pet_combat");
     public static final NamespacedId ALCHEMY_BREW =
             NamespacedId.parse("fabricmmo:alchemy_brew");
+    public static final NamespacedId REPAIR_ANVIL =
+            NamespacedId.parse("fabricmmo:repair_anvil");
+    public static final NamespacedId SMELTING_FURNACE =
+            NamespacedId.parse("fabricmmo:smelting_furnace");
 
     private CoreXpSources() {
     }
@@ -149,6 +153,14 @@ public final class CoreXpSources {
                 ALCHEMY_BREW,
                 CoreSkills.ALCHEMY,
                 Map.of("upstream", "AlchemyManager#handlePotionBrewSuccesses")));
+        registrar.registerXpSource(new XpSourceDefinition(
+                REPAIR_ANVIL,
+                CoreSkills.REPAIR,
+                Map.of("upstream", "RepairManager#handleRepair")));
+        registrar.registerXpSource(new XpSourceDefinition(
+                SMELTING_FURNACE,
+                CoreSkills.SMELTING,
+                Map.of("upstream", "SmeltingManager#smeltProcessing")));
     }
 
     public static void registerCommandSources(

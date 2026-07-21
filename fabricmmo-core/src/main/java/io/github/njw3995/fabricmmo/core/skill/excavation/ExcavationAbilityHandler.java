@@ -141,6 +141,17 @@ public final class ExcavationAbilityHandler {
         }
     }
 
+    /**
+     * Removes Giga Drill Breaker's temporary Efficiency before Repair or Salvage mutates
+     * the item's real enchantments. The ability may reapply its temporary bonus on the next
+     * tick, but expiry will then restore the post-anvil enchantment state.
+     */
+    public static void prepareToolForUtilityAnvil(ServerPlayerEntity player) {
+        if (FabricMmoFabricRuntime.running()) {
+            GigaDrillAttributeBoost.clear(player);
+        }
+    }
+
     private static boolean canPrepare(ServerPlayerEntity player) {
         return available(player)
                 && player.getMainHandStack().isIn(ItemTags.SHOVELS)

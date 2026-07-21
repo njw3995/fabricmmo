@@ -70,29 +70,93 @@ public final class DefaultProgressionService implements ProgressionService {
 
     @Override
     public XpAwardResult award(XpAwardRequest request) {
-        var skill = registry.find(request.skillId());
-        if (skill.isEmpty()) {
+        SkillDefinition skill = registry.find(request.skillId()).orElse(null);
+        if (skill == null) {
             return rejected("Unknown skill " + request.skillId(), 0);
         }
-        if (skill.orElseThrow().childSkill()) {
-            return rejected("Child skills do not receive direct XP", 0);
-        }
-        var source = xpSources.find(request.sourceId());
-        if (source.isEmpty()) {
+        XpSourceDefinition sourceDefinition = xpSources.find(request.sourceId()).orElse(null);
+        if (sourceDefinition == null) {
             return rejected("Unknown XP source " + request.sourceId(), 0);
         }
-        XpSourceDefinition sourceDefinition = source.orElseThrow();
         if (!sourceDefinition.skillId().equals(request.skillId())) {
             return rejected("XP source " + request.sourceId() + " does not target "
                     + request.skillId(), 0);
         }
+        return awardResolved(request, skill, sourceDefinition);
+    }
+
+    private XpAwardResult awardResolved(
+            XpAwardRequest request,
+            SkillDefinition skill,
+            XpSourceDefinition sourceDefinition) {
+        if (skill.childSkill()) {
+            return awardChild(request, skill, sourceDefinition);
+        }
         if (!commandSource(sourceDefinition)) {
-            var partyResult = PartyXpRuntime.distribute(request, this::award);
+            var partyResult = PartyXpRuntime.distribute(
+                    request,
+                    sharedRequest -> awardResolved(
+                            sharedRequest,
+                            requireRegisteredSkillDefinition(sharedRequest.skillId()),
+                            sourceDefinition));
             if (partyResult.isPresent()) {
                 return partyResult.orElseThrow();
             }
         }
+        return awardPrimary(request, sourceDefinition);
+    }
 
+    private XpAwardResult awardChild(
+            XpAwardRequest request,
+            SkillDefinition child,
+            XpSourceDefinition sourceDefinition) {
+        if (child.parents().isEmpty()) {
+            return rejected("Child skill has no parents: " + child.id(), 0);
+        }
+        ProgressionSnapshot before = query(request.playerId(), child.id());
+        XpPreAwardEvent childPreEvent = eventBus.publish(new XpPreAwardEvent(request));
+        if (childPreEvent.cancelled() || childPreEvent.multiplier() == 0.0D) {
+            return new XpAwardResult(
+                    XpAwardResult.Status.CANCELLED,
+                    0,
+                    before.level(),
+                    before.level(),
+                    "XP award cancelled");
+        }
+        double childXp = request.rawXp() * childPreEvent.multiplier();
+        if (!Double.isFinite(childXp) || childXp <= 0.0D) {
+            return rejected("XP modified to zero", before.level());
+        }
+        double dividedXp = childXp / child.parents().size();
+        long appliedXp = 0L;
+        boolean applied = false;
+        boolean cancelled = false;
+        String detail = "";
+        for (NamespacedId parentId : child.parents()) {
+            XpAwardRequest parentRequest = new XpAwardRequest(
+                    request.playerId(), parentId, request.sourceId(), dividedXp, request.context());
+            XpAwardResult parentResult = awardResolved(
+                    parentRequest,
+                    requireRegisteredSkillDefinition(parentId),
+                    sourceDefinition);
+            appliedXp = Math.min(Integer.MAX_VALUE, appliedXp + (long) parentResult.appliedXp());
+            applied |= parentResult.status() == XpAwardResult.Status.APPLIED;
+            cancelled |= parentResult.status() == XpAwardResult.Status.CANCELLED;
+            if (detail.isEmpty() && !parentResult.detail().isEmpty()) {
+                detail = parentResult.detail();
+            }
+        }
+        ProgressionSnapshot after = query(request.playerId(), child.id());
+        XpAwardResult.Status status = applied
+                ? XpAwardResult.Status.APPLIED
+                : cancelled ? XpAwardResult.Status.CANCELLED : XpAwardResult.Status.REJECTED;
+        return new XpAwardResult(
+                status, (int) appliedXp, before.level(), after.level(), detail);
+    }
+
+    private XpAwardResult awardPrimary(
+            XpAwardRequest request,
+            XpSourceDefinition sourceDefinition) {
         synchronized (playerLocks.computeIfAbsent(request.playerId(), ignored -> new Object())) {
             PlayerProgressionData existing = load(request.playerId());
             TreeMap<NamespacedId, StoredSkillProgress> updated = new TreeMap<>(existing.skills());

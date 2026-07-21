@@ -4,12 +4,14 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "EntityMixin",
+    "AbstractFurnaceBlockEntityMixin",
+    "BrewingStandBlockEntityMixin",
+    "ScreenHandlerMixin",
     "BlockDropStacksMixin",
     "BlockDropSuppressionMixin",
     "BlockItemMixin",
     "ExplosionMixin",
     "LavaFluidMixin",
-    "BrewingStandBlockEntityMixin",
     "EntityTamingDataMixin",
     "TameableEntityMixin",
     "AbstractHorseEntityMixin",
@@ -39,7 +41,8 @@
     "BoneMealItemMixin",
     "WorldNaturalGrowthMixin",
     "ItemEntityMixin",
-    "FishingBobberEntityMixin"
+    "FishingBobberEntityMixin",
+    "FurnaceOutputSlotMixin"
   ],
   "injectors": {
     "defaultRequire": 1

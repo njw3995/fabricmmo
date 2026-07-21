@@ -24,6 +24,7 @@ import io.github.njw3995.fabricmmo.core.skill.swords.SwordsRuntimeHandler;
 import io.github.njw3995.fabricmmo.core.skill.unarmed.UnarmedAbilityHandler;
 import io.github.njw3995.fabricmmo.core.skill.taming.TamingInteractionHandler;
 import io.github.njw3995.fabricmmo.core.skill.taming.TamingRuntimeHandler;
+import io.github.njw3995.fabricmmo.core.skill.repair.UtilityAnvilInteractionHandler;
 import io.github.njw3995.fabricmmo.core.skill.woodcutting.WoodcuttingAbilityHandler;
 import io.github.njw3995.fabricmmo.core.skill.woodcutting.WoodcuttingBlockBreakHandler;
 import java.io.IOException;
@@ -58,6 +59,7 @@ public final class FabricMmoMod implements ModInitializer {
         HerbalismInteractionHandler.register();
         HerbalismFoodHandler.register();
         FishingFoodHandler.register();
+        UtilityAnvilInteractionHandler.register();
         SwordsAbilityHandler.register();
         AxesAbilityHandler.register();
         UnarmedAbilityHandler.register();

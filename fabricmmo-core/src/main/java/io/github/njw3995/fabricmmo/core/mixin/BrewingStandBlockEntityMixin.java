@@ -3,6 +3,9 @@ package io.github.njw3995.fabricmmo.core.mixin;
 import io.github.njw3995.fabricmmo.core.access.AlchemyBrewingStandAccess;
 import io.github.njw3995.fabricmmo.core.skill.alchemy.AlchemyBrewState;
 import io.github.njw3995.fabricmmo.core.skill.alchemy.AlchemyRuntimeHandler;
+import io.github.njw3995.fabricmmo.core.skill.smelting.OwnedProcessingBlock;
+import io.github.njw3995.fabricmmo.core.skill.smelting.ProcessingBlockOwnershipNbt;
+import java.util.Optional;
 import java.util.UUID;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BrewingStandBlockEntity;
@@ -21,7 +24,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(BrewingStandBlockEntity.class)
-abstract class BrewingStandBlockEntityMixin implements AlchemyBrewingStandAccess {
+abstract class BrewingStandBlockEntityMixin
+        implements AlchemyBrewingStandAccess, OwnedProcessingBlock {
     @Shadow private DefaultedList<ItemStack> inventory;
     @Shadow int brewTime;
     @Shadow int fuel;
@@ -30,6 +34,7 @@ abstract class BrewingStandBlockEntityMixin implements AlchemyBrewingStandAccess
     @Unique private double fabricmmo$customAlchemyRemaining;
     @Unique private double fabricmmo$customAlchemySpeed = 1.0D;
     @Unique private String fabricmmo$customAlchemyIngredient = "";
+    @Unique private UUID fabricmmo$processingOwner;
 
     @Override public UUID fabricmmo$alchemyOwner() { return fabricmmo$alchemyOwner; }
     @Override public void fabricmmo$setAlchemyOwner(UUID owner) { fabricmmo$alchemyOwner = owner; }
@@ -69,6 +74,16 @@ abstract class BrewingStandBlockEntityMixin implements AlchemyBrewingStandAccess
         brewTime = 0;
     }
 
+    @Override
+    public Optional<UUID> fabricmmo$getOwner() {
+        return Optional.ofNullable(fabricmmo$processingOwner);
+    }
+
+    @Override
+    public void fabricmmo$setOwner(UUID owner) {
+        fabricmmo$processingOwner = owner;
+    }
+
     @Inject(method = "tick", at = @At("HEAD"), cancellable = true)
     private static void fabricmmo$tickAlchemy(
             World world,
@@ -94,6 +109,14 @@ abstract class BrewingStandBlockEntityMixin implements AlchemyBrewingStandAccess
         fabricmmo$customAlchemyIngredient = data.ingredientId();
     }
 
+    @Inject(method = "readNbt", at = @At("TAIL"))
+    private void fabricmmo$readProcessingOwner(
+            NbtCompound nbt,
+            RegistryWrapper.WrapperLookup registries,
+            CallbackInfo callback) {
+        fabricmmo$processingOwner = ProcessingBlockOwnershipNbt.read(nbt).orElse(null);
+    }
+
     @Inject(method = "writeNbt", at = @At("TAIL"))
     private void fabricmmo$writeAlchemyData(
             NbtCompound nbt,
@@ -104,6 +127,14 @@ abstract class BrewingStandBlockEntityMixin implements AlchemyBrewingStandAccess
                 fabricmmo$customAlchemyRemaining,
                 fabricmmo$customAlchemySpeed,
                 fabricmmo$customAlchemyIngredient).write(nbt);
+    }
+
+    @Inject(method = "writeNbt", at = @At("TAIL"))
+    private void fabricmmo$writeProcessingOwner(
+            NbtCompound nbt,
+            RegistryWrapper.WrapperLookup registries,
+            CallbackInfo callback) {
+        ProcessingBlockOwnershipNbt.write(nbt, fabricmmo$processingOwner);
     }
 
     @Inject(method = "canInsert", at = @At("HEAD"), cancellable = true)

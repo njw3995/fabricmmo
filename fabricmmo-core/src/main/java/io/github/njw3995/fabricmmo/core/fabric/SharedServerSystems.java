@@ -89,6 +89,12 @@ import io.github.njw3995.fabricmmo.core.skill.unarmed.UnarmedPanelMechanicsProvi
 import io.github.njw3995.fabricmmo.core.skill.unarmed.UnarmedSettings;
 import io.github.njw3995.fabricmmo.core.skill.taming.TamingPanelMechanicsProvider;
 import io.github.njw3995.fabricmmo.core.skill.taming.TamingSettings;
+import io.github.njw3995.fabricmmo.core.skill.repair.RepairPanelMechanicsProvider;
+import io.github.njw3995.fabricmmo.core.skill.repair.RepairSettings;
+import io.github.njw3995.fabricmmo.core.skill.repair.SalvagePanelMechanicsProvider;
+import io.github.njw3995.fabricmmo.core.skill.repair.SalvageSettings;
+import io.github.njw3995.fabricmmo.core.skill.smelting.SmeltingPanelMechanicsProvider;
+import io.github.njw3995.fabricmmo.core.skill.smelting.SmeltingSettings;
 import io.github.njw3995.fabricmmo.core.teleport.PartyTeleportService;
 import io.github.njw3995.fabricmmo.core.ui.InMemoryPlayerUiSettingsStore;
 import io.github.njw3995.fabricmmo.core.ui.PlayerScoreboardService;
@@ -160,7 +166,10 @@ public final class SharedServerSystems {
             UnarmedSettings unarmedSettings,
             MacesSettings macesSettings,
             TamingSettings tamingSettings,
-            AlchemySettings alchemySettings) throws IOException {
+            AlchemySettings alchemySettings,
+            RepairSettings repairSettings,
+            SalvageSettings salvageSettings,
+            SmeltingSettings smeltingSettings) throws IOException {
         if (state != null) {
             throw new IllegalStateException("Shared FabricMMO systems already active");
         }
@@ -277,6 +286,15 @@ public final class SharedServerSystems {
         skillPanelMechanics.register(
                 CoreSkills.ALCHEMY,
                 new AlchemyPanelMechanicsProvider(server, alchemySettings, locale));
+        skillPanelMechanics.register(
+                CoreSkills.REPAIR,
+                new RepairPanelMechanicsProvider(server, repairSettings, locale));
+        skillPanelMechanics.register(
+                CoreSkills.SALVAGE,
+                new SalvagePanelMechanicsProvider(server, salvageSettings, locale));
+        skillPanelMechanics.register(
+                CoreSkills.SMELTING,
+                new SmeltingPanelMechanicsProvider(server, smeltingSettings, locale));
         DebugDiagnosticsService diagnostics = new DebugDiagnosticsService(server, sessions);
         ProgressionMaintenanceService maintenance = new ProgressionMaintenanceService(
                 progressionStore, playerDataDirectory, mySqlSettings, Clock.systemUTC());

@@ -179,4 +179,22 @@ class CoreXpSourcesTest {
                 .filter(source -> source.skillId().equals(CoreSkills.ALCHEMY)).count());
     }
 
+
+    @Test
+    void registersRepairAndSmeltingXpSources() {
+        DefaultSkillRegistry skills = new DefaultSkillRegistry();
+        CoreSkills.registerAll(skills);
+        DefaultXpSourceRegistry sources = new DefaultXpSourceRegistry(skills);
+
+        CoreXpSources.registerDefaults(sources);
+
+        assertTrue(sources.find(CoreXpSources.REPAIR_ANVIL).isPresent());
+        assertTrue(sources.find(CoreXpSources.SMELTING_FURNACE).isPresent());
+        assertEquals(1, sources.sources().stream()
+                .filter(source -> source.skillId().equals(CoreSkills.REPAIR)).count());
+        assertEquals(1, sources.sources().stream()
+                .filter(source -> source.skillId().equals(CoreSkills.SMELTING)).count());
+    }
+
+
 }
