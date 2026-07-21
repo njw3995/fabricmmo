@@ -4,7 +4,10 @@ import io.github.njw3995.fabricmmo.api.NamespacedId;
 import io.github.njw3995.fabricmmo.core.ability.AbilityCooldownService;
 import io.github.njw3995.fabricmmo.core.locale.LocaleService;
 import io.github.njw3995.fabricmmo.core.skill.CoreSkills;
+import io.github.njw3995.fabricmmo.core.skill.axes.CoreAxesAbilities;
 import io.github.njw3995.fabricmmo.core.skill.herbalism.CoreHerbalismAbilities;
+import io.github.njw3995.fabricmmo.core.skill.swords.CoreSwordsAbilities;
+import io.github.njw3995.fabricmmo.core.skill.unarmed.CoreUnarmedAbilities;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -51,7 +54,7 @@ public final class SkillPanelCooldownCatalog {
     private void registerUpstreamCoreEntries() {
         registerLocale(CoreSkills.ARCHERY, id("explosive_shot"),
                 "Archery.SubSkill.ExplosiveShot.Name", Formatting.AQUA);
-        registerLocale(CoreSkills.AXES, id("skull_splitter"),
+        registerLocale(CoreSkills.AXES, CoreAxesAbilities.SKULL_SPLITTER,
                 "Axes.SubSkill.SkullSplitter.Name", Formatting.AQUA);
         registerLocale(CoreSkills.CROSSBOWS, id("super_shotgun"),
                 "Placeholder", Formatting.AQUA);
@@ -59,17 +62,15 @@ public final class SkillPanelCooldownCatalog {
                 "Excavation.SubSkill.GigaDrillBreaker.Name", Formatting.AQUA);
         registerLocale(CoreSkills.HERBALISM, CoreHerbalismAbilities.GREEN_TERRA,
                 "Herbalism.SubSkill.GreenTerra.Name", Formatting.AQUA);
-        registerLocale(CoreSkills.MACES, id("maces_super_ability"),
-                "Placeholder", Formatting.AQUA);
         registerLocale(CoreSkills.MINING, id("super_breaker"),
                 "Mining.SubSkill.SuperBreaker.Name", Formatting.AQUA);
         registerLocale(CoreSkills.MINING, id("blast_mining"),
                 "Mining.SubSkill.BlastMining.Name", Formatting.BLUE);
-        registerLocale(CoreSkills.SWORDS, id("serrated_strikes"),
+        registerLocale(CoreSkills.SWORDS, CoreSwordsAbilities.SERRATED_STRIKES,
                 "Swords.SubSkill.SerratedStrikes.Name", Formatting.AQUA);
         registerLocale(CoreSkills.TRIDENTS, id("tridents_super_ability"),
                 "Placeholder", Formatting.AQUA);
-        registerLocale(CoreSkills.UNARMED, id("berserk"),
+        registerLocale(CoreSkills.UNARMED, CoreUnarmedAbilities.BERSERK,
                 "Unarmed.SubSkill.Berserk.Name", Formatting.AQUA);
         registerLocale(CoreSkills.WOODCUTTING, id("tree_feller"),
                 "Woodcutting.SubSkill.TreeFeller.Name", Formatting.AQUA);

@@ -2,6 +2,7 @@ package io.github.njw3995.fabricmmo.core.skill.swords;
 
 import io.github.njw3995.fabricmmo.api.progression.XpAwardRequest;
 import io.github.njw3995.fabricmmo.core.command.LegacyText;
+import io.github.njw3995.fabricmmo.core.combat.MobHealthbarService;
 import io.github.njw3995.fabricmmo.core.fabric.FabricMmoFabricRuntime;
 import io.github.njw3995.fabricmmo.core.fabric.SharedServerSystems;
 import io.github.njw3995.fabricmmo.core.party.PartyState;
@@ -144,9 +145,6 @@ public final class SwordsRuntimeHandler {
                 return;
             }
             awardCombatXp(attacker, target, actualHealthDamage);
-            debug(attacker, "damage-finished target=" + target.getUuid()
-                    + " healthDamage=" + actualHealthDamage
-                    + " ruptureActive=" + RUPTURES.containsKey(target.getUuid()));
         } finally {
             CURRENT_HIT.remove();
         }
@@ -176,11 +174,9 @@ public final class SwordsRuntimeHandler {
         double healthDamage = Math.max(
                 0.0D, appliedDamage - target.getAbsorptionAmount());
         if (target.getHealth() - healthDamage <= 0.0D) {
-            debug(attacker, "rupture-check target=" + target.getUuid()
-                    + " result=SKIPPED_FATAL_HIT");
             return;
         }
-        tryApplyRupture(attacker, target, context.attackStrength(), false);
+        tryApplyRupture(attacker, target, context.attackStrength());
     }
 
     /**
@@ -210,17 +206,9 @@ public final class SwordsRuntimeHandler {
                     && step != RuptureTicker.Step.DAMAGE_AND_ANIMATE) {
                 return;
             }
-            double before = target.getHealth();
             if (applyPureRuptureDamageShouldCancel(target, state.tickDamage)) {
                 RUPTURES.remove(targetId, state);
                 return;
-            }
-            ServerPlayerEntity attacker = server.getPlayerManager().getPlayer(state.attackerId);
-            if (attacker != null) {
-                debug(attacker, "rupture-tick target=" + targetId
-                        + " damage=" + state.tickDamage
-                        + " health=" + before + "->" + target.getHealth()
-                        + " elapsedTicks=" + state.ticker.totalTicks());
             }
             if (step == RuptureTicker.Step.DAMAGE_AND_ANIMATE) {
                 playBleedAnimation(target);
@@ -307,7 +295,7 @@ public final class SwordsRuntimeHandler {
             if (target instanceof ServerPlayerEntity playerTarget) {
                 notify(playerTarget, "Swords.Combat.SS.Struck");
             }
-            tryApplyRupture(attacker, target, attackStrength, true);
+            tryApplyRupture(attacker, target, attackStrength);
             withInternalDamage(() -> target.damage(
                     attacker.getDamageSources().playerAttack(attacker), (float) damage));
         }
@@ -316,48 +304,26 @@ public final class SwordsRuntimeHandler {
     private static void tryApplyRupture(
             ServerPlayerEntity attacker,
             LivingEntity target,
-            double attackStrength,
-            boolean fromSerrated) {
-        String source = fromSerrated ? "SERRATED" : "PRIMARY";
+            double attackStrength) {
         if (!available(attacker, target)) {
-            debug(attacker, "rupture-check source=" + source
-                    + " target=" + target.getUuid() + " result=INELIGIBLE_TARGET");
             return;
         }
         SwordsSettings settings = FabricMmoFabricRuntime.swordsSettings();
         int rank = settings.ruptureRank(level(attacker));
-        if (rank <= 0) {
-            debug(attacker, "rupture-check source=" + source
-                    + " target=" + target.getUuid() + " result=LOCKED");
-            return;
-        }
-        if (!allowed(attacker, PermissionNodes.SWORDS_RUPTURE, true)) {
-            debug(attacker, "rupture-check source=" + source
-                    + " target=" + target.getUuid() + " result=NO_PERMISSION");
+        if (rank <= 0 || !allowed(attacker, PermissionNodes.SWORDS_RUPTURE, true)) {
             return;
         }
         RuptureState existing = RUPTURES.get(target.getUuid());
         if (existing != null) {
             existing.ticker.refresh();
-            debug(attacker, "rupture-check source=" + source
-                    + " target=" + target.getUuid() + " result=REFRESHED");
             return;
         }
         boolean lucky = allowed(attacker, PermissionNodes.SWORDS_LUCKY, false);
         double chance = settings.ruptureChancePercent(rank, lucky) * attackStrength;
-        double roll = attacker.getRandom().nextDouble() * 100.0D;
-        if (roll >= chance) {
-            debug(attacker, "rupture-check source=" + source
-                    + " target=" + target.getUuid()
-                    + " rank=" + rank
-                    + " chance=" + chance
-                    + " roll=" + roll
-                    + " result=FAILED_ROLL");
+        if (attacker.getRandom().nextDouble() * 100.0D >= chance) {
             return;
         }
         if (target instanceof ServerPlayerEntity defender && defender.isBlocking()) {
-            debug(attacker, "rupture-check source=" + source
-                    + " target=" + target.getUuid() + " result=BLOCKED");
             return;
         }
         if (target instanceof ServerPlayerEntity defender) {
@@ -369,14 +335,6 @@ public final class SwordsRuntimeHandler {
                 rank, target instanceof ServerPlayerEntity);
         RUPTURES.put(target.getUuid(), new RuptureState(
                 attacker.getUuid(), target, tickDamage, durationTicks));
-        debug(attacker, "rupture-check source=" + source
-                + " target=" + target.getUuid()
-                + " rank=" + rank
-                + " chance=" + chance
-                + " roll=" + roll
-                + " tickDamage=" + tickDamage
-                + " durationTicks=" + durationTicks
-                + " result=APPLIED");
     }
 
     private static boolean applyPureRuptureDamageShouldCancel(
@@ -394,6 +352,7 @@ public final class SwordsRuntimeHandler {
             return true;
         }
         target.setHealth((float) damagedHealth);
+        MobHealthbarService.showCurrentHealth(target);
         return false;
     }
 
@@ -650,13 +609,6 @@ public final class SwordsRuntimeHandler {
             }
         } else {
             player.sendMessage(text, false);
-        }
-    }
-
-    private static void debug(ServerPlayerEntity player, String detail) {
-        if (SharedServerSystems.running()) {
-            SharedServerSystems.require().diagnostics().message(
-                    player.getUuid(), "SWORDS " + detail);
         }
     }
 

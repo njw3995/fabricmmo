@@ -78,6 +78,13 @@ public final class CoreSkills {
                 WOODCUTTING);
     }
 
+    /** Core skills with complete gameplay handlers in the current FabricMMO build. */
+    public static Set<NamespacedId> implementedSkillIds() {
+        return Set.of(
+                ACROBATICS, AXES, EXCAVATION, FISHING, HERBALISM, MACES, MINING, SWORDS,
+                UNARMED, WOODCUTTING);
+    }
+
     private static void register(
             SkillRegistrar registrar,
             NamespacedId id,

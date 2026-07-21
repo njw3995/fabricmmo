@@ -32,7 +32,7 @@ class SkillPanelCooldownCatalogTest {
         assertRows(catalog, CoreSkills.EXCAVATION, "Giga Drill B..", "23");
         assertRows(catalog, CoreSkills.FISHING);
         assertRows(catalog, CoreSkills.HERBALISM, "Green Terra", "0");
-        assertRows(catalog, CoreSkills.MACES, "This value i..", "0");
+        assertRows(catalog, CoreSkills.MACES);
         assertRows(catalog, CoreSkills.MINING,
                 "Super Breaker", "31", "Blast Mining", "17");
         assertRows(catalog, CoreSkills.REPAIR);

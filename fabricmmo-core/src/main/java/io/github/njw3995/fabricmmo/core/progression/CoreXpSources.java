@@ -32,8 +32,14 @@ public final class CoreXpSources {
             NamespacedId.parse("fabricmmo:fishing_catch");
     public static final NamespacedId FISHING_SHAKE =
             NamespacedId.parse("fabricmmo:fishing_shake");
+    public static final NamespacedId AXES_COMBAT =
+            NamespacedId.parse("fabricmmo:axes_combat");
+    public static final NamespacedId MACES_COMBAT =
+            NamespacedId.parse("fabricmmo:maces_combat");
     public static final NamespacedId SWORDS_COMBAT =
             NamespacedId.parse("fabricmmo:swords_combat");
+    public static final NamespacedId UNARMED_COMBAT =
+            NamespacedId.parse("fabricmmo:unarmed_combat");
 
     private CoreXpSources() {
     }
@@ -92,9 +98,21 @@ public final class CoreXpSources {
                 CoreSkills.FISHING,
                 Map.of("upstream", "FishingManager#shakeCheck")));
         registrar.registerXpSource(new XpSourceDefinition(
+                AXES_COMBAT,
+                CoreSkills.AXES,
+                Map.of("upstream", "CombatUtils#processAxeCombat")));
+        registrar.registerXpSource(new XpSourceDefinition(
+                MACES_COMBAT,
+                CoreSkills.MACES,
+                Map.of("upstream", "CombatUtils#processMacesCombat")));
+        registrar.registerXpSource(new XpSourceDefinition(
                 SWORDS_COMBAT,
                 CoreSkills.SWORDS,
                 Map.of("upstream", "CombatUtils#processSwordCombat")));
+        registrar.registerXpSource(new XpSourceDefinition(
+                UNARMED_COMBAT,
+                CoreSkills.UNARMED,
+                Map.of("upstream", "CombatUtils#processUnarmedCombat")));
     }
 
     public static void registerCommandSources(

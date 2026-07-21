@@ -80,7 +80,23 @@ public final class PermissionNodes {
     public static final String FISHING_VANILLA_XP_BOOST =
             "mcmmo.ability.fishing.vanillaxpboost";
     public static final String FISHING_LUCKY = "mcmmo.perks.lucky.fishing";
+    public static final String AXES = "mcmmo.skills.axes";
+    public static final String AXES_COMMAND = "mcmmo.commands.axes";
+    public static final String AXES_SKULL_SPLITTER = "mcmmo.ability.axes.skullsplitter";
+    public static final String AXES_CRITICAL_STRIKES = "mcmmo.ability.axes.criticalstrikes";
+    public static final String AXES_AXE_MASTERY = "mcmmo.ability.axes.axemastery";
+    public static final String AXES_ARMOR_IMPACT = "mcmmo.ability.axes.armorimpact";
+    public static final String AXES_GREATER_IMPACT = "mcmmo.ability.axes.greaterimpact";
+    public static final String AXES_LIMIT_BREAK = "mcmmo.ability.axes.axeslimitbreak";
+    public static final String AXES_LUCKY = "mcmmo.perks.lucky.axes";
     public static final String SWORDS = "mcmmo.skills.swords";
+    public static final String MACES = "mcmmo.skills.maces";
+    public static final String MACES_COMMAND = "mcmmo.commands.maces";
+    public static final String MACES_CRIPPLE = "mcmmo.ability.maces.cripple";
+    public static final String MACES_CRUSH = "mcmmo.ability.maces.crush";
+    public static final String MACES_LIMIT_BREAK = "mcmmo.ability.maces.maceslimitbreak";
+    public static final String MACES_LUCKY = "mcmmo.perks.lucky.maces";
+
     public static final String SWORDS_COMMAND = "mcmmo.commands.swords";
     public static final String SWORDS_SERRATED_STRIKES =
             "mcmmo.ability.swords.serratedstrikes";
@@ -90,6 +106,16 @@ public final class PermissionNodes {
     public static final String SWORDS_STAB = "mcmmo.ability.swords.stab";
     public static final String SWORDS_LIMIT_BREAK = "mcmmo.ability.swords.swordslimitbreak";
     public static final String SWORDS_LUCKY = "mcmmo.perks.lucky.swords";
+    public static final String UNARMED = "mcmmo.skills.unarmed";
+    public static final String UNARMED_COMMAND = "mcmmo.commands.unarmed";
+    public static final String UNARMED_BERSERK = "mcmmo.ability.unarmed.berserk";
+    public static final String UNARMED_ARROW_DEFLECT = "mcmmo.ability.unarmed.arrowdeflect";
+    public static final String UNARMED_DISARM = "mcmmo.ability.unarmed.disarm";
+    public static final String UNARMED_IRON_GRIP = "mcmmo.ability.unarmed.irongrip";
+    public static final String UNARMED_STEEL_ARM_STYLE = "mcmmo.ability.unarmed.steelarmstyle";
+    public static final String UNARMED_BLOCK_CRACKER = "mcmmo.ability.unarmed.blockcracker";
+    public static final String UNARMED_LIMIT_BREAK = "mcmmo.ability.unarmed.unarmedlimitbreak";
+    public static final String UNARMED_LUCKY = "mcmmo.perks.lucky.unarmed";
     public static final String PARTY_FRIENDLY_FIRE = "mcmmo.party.friendlyfire";
     public static final String XP_CUSTOM_ALL = "mcmmo.perks.xp.customboost.all";
     public static final String XP_QUADRUPLE_ALL = "mcmmo.perks.xp.quadruple.all";

@@ -84,6 +84,36 @@ class CoreXpSourcesTest {
     }
 
     @Test
+    void registersAxesCombatSource() {
+        DefaultSkillRegistry skills = new DefaultSkillRegistry();
+        CoreSkills.registerAll(skills);
+        DefaultXpSourceRegistry sources = new DefaultXpSourceRegistry(skills);
+
+        CoreXpSources.registerDefaults(sources);
+
+        assertTrue(sources.find(CoreXpSources.AXES_COMBAT).isPresent());
+        long axesSources = sources.sources().stream()
+                .filter(source -> source.skillId().equals(CoreSkills.AXES))
+                .count();
+        assertEquals(1, axesSources);
+    }
+
+    @Test
+    void registersMacesCombatSource() {
+        DefaultSkillRegistry skills = new DefaultSkillRegistry();
+        CoreSkills.registerAll(skills);
+        DefaultXpSourceRegistry sources = new DefaultXpSourceRegistry(skills);
+
+        CoreXpSources.registerDefaults(sources);
+
+        assertTrue(sources.find(CoreXpSources.MACES_COMBAT).isPresent());
+        long macesSources = sources.sources().stream()
+                .filter(source -> source.skillId().equals(CoreSkills.MACES))
+                .count();
+        assertEquals(1, macesSources);
+    }
+
+    @Test
     void registersSwordsCombatSource() {
         DefaultSkillRegistry skills = new DefaultSkillRegistry();
         CoreSkills.registerAll(skills);
@@ -96,6 +126,21 @@ class CoreXpSourcesTest {
                 .filter(source -> source.skillId().equals(CoreSkills.SWORDS))
                 .count();
         assertEquals(1, swordsSources);
+    }
+
+    @Test
+    void registersUnarmedCombatSource() {
+        DefaultSkillRegistry skills = new DefaultSkillRegistry();
+        CoreSkills.registerAll(skills);
+        DefaultXpSourceRegistry sources = new DefaultXpSourceRegistry(skills);
+
+        CoreXpSources.registerDefaults(sources);
+
+        assertTrue(sources.find(CoreXpSources.UNARMED_COMBAT).isPresent());
+        long unarmedSources = sources.sources().stream()
+                .filter(source -> source.skillId().equals(CoreSkills.UNARMED))
+                .count();
+        assertEquals(1, unarmedSources);
     }
 
 }
