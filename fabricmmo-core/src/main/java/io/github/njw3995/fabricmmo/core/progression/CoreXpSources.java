@@ -32,8 +32,30 @@ public final class CoreXpSources {
             NamespacedId.parse("fabricmmo:fishing_catch");
     public static final NamespacedId FISHING_SHAKE =
             NamespacedId.parse("fabricmmo:fishing_shake");
+    public static final NamespacedId ARCHERY_COMBAT =
+            NamespacedId.parse("fabricmmo:archery_combat");
+    public static final NamespacedId CROSSBOWS_COMBAT =
+            NamespacedId.parse("fabricmmo:crossbows_combat");
+    public static final NamespacedId TRIDENTS_COMBAT =
+            NamespacedId.parse("fabricmmo:tridents_combat");
+    public static final NamespacedId AXES_COMBAT =
+            NamespacedId.parse("fabricmmo:axes_combat");
+    public static final NamespacedId MACES_COMBAT =
+            NamespacedId.parse("fabricmmo:maces_combat");
     public static final NamespacedId SWORDS_COMBAT =
             NamespacedId.parse("fabricmmo:swords_combat");
+    public static final NamespacedId UNARMED_COMBAT =
+            NamespacedId.parse("fabricmmo:unarmed_combat");
+    public static final NamespacedId TAMING_ANIMAL_TAMED =
+            NamespacedId.parse("fabricmmo:taming_animal_tamed");
+    public static final NamespacedId TAMING_PET_COMBAT =
+            NamespacedId.parse("fabricmmo:taming_pet_combat");
+    public static final NamespacedId ALCHEMY_BREW =
+            NamespacedId.parse("fabricmmo:alchemy_brew");
+    public static final NamespacedId REPAIR_ANVIL =
+            NamespacedId.parse("fabricmmo:repair_anvil");
+    public static final NamespacedId SMELTING_FURNACE =
+            NamespacedId.parse("fabricmmo:smelting_furnace");
 
     private CoreXpSources() {
     }
@@ -92,9 +114,53 @@ public final class CoreXpSources {
                 CoreSkills.FISHING,
                 Map.of("upstream", "FishingManager#shakeCheck")));
         registrar.registerXpSource(new XpSourceDefinition(
+                ARCHERY_COMBAT,
+                CoreSkills.ARCHERY,
+                Map.of("upstream", "CombatUtils#processArcheryCombat")));
+        registrar.registerXpSource(new XpSourceDefinition(
+                CROSSBOWS_COMBAT,
+                CoreSkills.CROSSBOWS,
+                Map.of("upstream", "CombatUtils#processCrossbowsCombat")));
+        registrar.registerXpSource(new XpSourceDefinition(
+                TRIDENTS_COMBAT,
+                CoreSkills.TRIDENTS,
+                Map.of("upstream", "CombatUtils#processTridentsCombat")));
+        registrar.registerXpSource(new XpSourceDefinition(
+                AXES_COMBAT,
+                CoreSkills.AXES,
+                Map.of("upstream", "CombatUtils#processAxeCombat")));
+        registrar.registerXpSource(new XpSourceDefinition(
+                MACES_COMBAT,
+                CoreSkills.MACES,
+                Map.of("upstream", "CombatUtils#processMacesCombat")));
+        registrar.registerXpSource(new XpSourceDefinition(
                 SWORDS_COMBAT,
                 CoreSkills.SWORDS,
                 Map.of("upstream", "CombatUtils#processSwordCombat")));
+        registrar.registerXpSource(new XpSourceDefinition(
+                UNARMED_COMBAT,
+                CoreSkills.UNARMED,
+                Map.of("upstream", "CombatUtils#processUnarmedCombat")));
+        registrar.registerXpSource(new XpSourceDefinition(
+                TAMING_ANIMAL_TAMED,
+                CoreSkills.TAMING,
+                Map.of("upstream", "EntityListener#onEntityTame")));
+        registrar.registerXpSource(new XpSourceDefinition(
+                TAMING_PET_COMBAT,
+                CoreSkills.TAMING,
+                Map.of("upstream", "CombatUtils#processTamingCombat")));
+        registrar.registerXpSource(new XpSourceDefinition(
+                ALCHEMY_BREW,
+                CoreSkills.ALCHEMY,
+                Map.of("upstream", "AlchemyManager#handlePotionBrewSuccesses")));
+        registrar.registerXpSource(new XpSourceDefinition(
+                REPAIR_ANVIL,
+                CoreSkills.REPAIR,
+                Map.of("upstream", "RepairManager#handleRepair")));
+        registrar.registerXpSource(new XpSourceDefinition(
+                SMELTING_FURNACE,
+                CoreSkills.SMELTING,
+                Map.of("upstream", "SmeltingManager#smeltProcessing")));
     }
 
     public static void registerCommandSources(

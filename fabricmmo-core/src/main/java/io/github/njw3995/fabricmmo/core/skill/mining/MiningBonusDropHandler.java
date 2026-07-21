@@ -60,7 +60,11 @@ public final class MiningBonusDropHandler {
                 Registries.BLOCK.getId(state.getBlock()).toString());
         String worldId = world.getRegistryKey().getValue().toString();
         BlockLocation location = new BlockLocation(worldId, pos.getX(), pos.getY(), pos.getZ());
-        boolean validTool = tool.isIn(ItemTags.PICKAXES) || tool.isIn(ItemTags.HOES);
+        var extension = FabricMmoFabricRuntime.gatheringContentFor(CoreSkills.MINING, state);
+        boolean validTool = extension
+                .map(definition -> FabricMmoFabricRuntime.gatheringContentResolver()
+                        .validTool(definition, tool))
+                .orElseGet(() -> tool.isIn(ItemTags.PICKAXES) || tool.isIn(ItemTags.HOES));
         boolean skillPermission = PERMISSIONS.hasPermission(
                 player.getCommandSource(), PermissionNodes.MINING, true);
         boolean doubleDropsPermission = PERMISSIONS.hasPermission(
@@ -87,8 +91,10 @@ public final class MiningBonusDropHandler {
                 validTool,
                 skillPermission,
                 protectionAllowed,
-                FabricMmoFabricRuntime.isPlayerPlaced(location),
-                settings.materialEnabled(sourceId),
+                FabricMmoFabricRuntime.isPlayerPlaced(location)
+                        && extension.map(definition -> definition.naturalBlocksOnly()).orElse(true),
+                extension.map(definition -> definition.bonusDrops())
+                        .orElseGet(() -> settings.materialEnabled(sourceId)),
                 silkTouch,
                 doubleDropsPermission,
                 motherLodePermission,

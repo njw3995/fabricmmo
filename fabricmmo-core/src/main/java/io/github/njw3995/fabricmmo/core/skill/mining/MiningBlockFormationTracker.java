@@ -23,7 +23,7 @@ public final class MiningBlockFormationTracker {
         }
         NamespacedId blockId = NamespacedId.parse(
                 Registries.BLOCK.getId(formed.getBlock()).toString());
-        if (FabricMmoFabricRuntime.miningXpFor(blockId) <= 0) {
+        if (FabricMmoFabricRuntime.miningXpFor(formed) <= 0) {
             return;
         }
         String worldId = world.getRegistryKey().getValue().toString();

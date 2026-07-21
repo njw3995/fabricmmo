@@ -1,0 +1,8 @@
+{
+  "format": 1,
+  "ingredient": "example:herb",
+  "input": "example:unfinished_brew",
+  "output": "example:healing_brew",
+  "stage": 2,
+  "metadata": {"source_mod": "example"}
+}

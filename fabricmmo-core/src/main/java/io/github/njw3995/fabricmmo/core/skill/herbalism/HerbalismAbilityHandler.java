@@ -81,10 +81,16 @@ public final class HerbalismAbilityHandler {
             }
             ItemStack tool = serverPlayer.getMainHandStack();
             BlockState state = serverWorld.getBlockState(pos);
-            NamespacedId blockId = NamespacedId.parse(
-                    Registries.BLOCK.getId(state.getBlock()).toString());
-            if (!tool.isIn(ItemTags.HOES)
-                    || FabricMmoFabricRuntime.herbalismXpFor(blockId) <= 0
+            var extension = FabricMmoFabricRuntime.gatheringContentFor(CoreSkills.HERBALISM, state);
+            boolean validTool = extension
+                    .map(definition -> FabricMmoFabricRuntime.gatheringContentResolver()
+                            .validTool(definition, tool))
+                    .orElseGet(() -> tool.isIn(ItemTags.HOES));
+            boolean activeEligible = extension.map(definition -> definition.activeAbility())
+                    .orElse(true);
+            if (!validTool
+                    || !activeEligible
+                    || FabricMmoFabricRuntime.herbalismXpFor(state) <= 0
                     || !PERMISSIONS.hasPermission(
                             serverPlayer.getCommandSource(), PermissionNodes.HERBALISM, true)
                     || !PERMISSIONS.hasPermission(

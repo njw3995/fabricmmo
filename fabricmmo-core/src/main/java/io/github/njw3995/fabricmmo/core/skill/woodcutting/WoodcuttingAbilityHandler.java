@@ -123,8 +123,7 @@ public final class WoodcuttingAbilityHandler {
             }
             TreeFellerContext.clearStartingBreak(serverPlayer.getUuid());
             if (!serverPlayer.getMainHandStack().isIn(ItemTags.AXES)
-                    || FabricMmoFabricRuntime.woodcuttingXpFor(
-                            WoodcuttingBlockClassifier.id(state)) <= 0
+                    || FabricMmoFabricRuntime.woodcuttingXpFor(state) <= 0
                     || !PERMISSIONS.hasPermission(
                             serverPlayer.getCommandSource(), PermissionNodes.WOODCUTTING, true)
                     || !PERMISSIONS.hasPermission(
@@ -344,7 +343,9 @@ public final class WoodcuttingAbilityHandler {
             return false;
         }
         BlockState state = player.getServerWorld().getBlockState(blockHit.getBlockPos());
-        return FabricMmoFabricRuntime.woodcuttingXpFor(WoodcuttingBlockClassifier.id(state)) > 0;
+        return FabricMmoFabricRuntime.woodcuttingXpFor(state) > 0
+                && FabricMmoFabricRuntime.gatheringContentFor(CoreSkills.WOODCUTTING, state)
+                        .map(definition -> definition.activeAbility()).orElse(true);
     }
 
     private static float fizzPitch(ServerWorld world) {

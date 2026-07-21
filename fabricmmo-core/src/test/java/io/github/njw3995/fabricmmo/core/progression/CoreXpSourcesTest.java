@@ -84,6 +84,55 @@ class CoreXpSourcesTest {
     }
 
     @Test
+    void registersAxesCombatSource() {
+        DefaultSkillRegistry skills = new DefaultSkillRegistry();
+        CoreSkills.registerAll(skills);
+        DefaultXpSourceRegistry sources = new DefaultXpSourceRegistry(skills);
+
+        CoreXpSources.registerDefaults(sources);
+
+        assertTrue(sources.find(CoreXpSources.AXES_COMBAT).isPresent());
+        long axesSources = sources.sources().stream()
+                .filter(source -> source.skillId().equals(CoreSkills.AXES))
+                .count();
+        assertEquals(1, axesSources);
+    }
+
+    @Test
+    void registersMacesCombatSource() {
+        DefaultSkillRegistry skills = new DefaultSkillRegistry();
+        CoreSkills.registerAll(skills);
+        DefaultXpSourceRegistry sources = new DefaultXpSourceRegistry(skills);
+
+        CoreXpSources.registerDefaults(sources);
+
+        assertTrue(sources.find(CoreXpSources.MACES_COMBAT).isPresent());
+        long macesSources = sources.sources().stream()
+                .filter(source -> source.skillId().equals(CoreSkills.MACES))
+                .count();
+        assertEquals(1, macesSources);
+    }
+
+    @Test
+    void registersRangedCombatSources() {
+        DefaultSkillRegistry skills = new DefaultSkillRegistry();
+        CoreSkills.registerAll(skills);
+        DefaultXpSourceRegistry sources = new DefaultXpSourceRegistry(skills);
+
+        CoreXpSources.registerDefaults(sources);
+
+        assertTrue(sources.find(CoreXpSources.ARCHERY_COMBAT).isPresent());
+        assertTrue(sources.find(CoreXpSources.CROSSBOWS_COMBAT).isPresent());
+        assertTrue(sources.find(CoreXpSources.TRIDENTS_COMBAT).isPresent());
+        assertEquals(1, sources.sources().stream()
+                .filter(source -> source.skillId().equals(CoreSkills.ARCHERY)).count());
+        assertEquals(1, sources.sources().stream()
+                .filter(source -> source.skillId().equals(CoreSkills.CROSSBOWS)).count());
+        assertEquals(1, sources.sources().stream()
+                .filter(source -> source.skillId().equals(CoreSkills.TRIDENTS)).count());
+    }
+
+    @Test
     void registersSwordsCombatSource() {
         DefaultSkillRegistry skills = new DefaultSkillRegistry();
         CoreSkills.registerAll(skills);
@@ -97,5 +146,55 @@ class CoreXpSourcesTest {
                 .count();
         assertEquals(1, swordsSources);
     }
+
+    @Test
+    void registersUnarmedCombatSource() {
+        DefaultSkillRegistry skills = new DefaultSkillRegistry();
+        CoreSkills.registerAll(skills);
+        DefaultXpSourceRegistry sources = new DefaultXpSourceRegistry(skills);
+
+        CoreXpSources.registerDefaults(sources);
+
+        assertTrue(sources.find(CoreXpSources.UNARMED_COMBAT).isPresent());
+        long unarmedSources = sources.sources().stream()
+                .filter(source -> source.skillId().equals(CoreSkills.UNARMED))
+                .count();
+        assertEquals(1, unarmedSources);
+    }
+
+    @Test
+    void registersTamingAndAlchemyXpSources() {
+        DefaultSkillRegistry skills = new DefaultSkillRegistry();
+        CoreSkills.registerAll(skills);
+        DefaultXpSourceRegistry sources = new DefaultXpSourceRegistry(skills);
+
+        CoreXpSources.registerDefaults(sources);
+
+        assertTrue(sources.find(CoreXpSources.TAMING_ANIMAL_TAMED).isPresent());
+        assertTrue(sources.find(CoreXpSources.TAMING_PET_COMBAT).isPresent());
+        assertTrue(sources.find(CoreXpSources.ALCHEMY_BREW).isPresent());
+        assertEquals(2, sources.sources().stream()
+                .filter(source -> source.skillId().equals(CoreSkills.TAMING)).count());
+        assertEquals(1, sources.sources().stream()
+                .filter(source -> source.skillId().equals(CoreSkills.ALCHEMY)).count());
+    }
+
+
+    @Test
+    void registersRepairAndSmeltingXpSources() {
+        DefaultSkillRegistry skills = new DefaultSkillRegistry();
+        CoreSkills.registerAll(skills);
+        DefaultXpSourceRegistry sources = new DefaultXpSourceRegistry(skills);
+
+        CoreXpSources.registerDefaults(sources);
+
+        assertTrue(sources.find(CoreXpSources.REPAIR_ANVIL).isPresent());
+        assertTrue(sources.find(CoreXpSources.SMELTING_FURNACE).isPresent());
+        assertEquals(1, sources.sources().stream()
+                .filter(source -> source.skillId().equals(CoreSkills.REPAIR)).count());
+        assertEquals(1, sources.sources().stream()
+                .filter(source -> source.skillId().equals(CoreSkills.SMELTING)).count());
+    }
+
 
 }

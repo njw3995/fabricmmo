@@ -134,8 +134,12 @@ public final class MiningBlockBreakHandler {
             ItemStack heldItem) {
         NamespacedId blockId = NamespacedId.parse(
                 Registries.BLOCK.getId(state.getBlock()).toString());
-        int configuredXp = FabricMmoFabricRuntime.miningXpFor(blockId);
-        boolean validTool = heldItem.isIn(ItemTags.PICKAXES) || heldItem.isIn(ItemTags.HOES);
+        var extension = FabricMmoFabricRuntime.gatheringContentFor(CoreSkills.MINING, state);
+        int configuredXp = FabricMmoFabricRuntime.miningXpFor(state);
+        boolean validTool = extension
+                .map(definition -> FabricMmoFabricRuntime.gatheringContentResolver()
+                        .validTool(definition, heldItem))
+                .orElseGet(() -> heldItem.isIn(ItemTags.PICKAXES) || heldItem.isIn(ItemTags.HOES));
         boolean hasPermission = PERMISSIONS.hasPermission(
                 player.getCommandSource(), PermissionNodes.MINING, true);
         FabricMmoApi api = FabricMmoFabricRuntime.requireApi();
@@ -148,7 +152,7 @@ public final class MiningBlockBreakHandler {
                 validTool,
                 hasPermission,
                 protectionAllowed,
-                playerPlaced);
+                playerPlaced && extension.map(definition -> definition.naturalBlocksOnly()).orElse(true));
         if (io.github.njw3995.fabricmmo.core.fabric.SharedServerSystems.running()) {
             io.github.njw3995.fabricmmo.core.fabric.SharedServerSystems.require().diagnostics()
                     .blockDecision(player.getUuid(), blockId.toString(), configuredXp,

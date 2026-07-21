@@ -80,7 +80,67 @@ public final class PermissionNodes {
     public static final String FISHING_VANILLA_XP_BOOST =
             "mcmmo.ability.fishing.vanillaxpboost";
     public static final String FISHING_LUCKY = "mcmmo.perks.lucky.fishing";
+    public static final String ARCHERY = "mcmmo.skills.archery";
+    public static final String ARCHERY_COMMAND = "mcmmo.commands.archery";
+    public static final String ARCHERY_SKILL_SHOT = "mcmmo.ability.archery.skillshot";
+    public static final String ARCHERY_DAZE = "mcmmo.ability.archery.daze";
+    public static final String ARCHERY_ARROW_RETRIEVAL =
+            "mcmmo.ability.archery.arrowretrieval";
+    public static final String ARCHERY_LIMIT_BREAK =
+            "mcmmo.ability.archery.archerylimitbreak";
+    public static final String ARCHERY_LUCKY = "mcmmo.perks.lucky.archery";
+    public static final String CROSSBOWS = "mcmmo.skills.crossbows";
+    public static final String CROSSBOWS_COMMAND = "mcmmo.commands.crossbows";
+    public static final String CROSSBOWS_POWERED_SHOT =
+            "mcmmo.ability.crossbows.poweredshot";
+    public static final String CROSSBOWS_TRICK_SHOT =
+            "mcmmo.ability.crossbows.trickshot";
+    public static final String CROSSBOWS_LIMIT_BREAK =
+            "mcmmo.ability.crossbows.crossbowslimitbreak";
+    public static final String CROSSBOWS_LUCKY = "mcmmo.perks.lucky.crossbows";
+    public static final String TRIDENTS = "mcmmo.skills.tridents";
+    public static final String TRIDENTS_COMMAND = "mcmmo.commands.tridents";
+    public static final String TRIDENTS_IMPALE = "mcmmo.ability.tridents.impale";
+    public static final String TRIDENTS_LIMIT_BREAK =
+            "mcmmo.ability.tridents.tridentslimitbreak";
+    public static final String TRIDENTS_LUCKY = "mcmmo.perks.lucky.tridents";
+    public static final String AXES = "mcmmo.skills.axes";
+    public static final String AXES_COMMAND = "mcmmo.commands.axes";
+    public static final String AXES_SKULL_SPLITTER = "mcmmo.ability.axes.skullsplitter";
+    public static final String AXES_CRITICAL_STRIKES = "mcmmo.ability.axes.criticalstrikes";
+    public static final String AXES_AXE_MASTERY = "mcmmo.ability.axes.axemastery";
+    public static final String AXES_ARMOR_IMPACT = "mcmmo.ability.axes.armorimpact";
+    public static final String AXES_GREATER_IMPACT = "mcmmo.ability.axes.greaterimpact";
+    public static final String AXES_LIMIT_BREAK = "mcmmo.ability.axes.axeslimitbreak";
+    public static final String AXES_LUCKY = "mcmmo.perks.lucky.axes";
     public static final String SWORDS = "mcmmo.skills.swords";
+    public static final String MACES = "mcmmo.skills.maces";
+    public static final String MACES_COMMAND = "mcmmo.commands.maces";
+    public static final String MACES_CRIPPLE = "mcmmo.ability.maces.cripple";
+    public static final String MACES_CRUSH = "mcmmo.ability.maces.crush";
+    public static final String MACES_LIMIT_BREAK = "mcmmo.ability.maces.maceslimitbreak";
+    public static final String MACES_LUCKY = "mcmmo.perks.lucky.maces";
+
+    public static final String REPAIR = "mcmmo.skills.repair";
+    public static final String REPAIR_COMMAND = "mcmmo.commands.repair";
+    public static final String REPAIR_MASTERY = "mcmmo.ability.repair.repairmastery";
+    public static final String REPAIR_SUPER_REPAIR = "mcmmo.ability.repair.superrepair";
+    public static final String REPAIR_ARCANE_FORGING = "mcmmo.ability.repair.arcaneforging";
+    public static final String REPAIR_LUCKY = "mcmmo.perks.lucky.repair";
+    public static final String REPAIR_ENCHANT_BYPASS = "mcmmo.perks.bypass.repairenchant";
+    public static final String ARCANE_BYPASS = "mcmmo.bypass.arcanebypass";
+    public static final String SALVAGE = "mcmmo.skills.salvage";
+    public static final String SALVAGE_COMMAND = "mcmmo.commands.salvage";
+    public static final String SALVAGE_SCRAP_COLLECTOR = "mcmmo.ability.salvage.scrapcollector";
+    public static final String SALVAGE_ARCANE = "mcmmo.ability.salvage.arcanesalvage";
+    public static final String SALVAGE_LUCKY = "mcmmo.perks.lucky.salvage";
+    public static final String SALVAGE_ENCHANT_BYPASS = "mcmmo.perks.bypass.salvageenchant";
+    public static final String SMELTING = "mcmmo.skills.smelting";
+    public static final String SMELTING_COMMAND = "mcmmo.commands.smelting";
+    public static final String SMELTING_FUEL_EFFICIENCY = "mcmmo.ability.smelting.fuelefficiency";
+    public static final String SMELTING_SECOND_SMELT = "mcmmo.ability.smelting.secondsmelt";
+    public static final String SMELTING_VANILLA_XP = "mcmmo.ability.smelting.vanillaxpboost";
+    public static final String SMELTING_LUCKY = "mcmmo.perks.lucky.smelting";
     public static final String SWORDS_COMMAND = "mcmmo.commands.swords";
     public static final String SWORDS_SERRATED_STRIKES =
             "mcmmo.ability.swords.serratedstrikes";
@@ -90,6 +150,37 @@ public final class PermissionNodes {
     public static final String SWORDS_STAB = "mcmmo.ability.swords.stab";
     public static final String SWORDS_LIMIT_BREAK = "mcmmo.ability.swords.swordslimitbreak";
     public static final String SWORDS_LUCKY = "mcmmo.perks.lucky.swords";
+    public static final String UNARMED = "mcmmo.skills.unarmed";
+    public static final String UNARMED_COMMAND = "mcmmo.commands.unarmed";
+    public static final String UNARMED_BERSERK = "mcmmo.ability.unarmed.berserk";
+    public static final String UNARMED_ARROW_DEFLECT = "mcmmo.ability.unarmed.arrowdeflect";
+    public static final String UNARMED_DISARM = "mcmmo.ability.unarmed.disarm";
+    public static final String UNARMED_IRON_GRIP = "mcmmo.ability.unarmed.irongrip";
+    public static final String UNARMED_STEEL_ARM_STYLE = "mcmmo.ability.unarmed.steelarmstyle";
+    public static final String UNARMED_BLOCK_CRACKER = "mcmmo.ability.unarmed.blockcracker";
+    public static final String UNARMED_LIMIT_BREAK = "mcmmo.ability.unarmed.unarmedlimitbreak";
+    public static final String UNARMED_LUCKY = "mcmmo.perks.lucky.unarmed";
+    public static final String TAMING = "mcmmo.skills.taming";
+    public static final String TAMING_COMMAND = "mcmmo.commands.taming";
+    public static final String TAMING_BEAST_LORE = "mcmmo.ability.taming.beastlore";
+    public static final String TAMING_CALL_OF_THE_WILD = "mcmmo.ability.taming.callofthewild";
+    public static final String TAMING_COTW_WOLF = "mcmmo.ability.taming.callofthewild.wolf";
+    public static final String TAMING_COTW_OCELOT = "mcmmo.ability.taming.callofthewild.ocelot";
+    public static final String TAMING_COTW_HORSE = "mcmmo.ability.taming.callofthewild.horse";
+    public static final String TAMING_GORE = "mcmmo.ability.taming.gore";
+    public static final String TAMING_SHARPENED_CLAWS = "mcmmo.ability.taming.sharpenedclaws";
+    public static final String TAMING_ENVIRONMENTALLY_AWARE = "mcmmo.ability.taming.environmentallyaware";
+    public static final String TAMING_THICK_FUR = "mcmmo.ability.taming.thickfur";
+    public static final String TAMING_HOLY_HOUND = "mcmmo.ability.taming.holyhound";
+    public static final String TAMING_SHOCK_PROOF = "mcmmo.ability.taming.shockproof";
+    public static final String TAMING_FAST_FOOD = "mcmmo.ability.taming.fastfoodservice";
+    public static final String TAMING_PUMMEL = "mcmmo.ability.taming.pummel";
+    public static final String TAMING_LUCKY = "mcmmo.perks.lucky.taming";
+    public static final String ALCHEMY = "mcmmo.skills.alchemy";
+    public static final String ALCHEMY_COMMAND = "mcmmo.commands.alchemy";
+    public static final String ALCHEMY_CATALYSIS = "mcmmo.ability.alchemy.catalysis";
+    public static final String ALCHEMY_CONCOCTIONS = "mcmmo.ability.alchemy.concoctions";
+    public static final String ALCHEMY_LUCKY = "mcmmo.perks.lucky.alchemy";
     public static final String PARTY_FRIENDLY_FIRE = "mcmmo.party.friendlyfire";
     public static final String XP_CUSTOM_ALL = "mcmmo.perks.xp.customboost.all";
     public static final String XP_QUADRUPLE_ALL = "mcmmo.perks.xp.quadruple.all";

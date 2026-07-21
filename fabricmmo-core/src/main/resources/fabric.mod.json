@@ -8,7 +8,10 @@
   "contact": {"sources": "https://github.com/njw3995/fabricmmo"},
   "license": "GPL-3.0-only",
   "environment": "*",
-  "entrypoints": {"main": ["io.github.njw3995.fabricmmo.core.fabric.FabricMmoMod"]},
+  "entrypoints": {
+    "main": ["io.github.njw3995.fabricmmo.core.fabric.FabricMmoMod"],
+    "client": ["io.github.njw3995.fabricmmo.client.fabric.FabricMmoClientMod"]
+  },
   "depends": {
     "fabricloader": ">=0.18.4",
     "minecraft": "1.21.1",

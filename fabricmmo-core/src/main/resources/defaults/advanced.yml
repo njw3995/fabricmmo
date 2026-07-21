@@ -62,6 +62,39 @@ Skills:
       DamageThreshold: 7.0
     GracefulRoll:
       DamageThreshold: 14.0
+  Alchemy:
+    Catalysis:
+      MaxBonusLevel:
+        Standard: 100
+        RetroMode: 1000
+      MinSpeed: 1.0
+      MaxSpeed: 4.0
+
+  Archery:
+    SkillShot:
+      RankDamageMultiplier: 10.0
+      MaxDamage: 9.0
+    Daze:
+      ChanceMax: 50.0
+      MaxBonusLevel:
+        Standard: 100
+        RetroMode: 1000
+      BonusDamage: 4.0
+    ArrowRetrieval:
+      ChanceMax: 100.0
+      MaxBonusLevel:
+        Standard: 100
+        RetroMode: 1000
+    ForceMultiplier: 2.0
+  Crossbows:
+    PoweredShot:
+      RankDamageMultiplier: 10.0
+      MaxDamage: 9.0
+  Tridents:
+    Impale:
+      Base_Damage: 1.0
+      Rank_Damage_Multiplier: 0.5
+
   Fishing:
     ShakeChance:
       Rank_1: 15.0
@@ -182,6 +215,111 @@ Skills:
         Rank_6: 3.0
         Rank_7: 4.0
         Rank_8: 4.0
+  Axes:
+    AxeMastery:
+      RankDamageMultiplier: 1.0
+    CriticalStrikes:
+      ChanceMax: 37.50
+      MaxBonusLevel:
+        Standard: 100
+        RetroMode: 1000
+      PVP_Modifier: 1.5
+      PVE_Modifier: 2.0
+    GreaterImpact:
+      Chance: 25.0
+      KnockbackModifier: 1.5
+      BonusDamage: 2.0
+    ArmorImpact:
+      DamagePerRank: 6.5
+      Chance: 25.0
+    SkullSplitter:
+      DamageModifier: 2.0
+  Maces:
+    Crush:
+      Base_Damage: 0.5
+      Rank_Damage_Multiplier: 1.0
+    Cripple:
+      Chance_To_Apply_On_Hit:
+        Rank_1: 10
+        Rank_2: 15
+        Rank_3: 20
+        Rank_4: 33
+  Repair:
+    RepairMastery:
+      MaxBonusPercentage: 200.0
+      MaxBonusLevel:
+        Standard: 100
+        RetroMode: 1000
+    SuperRepair:
+      ChanceMax: 100.0
+      MaxBonusLevel:
+        Standard: 100
+        RetroMode: 1000
+    ArcaneForging:
+      May_Lose_Enchants: true
+      MaxEnchantLevel: 5
+      Keep_Enchants_Chance:
+        Rank_1: 10.0
+        Rank_2: 20.0
+        Rank_3: 30.0
+        Rank_4: 40.0
+        Rank_5: 50.0
+        Rank_6: 50.0
+        Rank_7: 60.0
+        Rank_8: 60.0
+      Downgrades_Enabled: true
+      Downgrades_Chance:
+        Rank_1: 75.0
+        Rank_2: 50.0
+        Rank_3: 40.0
+        Rank_4: 30.0
+        Rank_5: 25.0
+        Rank_6: 20.0
+        Rank_7: 15.0
+        Rank_8: 10.0
+  Salvage:
+    ArcaneSalvage:
+      EnchantLossEnabled: true
+      EnchantDowngradeEnabled: true
+      MaxEnchantLevel: 5
+      ExtractFullEnchant:
+        Rank_1: 2.5
+        Rank_2: 5.0
+        Rank_3: 7.5
+        Rank_4: 10.0
+        Rank_5: 12.5
+        Rank_6: 17.5
+        Rank_7: 25.0
+        Rank_8: 32.5
+      ExtractPartialEnchant:
+        Rank_1: 2.0
+        Rank_2: 2.5
+        Rank_3: 5.0
+        Rank_4: 7.5
+        Rank_5: 10.0
+        Rank_6: 12.5
+        Rank_7: 15.0
+        Rank_8: 17.5
+  Smelting:
+    SecondSmelt:
+      ChanceMax: 50.0
+      MaxBonusLevel:
+        Standard: 100
+        RetroMode: 1000
+    FluxMining:
+      Chance: 33.0
+      MaxBonusLevel:
+        Standard: 100
+        RetroMode: 1000
+    VanillaXPMultiplier:
+      Rank_1: 1
+      Rank_2: 2
+      Rank_3: 3
+      Rank_4: 3
+      Rank_5: 4
+      Rank_6: 4
+      Rank_7: 5
+      Rank_8: 5
   Swords:
     Stab:
       Base_Damage: 1.0
@@ -227,6 +365,66 @@ Skills:
     SerratedStrikes:
       DamageModifier: 4.0
       BleedTicks: 5
+  Unarmed:
+    Disarm:
+      ChanceMax: 33.0
+      MaxBonusLevel:
+        Standard: 100
+        RetroMode: 1000
+      AntiTheft: false
+    ArrowDeflect:
+      ChanceMax: 50.0
+      MaxBonusLevel:
+        Standard: 100
+        RetroMode: 1000
+    IronGrip:
+      ChanceMax: 100.0
+      MaxBonusLevel:
+        Standard: 100
+        RetroMode: 1000
+    SteelArmStyle:
+      Damage_Override: false
+      Override:
+        Rank_1: 1.0
+        Rank_2: 1.5
+        Rank_3: 2.0
+        Rank_4: 2.5
+        Rank_5: 3.0
+        Rank_6: 3.5
+        Rank_7: 4.0
+        Rank_8: 4.5
+        Rank_9: 5.0
+        Rank_10: 5.5
+        Rank_11: 6.0
+        Rank_12: 6.5
+        Rank_13: 7.0
+        Rank_14: 7.5
+        Rank_15: 8.0
+        Rank_16: 8.5
+        Rank_17: 9.0
+        Rank_18: 10.5
+        Rank_19: 12.0
+        Rank_20: 13.5
+  Taming:
+    Gore:
+      ChanceMax: 100.0
+      MaxBonusLevel:
+        Standard: 100
+        RetroMode: 1000
+      Modifier: 2.0
+    FastFoodService:
+      Chance: 50.0
+    ThickFur:
+      Modifier: 2.0
+    ShockProof:
+      Modifier: 6.0
+    SharpenedClaws:
+      Bonus: 2.0
+    CallOfTheWild:
+      MinHorseJumpStrength: 0.7
+      MaxHorseJumpStrength: 2.0
+    Pummel:
+      Chance: 10.0
   Woodcutting:
     TreeFeller:
       Knock_On_Wood:

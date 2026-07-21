@@ -3,11 +3,19 @@
   "package": "io.github.njw3995.fabricmmo.core.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "EntityMixin",
+    "AbstractFurnaceBlockEntityMixin",
+    "BrewingStandBlockEntityMixin",
+    "ScreenHandlerMixin",
     "BlockDropStacksMixin",
     "BlockDropSuppressionMixin",
     "BlockItemMixin",
     "ExplosionMixin",
     "LavaFluidMixin",
+    "EntityTamingDataMixin",
+    "TameableEntityMixin",
+    "AbstractHorseEntityMixin",
+    "ServerPlayerEntityTamingMixin",
     "AnimalEntityMixin",
     "EggEntityMixin",
     "MobEntityMixin",
@@ -16,6 +24,9 @@
     "LivingEntityMixin",
     "PistonHandlerMixin",
     "PlayerEntityMixin",
+    "ServerPlayNetworkHandlerMixin",
+    "PersistentProjectileEntityAccessor",
+    "PersistentProjectileEntityMixin",
     "ServerPlayerInteractionManagerMixin",
     "ServerPlayerEntityUiTraceMixin",
     "ServerCommandSourceUiTraceMixin",
@@ -30,7 +41,8 @@
     "BoneMealItemMixin",
     "WorldNaturalGrowthMixin",
     "ItemEntityMixin",
-    "FishingBobberEntityMixin"
+    "FishingBobberEntityMixin",
+    "FurnaceOutputSlotMixin"
   ],
   "injectors": {
     "defaultRequire": 1

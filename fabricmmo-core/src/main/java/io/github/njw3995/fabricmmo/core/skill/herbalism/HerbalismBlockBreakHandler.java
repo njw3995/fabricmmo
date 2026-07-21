@@ -124,7 +124,7 @@ public final class HerbalismBlockBreakHandler {
         synchronized (PENDING_REPLANTS) {
             pending = PENDING_REPLANTS.remove(key);
             if (successful && pending != null) {
-                SCHEDULED_REPLANTS.add(new ScheduledReplant(pending, 20));
+                SCHEDULED_REPLANTS.add(new ScheduledReplant(pending, pending.delayTicks()));
             }
         }
         try {
@@ -143,12 +143,19 @@ public final class HerbalismBlockBreakHandler {
             ServerPlayerEntity player,
             BlockPos pos,
             BlockState state) {
-        String path = path(state);
-        int xp = FabricMmoFabricRuntime.herbalismXpFor(id(state));
+        int xp = FabricMmoFabricRuntime.herbalismXpFor(state);
         if (xp <= 0 || player.isCreative()) {
             return false;
         }
         boolean placed = FabricMmoFabricRuntime.isPlayerPlaced(location(world, pos));
+        var extension = FabricMmoFabricRuntime.gatheringContentFor(CoreSkills.HERBALISM, state);
+        if (extension.isPresent()) {
+            var definition = extension.get();
+            return definition.bonusDrops()
+                    && (!placed || !definition.naturalBlocksOnly())
+                    && FabricMmoFabricRuntime.gatheringContentResolver().mature(definition, state);
+        }
+        String path = path(state);
         IntProperty age = HerbalismPlantRules.ageProperty(state);
         if (placed) {
             return age != null
@@ -161,12 +168,21 @@ public final class HerbalismBlockBreakHandler {
     }
 
     private static int xpFor(ServerWorld world, BlockPos pos, BlockState state) {
-        int configured = FabricMmoFabricRuntime.herbalismXpFor(id(state));
+        int configured = FabricMmoFabricRuntime.herbalismXpFor(state);
         if (configured <= 0) {
             return 0;
         }
-        String path = path(state);
         boolean placed = FabricMmoFabricRuntime.isPlayerPlaced(location(world, pos));
+        var extension = FabricMmoFabricRuntime.gatheringContentFor(CoreSkills.HERBALISM, state);
+        if (extension.isPresent()) {
+            var definition = extension.get();
+            if ((placed && definition.naturalBlocksOnly())
+                    || !FabricMmoFabricRuntime.gatheringContentResolver().mature(definition, state)) {
+                return 0;
+            }
+            return configured;
+        }
+        String path = path(state);
         IntProperty age = HerbalismPlantRules.ageProperty(state);
         if (placed) {
             return age != null
@@ -237,6 +253,11 @@ public final class HerbalismBlockBreakHandler {
             BreakKey key) {
         String path = path(state);
         HerbalismSettings settings = FabricMmoFabricRuntime.herbalismSettings();
+        var extension = FabricMmoFabricRuntime.gatheringContentFor(CoreSkills.HERBALISM, state);
+        if (extension.isPresent()) {
+            prepareRegisteredReplant(world, player, pos, state, tool, key, settings, extension.get());
+            return;
+        }
         IntProperty age = HerbalismPlantRules.ageProperty(state);
         if (age == null || !settings.replantEnabled(path) || player.isSneaking()) {
             return;
@@ -273,7 +294,7 @@ public final class HerbalismBlockBreakHandler {
         BlockState replanted = state.with(age, Math.min(max, Math.max(0, desired)));
         synchronized (PENDING_REPLANTS) {
             PENDING_REPLANTS.put(key,
-                    new PendingReplant(world, pos.toImmutable(), replanted));
+                    new PendingReplant(world, pos.toImmutable(), replanted, 20));
         }
         world.playSound(
                 null,
@@ -282,6 +303,67 @@ public final class HerbalismBlockBreakHandler {
                 SoundCategory.PLAYERS,
                 1.0F,
                 1.0F);
+    }
+
+    private static void prepareRegisteredReplant(
+            ServerWorld world,
+            ServerPlayerEntity player,
+            BlockPos pos,
+            BlockState state,
+            ItemStack tool,
+            BreakKey key,
+            HerbalismSettings settings,
+            io.github.njw3995.fabricmmo.api.content.GatheringContentDefinition definition) {
+        var replant = definition.replant().orElse(null);
+        if (replant == null || player.isSneaking()) {
+            return;
+        }
+        var resolver = FabricMmoFabricRuntime.gatheringContentResolver();
+        if (!resolver.validTool(definition, tool)) {
+            return;
+        }
+        IntProperty age = resolver.integerProperty(state, replant.ageProperty());
+        if (age == null) {
+            return;
+        }
+        int level = FabricMmoFabricRuntime.requireApi().progression()
+                .query(player.getUuid(), CoreSkills.HERBALISM).level();
+        int rank = settings.greenThumbRank(level);
+        if (rank <= 0
+                || !PERMISSIONS.hasPermission(
+                        player.getCommandSource(),
+                        PermissionNodes.herbalismGreenThumbPlant(path(state)),
+                        true)) {
+            return;
+        }
+        boolean greenTerra = HerbalismAbilityHandler.isActive(player.getUuid());
+        boolean lucky = PERMISSIONS.hasPermission(
+                player.getCommandSource(), PermissionNodes.HERBALISM_LUCKY, false);
+        if (!greenTerra && !HerbalismProbability.roll(
+                world.getRandom().nextDouble(), settings.greenThumbChance(level, lucky))) {
+            return;
+        }
+        if (!HerbalismInventory.removeOne(
+                player, stack -> resolver.matchesItem(replant.plantingItem(), stack))) {
+            return;
+        }
+        boolean mature = resolver.mature(definition, state);
+        int desired;
+        if (!mature) {
+            desired = 0;
+        } else {
+            int effectiveRank = rank + (greenTerra ? replant.activeAbilityRankBonus() : 0);
+            int index = Math.min(replant.rankAges().size(), effectiveRank) - 1;
+            desired = replant.rankAges().get(Math.max(0, index));
+        }
+        int max = age.getValues().stream().mapToInt(Integer::intValue).max().orElse(0);
+        BlockState replanted = state.with(age, Math.min(max, Math.max(0, desired)));
+        synchronized (PENDING_REPLANTS) {
+            PENDING_REPLANTS.put(key,
+                    new PendingReplant(world, pos.toImmutable(), replanted, replant.delayTicks()));
+        }
+        world.playSound(null, pos, SoundEvents.ITEM_BOTTLE_EMPTY,
+                SoundCategory.PLAYERS, 1.0F, 1.0F);
     }
 
     private static Item seedFor(String path) {
@@ -359,7 +441,7 @@ public final class HerbalismBlockBreakHandler {
             case "chorus_plant" -> 22;
             default -> Integer.MAX_VALUE;
         };
-        int perBlock = FabricMmoFabricRuntime.herbalismXpFor(id(origin));
+        int perBlock = FabricMmoFabricRuntime.herbalismXpFor(origin);
         return limit == Integer.MAX_VALUE ? limit : limit * Math.max(0, perBlock);
     }
 
@@ -464,7 +546,7 @@ public final class HerbalismBlockBreakHandler {
     private record BreakKey(UUID playerId, BlockLocation location) {
     }
 
-    private record PendingReplant(ServerWorld world, BlockPos pos, BlockState state) {
+    private record PendingReplant(ServerWorld world, BlockPos pos, BlockState state, int delayTicks) {
     }
 
     private record ScheduledReplant(PendingReplant replant, int ticksRemaining) {

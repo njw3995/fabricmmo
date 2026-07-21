@@ -1,0 +1,11 @@
+{
+  "format": 1,
+  "skill": "fabricmmo:mining",
+  "block": "#example:crystal_ores",
+  "xp": 125,
+  "valid_tools": ["#minecraft:pickaxes"],
+  "natural_blocks_only": true,
+  "bonus_drops": true,
+  "active_ability": true,
+  "metadata": {"source_mod": "example"}
+}

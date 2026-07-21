@@ -75,8 +75,7 @@ public final class MiningAbilityHandler {
             ItemStack tool = serverPlayer.getMainHandStack();
             net.minecraft.block.BlockState state = serverWorld.getBlockState(pos);
             boolean eligibleBlock = state.isIn(net.minecraft.registry.tag.BlockTags.PICKAXE_MINEABLE)
-                    || FabricMmoFabricRuntime.miningXpFor(io.github.njw3995.fabricmmo.api.NamespacedId.parse(
-                            net.minecraft.registry.Registries.BLOCK.getId(state.getBlock()).toString())) > 0;
+                    || FabricMmoFabricRuntime.miningXpFor(state) > 0;
             if (!tool.isIn(ItemTags.PICKAXES) || !eligibleBlock) {
                 return ActionResult.PASS;
             }
@@ -125,6 +124,13 @@ public final class MiningAbilityHandler {
 
     public static void trackBlastCooldown(UUID playerId) {
         BLAST_MINING_COOLDOWNS.add(playerId);
+    }
+
+    /** Removes the temporary Super Breaker Efficiency marker before Repair reads enchantments. */
+    public static boolean removeTemporaryToolBuffForRepair(
+            ServerPlayerEntity player,
+            ItemStack stack) {
+        return SuperBreakerAttributeBoost.restoreForRepair(player, stack);
     }
 
     public static void restoreDroppedTool(ServerPlayerEntity player, ItemStack stack) {

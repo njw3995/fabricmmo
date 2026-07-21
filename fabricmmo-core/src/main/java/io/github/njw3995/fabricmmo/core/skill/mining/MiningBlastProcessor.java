@@ -75,9 +75,12 @@ public final class MiningBlastProcessor {
 
             NamespacedId blockId = NamespacedId.parse(
                     Registries.BLOCK.getId(state.getBlock()).toString());
-            int blockXp = FabricMmoFabricRuntime.miningXpFor(blockId);
+            int blockXp = FabricMmoFabricRuntime.miningXpFor(state);
             BlockEntity blockEntity = world.getBlockEntity(pos);
-            if (blockXp > 0 && MiningOreClassifier.isOre(state) && blockEntity == null) {
+            boolean blastEligible = FabricMmoFabricRuntime.gatheringContentFor(CoreSkills.MINING, state)
+                    .map(definition -> definition.activeAbility())
+                    .orElseGet(() -> MiningOreClassifier.isOre(state));
+            if (blockXp > 0 && blastEligible && blockEntity == null) {
                 xp = Math.addExact(xp, blockXp);
                 Collection<ItemStack> drops = pickaxe
                         ? Block.getDroppedStacks(state, world, pos, null, owner, held)

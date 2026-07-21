@@ -66,10 +66,18 @@ public final class WoodcuttingBonusDropHandler {
             BlockState state,
             ItemStack tool) {
         NamespacedId sourceId = WoodcuttingBlockClassifier.id(state);
-        if (FabricMmoFabricRuntime.woodcuttingXpFor(sourceId) <= 0
-                || !FabricMmoFabricRuntime.woodcuttingDropSettings().materialEnabled(sourceId)
+        var extension = FabricMmoFabricRuntime.gatheringContentFor(CoreSkills.WOODCUTTING, state);
+        boolean validTool = extension
+                .map(definition -> FabricMmoFabricRuntime.gatheringContentResolver()
+                        .validTool(definition, tool))
+                .orElseGet(() -> tool.isIn(ItemTags.AXES));
+        boolean bonusDrops = extension.map(definition -> definition.bonusDrops())
+                .orElseGet(() -> FabricMmoFabricRuntime.woodcuttingDropSettings()
+                        .materialEnabled(sourceId));
+        if (FabricMmoFabricRuntime.woodcuttingXpFor(state) <= 0
+                || !bonusDrops
                 || player.isCreative()
-                || !tool.isIn(ItemTags.AXES)) {
+                || !validTool) {
             return WoodcuttingDropOutcome.NONE;
         }
         String worldId = world.getRegistryKey().getValue().toString();
@@ -80,7 +88,8 @@ public final class WoodcuttingBonusDropHandler {
         boolean skillPermission = PERMISSIONS.hasPermission(
                 player.getCommandSource(), PermissionNodes.WOODCUTTING, true);
         if (!skillPermission
-                || FabricMmoFabricRuntime.isPlayerPlaced(location)) {
+                || (FabricMmoFabricRuntime.isPlayerPlaced(location)
+                        && extension.map(definition -> definition.naturalBlocksOnly()).orElse(true))) {
             return WoodcuttingDropOutcome.NONE;
         }
         FabricMmoApi api = FabricMmoFabricRuntime.requireApi();

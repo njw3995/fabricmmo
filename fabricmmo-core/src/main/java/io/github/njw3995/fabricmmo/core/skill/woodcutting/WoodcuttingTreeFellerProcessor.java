@@ -63,7 +63,7 @@ public final class WoodcuttingTreeFellerProcessor {
         int logCount = (int) nodes.stream()
                 .map(WoodcuttingTreeFellerProcessor::pos)
                 .map(world::getBlockState)
-                .filter(state -> xpTable.xpFor(WoodcuttingBlockClassifier.id(state)) > 0)
+                .filter(state -> WoodcuttingBlockClassifier.kind(state, xpTable) == TreeFellerSearch.Kind.WOOD_XP)
                 .count();
         if (!applyDurability(tool, player, logCount, settings.abilityToolDamage())) {
             player.sendMessage(WoodcuttingMessages.splinter(), true);
@@ -117,7 +117,7 @@ public final class WoodcuttingTreeFellerProcessor {
                 int blockXp = 0;
                 int orbXp = 0;
                 if (kind == TreeFellerSearch.Kind.WOOD_XP) {
-                    int rawXp = xpTable.xpFor(WoodcuttingBlockClassifier.id(state));
+                    int rawXp = FabricMmoFabricRuntime.woodcuttingXpFor(state);
                     if (rawXp > 0) {
                         blockXp = settings.treeFellerReducedXp()
                                 ? Math.max(1, rawXp - processedLogs * 5)

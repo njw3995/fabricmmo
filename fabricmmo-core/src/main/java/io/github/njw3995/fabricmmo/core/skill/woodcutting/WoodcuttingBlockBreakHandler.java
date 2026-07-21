@@ -165,9 +165,13 @@ public final class WoodcuttingBlockBreakHandler {
             boolean playerPlaced,
             boolean treeFeller) {
         NamespacedId blockId = WoodcuttingBlockClassifier.id(state);
-        int configuredXp = FabricMmoFabricRuntime.woodcuttingXpFor(blockId);
+        var extension = FabricMmoFabricRuntime.gatheringContentFor(CoreSkills.WOODCUTTING, state);
+        int configuredXp = FabricMmoFabricRuntime.woodcuttingXpFor(state);
         String worldId = world.getRegistryKey().getValue().toString();
-        boolean validTool = tool.isIn(ItemTags.AXES);
+        boolean validTool = extension
+                .map(definition -> FabricMmoFabricRuntime.gatheringContentResolver()
+                        .validTool(definition, tool))
+                .orElseGet(() -> tool.isIn(ItemTags.AXES));
         boolean permission = PERMISSIONS.hasPermission(
                 player.getCommandSource(), PermissionNodes.WOODCUTTING, true);
         FabricMmoApi api = FabricMmoFabricRuntime.requireApi();
@@ -179,7 +183,7 @@ public final class WoodcuttingBlockBreakHandler {
                 validTool,
                 permission,
                 protection,
-                playerPlaced);
+                playerPlaced && extension.map(definition -> definition.naturalBlocksOnly()).orElse(true));
         if (SharedServerSystems.running()) {
             SharedServerSystems.require().diagnostics().message(
                     player.getUuid(),

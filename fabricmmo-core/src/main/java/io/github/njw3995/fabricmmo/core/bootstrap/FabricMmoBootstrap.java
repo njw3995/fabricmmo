@@ -3,25 +3,40 @@ package io.github.njw3995.fabricmmo.core.bootstrap;
 import io.github.njw3995.fabricmmo.api.protection.ProtectionService;
 import io.github.njw3995.fabricmmo.core.ability.AbilityPipeline;
 import io.github.njw3995.fabricmmo.core.ability.DefaultAbilityRegistry;
+import io.github.njw3995.fabricmmo.core.ability.PassivePipeline;
 import io.github.njw3995.fabricmmo.core.command.CoreCommandMetadata;
 import io.github.njw3995.fabricmmo.core.command.DefaultCommandMetadataRegistry;
 import io.github.njw3995.fabricmmo.core.config.DefaultConfigRegistry;
+import io.github.njw3995.fabricmmo.core.content.DefaultBrewingContentRegistry;
+import io.github.njw3995.fabricmmo.core.content.DefaultEntityXpContentRegistry;
+import io.github.njw3995.fabricmmo.core.content.DefaultGatheringContentRegistry;
 import io.github.njw3995.fabricmmo.core.event.SimpleEventBus;
+import io.github.njw3995.fabricmmo.core.data.DefaultPersistentMarkerService;
 import io.github.njw3995.fabricmmo.core.persistence.ProgressionStore;
 import io.github.njw3995.fabricmmo.core.progression.CoreXpSources;
+import io.github.njw3995.fabricmmo.core.progression.DefaultGameplayXpService;
 import io.github.njw3995.fabricmmo.core.progression.DefaultProgressionService;
 import io.github.njw3995.fabricmmo.core.progression.DefaultXpSourceRegistry;
 import io.github.njw3995.fabricmmo.core.progression.ProgressionFormula;
 import io.github.njw3995.fabricmmo.core.progression.ProgressionSettings;
 import io.github.njw3995.fabricmmo.core.protection.AllowAllProtectionService;
+import io.github.njw3995.fabricmmo.core.protection.CompositeProtectionService;
 import io.github.njw3995.fabricmmo.core.registry.DefaultSkillRegistry;
 import io.github.njw3995.fabricmmo.core.skill.CoreSkills;
 import io.github.njw3995.fabricmmo.core.skill.acrobatics.CoreAcrobaticsAbilities;
+import io.github.njw3995.fabricmmo.core.skill.archery.CoreArcheryAbilities;
+import io.github.njw3995.fabricmmo.core.skill.axes.CoreAxesAbilities;
+import io.github.njw3995.fabricmmo.core.skill.crossbows.CoreCrossbowsAbilities;
+import io.github.njw3995.fabricmmo.core.skill.alchemy.CoreAlchemyAbilities;
 import io.github.njw3995.fabricmmo.core.skill.excavation.CoreExcavationAbilities;
 import io.github.njw3995.fabricmmo.core.skill.herbalism.CoreHerbalismAbilities;
 import io.github.njw3995.fabricmmo.core.skill.fishing.CoreFishingAbilities;
+import io.github.njw3995.fabricmmo.core.skill.maces.CoreMacesAbilities;
 import io.github.njw3995.fabricmmo.core.skill.mining.CoreMiningAbilities;
 import io.github.njw3995.fabricmmo.core.skill.swords.CoreSwordsAbilities;
+import io.github.njw3995.fabricmmo.core.skill.tridents.CoreTridentsAbilities;
+import io.github.njw3995.fabricmmo.core.skill.unarmed.CoreUnarmedAbilities;
+import io.github.njw3995.fabricmmo.core.skill.taming.CoreTamingAbilities;
 import io.github.njw3995.fabricmmo.core.skill.woodcutting.CoreWoodcuttingAbilities;
 import io.github.njw3995.fabricmmo.core.ui.DefaultUiMetadataRegistry;
 import java.time.Clock;
@@ -67,17 +82,29 @@ public final class FabricMmoBootstrap {
         CoreXpSources.registerDefaults(xpSources);
         DefaultAbilityRegistry abilities = new DefaultAbilityRegistry(skills);
         CoreAcrobaticsAbilities.registerAll(abilities);
+        CoreArcheryAbilities.registerAll(abilities);
+        CoreAxesAbilities.registerAll(abilities);
+        CoreCrossbowsAbilities.registerAll(abilities);
+        CoreMacesAbilities.registerAll(abilities);
+        CoreAlchemyAbilities.registerAll(abilities);
         CoreMiningAbilities.registerAll(abilities);
         CoreWoodcuttingAbilities.registerAll(abilities);
         CoreExcavationAbilities.registerAll(abilities);
         CoreHerbalismAbilities.registerAll(abilities);
         CoreFishingAbilities.registerAll(abilities);
         CoreSwordsAbilities.registerAll(abilities);
-        AbilityPipeline abilityPipeline = new AbilityPipeline(abilities, events, clock);
+        CoreTridentsAbilities.registerAll(abilities);
+        CoreUnarmedAbilities.registerAll(abilities);
+        CoreTamingAbilities.registerAll(abilities);
         DefaultConfigRegistry configs = new DefaultConfigRegistry();
+        DefaultGatheringContentRegistry gatheringContent = new DefaultGatheringContentRegistry(skills);
+        DefaultEntityXpContentRegistry entityXpContent = new DefaultEntityXpContentRegistry();
+        DefaultBrewingContentRegistry brewingContent = new DefaultBrewingContentRegistry();
         DefaultCommandMetadataRegistry commands = new DefaultCommandMetadataRegistry();
         CoreCommandMetadata.registerDefaults(commands);
         DefaultUiMetadataRegistry ui = new DefaultUiMetadataRegistry(skills);
+        DefaultPersistentMarkerService markers = new DefaultPersistentMarkerService();
+        CompositeProtectionService protections = new CompositeProtectionService(protection);
         DefaultProgressionService progression = new DefaultProgressionService(
                 skills,
                 store,
@@ -86,17 +113,29 @@ public final class FabricMmoBootstrap {
                 events,
                 progressionSettings,
                 clock);
+        AbilityPipeline abilityPipeline = new AbilityPipeline(
+                abilities, skills, progression, events, clock);
+        PassivePipeline passivePipeline = new PassivePipeline(
+                abilities, skills, progression, events);
+        DefaultGameplayXpService gameplayXp = new DefaultGameplayXpService(
+                skills, xpSources, progression, progressionSettings);
         DefaultFabricMmoApi api = new DefaultFabricMmoApi(
                 skills,
                 xpSources,
                 abilities,
                 abilityPipeline,
+                passivePipeline,
+                gameplayXp,
                 configs,
+                gatheringContent,
+                entityXpContent,
+                brewingContent,
                 commands,
                 ui,
                 events,
                 progression,
-                protection);
+                protections,
+                markers);
 
         addonRegistration.accept(api);
         CoreXpSources.registerCommandSources(skills.skills(), xpSources);
@@ -105,8 +144,12 @@ public final class FabricMmoBootstrap {
         xpSources.freeze();
         abilities.freeze();
         configs.freeze();
+        gatheringContent.freeze();
+        entityXpContent.freeze();
+        brewingContent.freeze();
         commands.freeze();
         ui.freeze();
+        protections.freeze();
         return api;
     }
 }

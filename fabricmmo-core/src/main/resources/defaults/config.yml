@@ -12,19 +12,23 @@ Abilities:
   Activation:
     Only_Activate_When_Sneaking: false
   Cooldowns:
+    Berserk: 240
     Blast_Mining: 60
     Super_Breaker: 240
     Tree_Feller: 240
     Giga_Drill_Breaker: 240
     Green_Terra: 240
     Serrated_Strikes: 240
+    Skull_Splitter: 240
   Max_Seconds:
+    Berserk: 0
     Blast_Mining: 0
     Super_Breaker: 0
     Tree_Feller: 0
     Giga_Drill_Breaker: 0
     Green_Terra: 0
     Serrated_Strikes: 0
+    Skull_Splitter: 0
   Limits:
     Tree_Feller_Threshold: 1000
   Tools:
@@ -37,12 +41,24 @@ Skills:
     XP_After_Teleport_Cooldown: 5
     Level_Cap: 0
   Alchemy:
+    # Allow hoppers to transfer ingredients and brew Rank 1 Alchemy potions.
+    Enabled_for_Hoppers: true
+    # Prevent hoppers from transferring ingredients into brewing stands.
+    Prevent_Hopper_Transfer_Ingredients: false
+    # Prevent hoppers from transferring potion bottles into brewing stands.
+    Prevent_Hopper_Transfer_Bottles: false
     Level_Cap: 0
   Archery:
+    Enabled_For_PVP: true
+    Enabled_For_PVE: true
     Level_Cap: 0
   Axes:
+    Enabled_For_PVP: true
+    Enabled_For_PVE: true
     Level_Cap: 0
   Crossbows:
+    Enabled_For_PVP: true
+    Enabled_For_PVE: true
     Level_Cap: 0
   Excavation:
     Level_Cap: 0
@@ -59,14 +75,27 @@ Skills:
     Level_Cap: 0
     Prevent_AFK_Leveling: true
   Maces:
+    Enabled_For_PVP: true
+    Enabled_For_PVE: true
     Level_Cap: 0
   Mining:
     Level_Cap: 0
     Detonator_Name: FLINT_AND_STEEL
   Repair:
     Level_Cap: 0
+    Anvil_Messages: true
+    Anvil_Placed_Sounds: true
+    Anvil_Use_Sounds: true
+    Anvil_Material: IRON_BLOCK
+    Use_Enchanted_Materials: false
+    Confirm_Required: true
   Salvage:
     Level_Cap: 0
+    Anvil_Messages: true
+    Anvil_Placed_Sounds: true
+    Anvil_Use_Sounds: true
+    Anvil_Material: GOLD_BLOCK
+    Confirm_Required: true
   Smelting:
     Level_Cap: 0
   Swords:
@@ -74,11 +103,45 @@ Skills:
     Enabled_For_PVE: true
     Level_Cap: 0
   Taming:
+    Enabled_For_PVP: true
+    Enabled_For_PVE: true
     Level_Cap: 0
+    Call_Of_The_Wild:
+      # Item_Material: item required to summon the pet. Legacy mcMMO names and namespaced IDs are accepted.
+      # Item_Amount: number of items required per activation.
+      # Summon_Amount: pets summoned per activation.
+      # Summon_Length: summon lifetime in seconds.
+      # Per_Player_Limit: maximum active summons of this type per player.
+      Wolf:
+        Item_Material: BONE
+        Item_Amount: 10
+        Summon_Amount: 1
+        Summon_Length: 240
+        Per_Player_Limit: 2
+      Ocelot:
+        Item_Material: COD
+        Item_Amount: 10
+        Summon_Amount: 1
+        Summon_Length: 240
+        Per_Player_Limit: 1
+      Horse:
+        Item_Material: APPLE
+        Item_Amount: 10
+        Summon_Amount: 1
+        Summon_Length: 240
+        Per_Player_Limit: 1
   Tridents:
+    Enabled_For_PVP: true
+    Enabled_For_PVE: true
     Level_Cap: 0
   Unarmed:
+    Enabled_For_PVP: true
+    Enabled_For_PVE: true
     Level_Cap: 0
+    Block_Cracker:
+      Allow_Block_Cracker: true
+    Item_Pickup_Disabled_Full_Inventory: true
+    Items_As_Unarmed: false
   Woodcutting:
     Level_Cap: 0
     Tree_Feller_Sounds: true
@@ -284,6 +347,20 @@ Bonus_Drops:
     Mangrove_Wood: true
     Mangrove_Log: true
 
+  Smelting:
+    Iron_Ingot: true
+    Gold_Ingot: true
+    Emerald: true
+    Diamond: true
+    Lapis_Lazuli: true
+    Coal: true
+    Nether_Quartz: true
+    Quartz: true
+    Redstone: true
+    Deepslate: true
+    Copper_Ingot: true
+    Netherite_Scrap: true
+
 # Shared mcMMO 2.3.000 command, party, scoreboard, and storage defaults.
 Party:
   FriendlyFire: false
@@ -356,6 +433,13 @@ Scoreboard:
       Board: true
       Display_Time: 30
 
+Mob_Healthbar:
+  # Enabled: Whether the feature is enabled at all
+  # Display_Type: Per player Default display for mob health bars - HEARTS, BAR, or DISABLED
+  Enabled: true
+  Display_Type: HEARTS
+  Display_Time: 3
+
 Database_Purging:
   Purge_Interval: -1
   Old_User_Cutoff: 6
@@ -389,4 +473,6 @@ Debugging:
 
 Particles:
   Bleed: true
+  Cripple: true
   Dodge: true
+  Greater_Impact: true
