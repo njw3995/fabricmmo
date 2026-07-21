@@ -46,6 +46,10 @@ public final class DefaultAbilityRegistry implements AbilityRegistrar {
         return List.copyOf(actives.values());
     }
 
+    public synchronized Optional<PassiveDefinition> passive(NamespacedId id) {
+        return Optional.ofNullable(passives.get(id));
+    }
+
     public synchronized List<PassiveDefinition> passives() {
         return List.copyOf(passives.values());
     }

@@ -273,9 +273,7 @@ public final class UnarmedRuntimeHandler {
             if (target instanceof IronGolemEntity ironGolem && ironGolem.isPlayerCreated()) {
                 return;
             }
-            String path = Registries.ENTITY_TYPE.getId(target.getType()).getPath();
-            baseXp = settings.pveXp(
-                    path, target instanceof AnimalEntity, target instanceof HostileEntity);
+            baseXp = FabricMmoFabricRuntime.combatBaseXp(target);
             CombatXpSettings.Origin origin = CombatMobOrigin.origin(target);
             baseXp *= settings.originMultiplier(origin);
             context = "PVE_" + origin.name();

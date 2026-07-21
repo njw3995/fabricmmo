@@ -91,10 +91,23 @@ abstract class BrewingStandBlockEntityMixin
             BlockState state,
             BrewingStandBlockEntity stand,
             CallbackInfo callback) {
-        if (AlchemyRuntimeHandler.tick(world, pos, state, stand,
-                (AlchemyBrewingStandAccess) stand)) {
+        AlchemyBrewingStandAccess access = (AlchemyBrewingStandAccess) stand;
+        AlchemyRuntimeHandler.captureExternalBrew(world, pos, stand, access);
+        if (AlchemyRuntimeHandler.tick(world, pos, state, stand, access)) {
+            AlchemyRuntimeHandler.discardExternalBrew(stand);
             callback.cancel();
         }
+    }
+
+    @Inject(method = "tick", at = @At("TAIL"))
+    private static void fabricmmo$finishExternalAlchemy(
+            World world,
+            BlockPos pos,
+            BlockState state,
+            BrewingStandBlockEntity stand,
+            CallbackInfo callback) {
+        AlchemyRuntimeHandler.finishExternalBrew(
+                world, stand, (AlchemyBrewingStandAccess) stand);
     }
 
     @Inject(method = "readNbt", at = @At("TAIL"))

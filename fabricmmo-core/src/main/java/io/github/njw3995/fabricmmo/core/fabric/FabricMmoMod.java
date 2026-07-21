@@ -67,6 +67,7 @@ public final class FabricMmoMod implements ModInitializer {
         AlchemyInteractionHandler.register();
         SharedChatHandler.register(permissions);
         ServerTickEvents.END_SERVER_TICK.register(SharedServerSystems::tick);
+        ServerTickEvents.END_SERVER_TICK.register(FabricMmoFabricRuntime::tick);
         ServerTickEvents.END_SERVER_TICK.register(SwordsRuntimeHandler::tick);
         ServerTickEvents.END_SERVER_TICK.register(TamingRuntimeHandler::tick);
         ServerTickEvents.END_SERVER_TICK.register(RangedCombatRuntimeHandler::tick);
@@ -76,6 +77,7 @@ public final class FabricMmoMod implements ModInitializer {
             }
         });
         ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> {
+            FabricMmoFabricRuntime.playerDisconnected(handler.player.getUuid());
             FishingRuntimeHandler.playerDisconnected(handler.player.getUuid());
             AcrobaticsRuntimeHandler.playerDisconnected(handler.player.getUuid());
             SwordsRuntimeHandler.playerDisconnected(handler.player.getUuid());
@@ -104,6 +106,9 @@ public final class FabricMmoMod implements ModInitializer {
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) ->
                 FabricMmoCommands.register(dispatcher, registryAccess, environment, permissions));
         ServerLifecycleEvents.SERVER_STARTING.register(FabricMmoFabricRuntime::start);
+        ServerLifecycleEvents.END_DATA_PACK_RELOAD.register(
+                (server, resourceManager, success) ->
+                        FabricMmoFabricRuntime.dataPacksReloaded(server, success));
         ServerWorldEvents.LOAD.register((server, world) -> FabricMmoFabricRuntime.worldLoaded(world));
         ServerChunkEvents.CHUNK_UNLOAD.register((world, chunk) ->
                 FabricMmoFabricRuntime.chunkUnloaded(

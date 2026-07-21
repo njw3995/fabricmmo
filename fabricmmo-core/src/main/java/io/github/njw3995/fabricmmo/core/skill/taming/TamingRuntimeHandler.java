@@ -58,7 +58,7 @@ public final class TamingRuntimeHandler {
         if (!available(player) || TamingSummonTracker.isSummon(entity)
                 || PROCESSED_TAMES.putIfAbsent(entity.getUuid(), now) != null) return;
         String path = Registries.ENTITY_TYPE.getId(entity.getType()).getPath();
-        double xp = FabricMmoFabricRuntime.tamingXpTable().xp(path);
+        double xp = FabricMmoFabricRuntime.tamingXp(entity.getType());
         if (xp <= 0.0D) return;
         TamingEntityTamedEvent event = new TamingEntityTamedEvent(
                 player.getUuid(), entity.getUuid(), path, xp);
@@ -198,9 +198,7 @@ public final class TamingRuntimeHandler {
             baseXp = settings.pvpXp();
             context = "PVP";
         } else {
-            String path = Registries.ENTITY_TYPE.getId(victim.getType()).getPath();
-            baseXp = settings.pveXp(path, victim instanceof AnimalEntity,
-                    victim instanceof HostileEntity);
+            baseXp = FabricMmoFabricRuntime.combatBaseXp(victim);
             baseXp *= settings.originMultiplier(CombatMobOrigin.origin(victim));
             context = "PVE_" + CombatMobOrigin.origin(victim).name();
         }

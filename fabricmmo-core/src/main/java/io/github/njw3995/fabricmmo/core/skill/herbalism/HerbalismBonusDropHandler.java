@@ -45,7 +45,12 @@ public final class HerbalismBonusDropHandler {
         }
         NamespacedId blockId = NamespacedId.parse(
                 Registries.BLOCK.getId(state.getBlock()).toString());
-        if (!FabricMmoFabricRuntime.herbalismDropSettings().materialEnabled(blockId)) {
+        boolean materialEnabled = FabricMmoFabricRuntime
+                .gatheringContentFor(CoreSkills.HERBALISM, state)
+                .map(definition -> definition.bonusDrops())
+                .orElseGet(() -> FabricMmoFabricRuntime.herbalismDropSettings()
+                        .materialEnabled(blockId));
+        if (!materialEnabled) {
             return vanillaDrops;
         }
         boolean skillPermission = PERMISSIONS.hasPermission(

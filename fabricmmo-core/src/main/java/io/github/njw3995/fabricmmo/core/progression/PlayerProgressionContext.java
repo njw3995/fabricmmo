@@ -3,6 +3,8 @@ package io.github.njw3995.fabricmmo.core.progression;
 import io.github.njw3995.fabricmmo.api.NamespacedId;
 import io.github.njw3995.fabricmmo.core.permission.FabricCommandPermissionService;
 import io.github.njw3995.fabricmmo.core.permission.PermissionNodes;
+import io.github.njw3995.fabricmmo.api.registry.SkillRegistryView;
+import io.github.njw3995.fabricmmo.api.skill.SkillDefinition;
 import io.github.njw3995.fabricmmo.core.skill.CoreSkills;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,6 +34,44 @@ public final class PlayerProgressionContext {
                 .map(NamespacedId::toString)
                 .collect(Collectors.joining(",")));
         return Map.copyOf(context);
+    }
+
+    /** Enriches an external award using every registered permission-visible primary skill. */
+    public static Map<String, String> enrich(
+            ServerPlayerEntity player,
+            Map<String, String> base,
+            ProgressionSettings settings,
+            NamespacedId skillId,
+            SkillRegistryView registry) {
+        Map<String, String> context = new HashMap<>(base);
+        context.put("xpPerkMultiplier", Double.toString(xpPerkMultiplier(
+                player, settings, skillId)));
+        context.put("powerLevelSkills", registry.skills().stream()
+                .filter(definition -> !definition.childSkill())
+                .filter(PlayerProgressionContext::countsTowardPowerLevel)
+                .filter(definition -> hasSkillPermission(player, definition))
+                .map(SkillDefinition::id)
+                .sorted()
+                .map(NamespacedId::toString)
+                .collect(Collectors.joining(",")));
+        return Map.copyOf(context);
+    }
+
+    private static boolean countsTowardPowerLevel(SkillDefinition definition) {
+        return Boolean.parseBoolean(definition.metadata().getOrDefault("power_level", "true"));
+    }
+
+    private static boolean hasSkillPermission(
+            ServerPlayerEntity player,
+            SkillDefinition definition) {
+        String explicit = definition.metadata().getOrDefault("permission", "").trim();
+        String permission = !explicit.isBlank()
+                ? explicit
+                : definition.id().namespace().equals("fabricmmo")
+                        ? "mcmmo.skills." + definition.id().path()
+                        : "";
+        return permission.isBlank() || PERMISSIONS.hasPermission(
+                player.getCommandSource(), permission, true);
     }
 
     static double xpPerkMultiplier(

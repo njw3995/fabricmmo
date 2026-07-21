@@ -407,10 +407,7 @@ public final class SwordsRuntimeHandler {
             if (target instanceof IronGolemEntity ironGolem && ironGolem.isPlayerCreated()) {
                 return;
             }
-            String path = Registries.ENTITY_TYPE.getId(target.getType()).getPath();
-            boolean animal = target instanceof AnimalEntity;
-            boolean monster = target instanceof HostileEntity;
-            baseXp = settings.pveXp(path, animal, monster);
+            baseXp = FabricMmoFabricRuntime.combatBaseXp(target);
             CombatXpSettings.Origin origin = CombatMobOrigin.origin(target);
             baseXp *= settings.originMultiplier(origin);
             context = "PVE_" + origin.name();

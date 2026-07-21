@@ -2,6 +2,7 @@ package io.github.njw3995.fabricmmo.core.skill.alchemy;
 
 import io.github.njw3995.fabricmmo.api.event.AlchemyBrewEvent;
 import io.github.njw3995.fabricmmo.api.event.AlchemyCatalysisEvent;
+import io.github.njw3995.fabricmmo.api.content.BrewingContentDefinition;
 import io.github.njw3995.fabricmmo.api.progression.XpAwardRequest;
 import io.github.njw3995.fabricmmo.core.fabric.FabricMmoFabricRuntime;
 import io.github.njw3995.fabricmmo.core.access.AlchemyBrewingStandAccess;
@@ -42,6 +43,8 @@ public final class AlchemyRuntimeHandler {
             new FabricCommandPermissionService();
     private static final Set<BrewingStandBlockEntity> ACTIVE_STANDS =
             Collections.newSetFromMap(new IdentityHashMap<>());
+    private static final Map<BrewingStandBlockEntity, ExternalBrewSnapshot> EXTERNAL_BREWS =
+            new IdentityHashMap<>();
 
     private AlchemyRuntimeHandler() {}
 
@@ -121,6 +124,100 @@ public final class AlchemyRuntimeHandler {
         return true;
     }
 
+    /** Captures a possible non-FabricMMO recipe immediately before its completion tick. */
+    public static void captureExternalBrew(
+            World world,
+            BlockPos pos,
+            BrewingStandBlockEntity stand,
+            AlchemyBrewingStandAccess access) {
+        synchronized (EXTERNAL_BREWS) {
+            EXTERNAL_BREWS.remove(stand);
+        }
+        if (!(world instanceof ServerWorld serverWorld)
+                || !FabricMmoFabricRuntime.running()
+                || access.fabricmmo$customAlchemyActive()
+                || access.fabricmmo$alchemyBrewTime() != 1
+                || access.fabricmmo$alchemyOwner() == null
+                || FabricMmoFabricRuntime.isWorldBlacklisted(serverWorld)) {
+            return;
+        }
+        var resolver = FabricMmoFabricRuntime.brewingContentResolver();
+        if (resolver.empty()) {
+            return;
+        }
+        DefaultedList<ItemStack> inventory = access.fabricmmo$alchemyInventory();
+        if (inventory.size() <= FUEL_SLOT) {
+            return;
+        }
+        ItemStack ingredient = inventory.get(INGREDIENT_SLOT);
+        if (ingredient.isEmpty() || !resolver.mayMatchIngredient(ingredient)) {
+            return;
+        }
+        List<ItemStack> inputs = List.of(
+                inventory.get(0).copy(),
+                inventory.get(1).copy(),
+                inventory.get(2).copy());
+        ExternalBrewSnapshot snapshot = new ExternalBrewSnapshot(
+                access.fabricmmo$alchemyOwner(),
+                serverWorld.getRegistryKey().getValue().toString(),
+                pos.asLong(),
+                ingredient.copy(),
+                inputs);
+        synchronized (EXTERNAL_BREWS) {
+            EXTERNAL_BREWS.put(stand, snapshot);
+        }
+    }
+
+    public static void discardExternalBrew(BrewingStandBlockEntity stand) {
+        synchronized (EXTERNAL_BREWS) {
+            EXTERNAL_BREWS.remove(stand);
+        }
+    }
+
+    /** Validates a completed external recipe and awards normal core Alchemy stage XP. */
+    public static void finishExternalBrew(
+            World world,
+            BrewingStandBlockEntity stand,
+            AlchemyBrewingStandAccess access) {
+        ExternalBrewSnapshot snapshot;
+        synchronized (EXTERNAL_BREWS) {
+            snapshot = EXTERNAL_BREWS.remove(stand);
+        }
+        if (snapshot == null
+                || !(world instanceof ServerWorld serverWorld)
+                || !FabricMmoFabricRuntime.running()
+                || FabricMmoFabricRuntime.isWorldBlacklisted(serverWorld)
+                || !snapshot.ownerId().equals(access.fabricmmo$alchemyOwner())) {
+            return;
+        }
+        DefaultedList<ItemStack> inventory = access.fabricmmo$alchemyInventory();
+        if (inventory.size() <= FUEL_SLOT
+                || !ingredientWasConsumed(snapshot.ingredient(), inventory.get(INGREDIENT_SLOT))) {
+            return;
+        }
+        ServerPlayerEntity owner = serverWorld.getServer().getPlayerManager()
+                .getPlayer(snapshot.ownerId());
+        if (owner == null
+                || owner.isCreative()
+                || owner.isSpectator()
+                || !allowed(owner, PermissionNodes.ALCHEMY, true)) {
+            return;
+        }
+        var resolver = FabricMmoFabricRuntime.brewingContentResolver();
+        for (int slot = 0; slot < INGREDIENT_SLOT; slot++) {
+            ItemStack input = snapshot.inputs().get(slot);
+            ItemStack output = inventory.get(slot);
+            if (input.isEmpty()
+                    || output.isEmpty()
+                    || unchanged(input, output)) {
+                continue;
+            }
+            resolver.resolve(snapshot.ingredient(), input, output)
+                    .ifPresent(definition -> awardExternalXp(
+                            owner, snapshot, definition, input, output));
+        }
+    }
+
     public static void setOwner(BrewingStandBlockEntity stand, ServerPlayerEntity player) {
         if (!FabricMmoFabricRuntime.running()
                 || FabricMmoFabricRuntime.isWorldBlacklisted(player.getServerWorld())
@@ -170,6 +267,9 @@ public final class AlchemyRuntimeHandler {
     public static void reset() {
         synchronized (ACTIVE_STANDS) {
             ACTIVE_STANDS.clear();
+        }
+        synchronized (EXTERNAL_BREWS) {
+            EXTERNAL_BREWS.clear();
         }
     }
 
@@ -265,6 +365,48 @@ public final class AlchemyRuntimeHandler {
                 player.getUuid(), CoreSkills.ALCHEMY, CoreXpSources.ALCHEMY_BREW, xp, context));
     }
 
+    private static void awardExternalXp(
+            ServerPlayerEntity player,
+            ExternalBrewSnapshot snapshot,
+            BrewingContentDefinition definition,
+            ItemStack input,
+            ItemStack output) {
+        double xp = FabricMmoFabricRuntime.alchemySettings().xpForStage(definition.stage());
+        if (xp <= 0.0D) {
+            return;
+        }
+        String inputId = Registries.ITEM.getId(input.getItem()).toString();
+        String outputId = Registries.ITEM.getId(output.getItem()).toString();
+        Map<String, String> context = PlayerProgressionContext.enrich(
+                player,
+                Map.of(
+                        "context", "EXTERNAL_BREWING",
+                        "definition", definition.id().toString(),
+                        "stage", Integer.toString(definition.stage()),
+                        "ingredient", Registries.ITEM.getId(snapshot.ingredient().getItem()).toString(),
+                        "input", inputId,
+                        "output", outputId,
+                        "world", snapshot.worldId(),
+                        "blockPosition", Long.toString(snapshot.blockPosition())),
+                FabricMmoFabricRuntime.progressionSettings(),
+                CoreSkills.ALCHEMY);
+        FabricMmoFabricRuntime.requireApi().progression().award(new XpAwardRequest(
+                player.getUuid(), CoreSkills.ALCHEMY, CoreXpSources.ALCHEMY_BREW, xp, context));
+    }
+
+    private static boolean ingredientWasConsumed(ItemStack before, ItemStack after) {
+        if (after.isEmpty()) {
+            return true;
+        }
+        return !ItemStack.areItemsAndComponentsEqual(before, after)
+                || after.getCount() < before.getCount();
+    }
+
+    private static boolean unchanged(ItemStack before, ItemStack after) {
+        return before.getCount() == after.getCount()
+                && ItemStack.areItemsAndComponentsEqual(before, after);
+    }
+
     private static int ingredientTier(ServerPlayerEntity owner) {
         if (owner == null || !allowed(owner, PermissionNodes.ALCHEMY_CONCOCTIONS, true)) return 1;
         return FabricMmoFabricRuntime.alchemySettings().concoctionsTier(level(owner));
@@ -306,4 +448,15 @@ public final class AlchemyRuntimeHandler {
             int amount) {}
 
     private record BrewPlan(Identifier ingredient, List<SlotBrew> outputs) {}
+
+    private record ExternalBrewSnapshot(
+            UUID ownerId,
+            String worldId,
+            long blockPosition,
+            ItemStack ingredient,
+            List<ItemStack> inputs) {
+        private ExternalBrewSnapshot {
+            inputs = List.copyOf(inputs);
+        }
+    }
 }

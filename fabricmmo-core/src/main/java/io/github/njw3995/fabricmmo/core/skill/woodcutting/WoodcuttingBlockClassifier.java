@@ -2,6 +2,8 @@ package io.github.njw3995.fabricmmo.core.skill.woodcutting;
 
 import io.github.njw3995.fabricmmo.api.NamespacedId;
 import io.github.njw3995.fabricmmo.core.skill.gathering.ConfiguredBlockXpTable;
+import io.github.njw3995.fabricmmo.core.fabric.FabricMmoFabricRuntime;
+import io.github.njw3995.fabricmmo.core.skill.CoreSkills;
 import java.util.Set;
 import net.minecraft.block.BlockState;
 import net.minecraft.registry.Registries;
@@ -23,6 +25,14 @@ public final class WoodcuttingBlockClassifier {
             BlockState state,
             ConfiguredBlockXpTable xpTable) {
         NamespacedId id = id(state);
+        if (FabricMmoFabricRuntime.running()) {
+            var extension = FabricMmoFabricRuntime.gatheringContentFor(CoreSkills.WOODCUTTING, state);
+            if (extension.isPresent()) {
+                return extension.get().activeAbility()
+                        ? TreeFellerSearch.Kind.WOOD_XP
+                        : TreeFellerSearch.Kind.OTHER;
+            }
+        }
         if (xpTable.xpFor(id) > 0) {
             return TreeFellerSearch.Kind.WOOD_XP;
         }

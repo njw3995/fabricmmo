@@ -75,8 +75,7 @@ public final class MiningAbilityHandler {
             ItemStack tool = serverPlayer.getMainHandStack();
             net.minecraft.block.BlockState state = serverWorld.getBlockState(pos);
             boolean eligibleBlock = state.isIn(net.minecraft.registry.tag.BlockTags.PICKAXE_MINEABLE)
-                    || FabricMmoFabricRuntime.miningXpFor(io.github.njw3995.fabricmmo.api.NamespacedId.parse(
-                            net.minecraft.registry.Registries.BLOCK.getId(state.getBlock()).toString())) > 0;
+                    || FabricMmoFabricRuntime.miningXpFor(state) > 0;
             if (!tool.isIn(ItemTags.PICKAXES) || !eligibleBlock) {
                 return ActionResult.PASS;
             }

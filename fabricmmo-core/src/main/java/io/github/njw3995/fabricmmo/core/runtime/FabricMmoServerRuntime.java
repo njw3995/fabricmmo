@@ -81,6 +81,18 @@ public final class FabricMmoServerRuntime implements AutoCloseable {
     public synchronized void close() throws IOException {
         if (closed) return;
         closed = true;
-        store.close();
+        IOException failure = null;
+        try {
+            api.markers().close();
+        } catch (IOException exception) {
+            failure = exception;
+        }
+        try {
+            store.close();
+        } catch (IOException exception) {
+            if (failure == null) failure = exception;
+            else failure.addSuppressed(exception);
+        }
+        if (failure != null) throw failure;
     }
 }

@@ -1,0 +1,7 @@
+{
+  "format": 1,
+  "scope": "combat",
+  "entity": "example:crystal_golem",
+  "xp": 2.5,
+  "metadata": {"source_mod": "example"}
+}

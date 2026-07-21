@@ -1,0 +1,18 @@
+{
+  "format": 1,
+  "skill": "fabricmmo:herbalism",
+  "block": "#example:berry_crops",
+  "xp": 40,
+  "valid_tools": ["#minecraft:hoes"],
+  "natural_blocks_only": false,
+  "maturity": {"mode": "maximum", "property": "age"},
+  "bonus_drops": true,
+  "active_ability": true,
+  "replant": {
+    "planting_item": "example:berry_seed",
+    "age_property": "age",
+    "rank_ages": [0, 1, 2, 3, 4],
+    "active_ability_rank_bonus": 1,
+    "delay_ticks": 2
+  }
+}

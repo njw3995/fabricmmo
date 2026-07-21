@@ -10,6 +10,13 @@ import io.github.njw3995.fabricmmo.core.block.PlacedBlockTracker;
 import io.github.njw3995.fabricmmo.core.block.RegionPlacedBlockTracker;
 import io.github.njw3995.fabricmmo.core.block.TrackedWorld;
 import io.github.njw3995.fabricmmo.core.config.WorldBlacklist;
+import io.github.njw3995.fabricmmo.core.content.DatapackContentLoader;
+import io.github.njw3995.fabricmmo.core.content.MinecraftBrewingContentResolver;
+import io.github.njw3995.fabricmmo.core.content.MinecraftEntityXpContentResolver;
+import io.github.njw3995.fabricmmo.core.content.MinecraftGatheringContentResolver;
+import io.github.njw3995.fabricmmo.api.content.EntityXpContentDefinition;
+import io.github.njw3995.fabricmmo.api.content.GatheringContentDefinition;
+import java.util.Optional;
 import io.github.njw3995.fabricmmo.core.combat.MobHealthbarService;
 import io.github.njw3995.fabricmmo.core.combat.MobHealthbarSettings;
 import io.github.njw3995.fabricmmo.core.progression.ProgressionSettings;
@@ -170,6 +177,11 @@ public final class FabricMmoFabricRuntime {
     private static WorldBlacklist worldBlacklist;
     private static ProgressionSettings progressionSettings;
     private static PlayerSessionSettingsService playerSessionSettings;
+    private static MinecraftGatheringContentResolver gatheringContentResolver;
+    private static MinecraftEntityXpContentResolver entityXpContentResolver;
+    private static MinecraftBrewingContentResolver brewingContentResolver;
+    private static DatapackContentLoader.Report datapackContentReport;
+    private static int markerSaveTicks;
 
     private FabricMmoFabricRuntime() {
     }
@@ -322,35 +334,46 @@ public final class FabricMmoFabricRuntime {
                             FabricMmoEntrypoint.KEY,
                             FabricMmoEntrypoint.class,
                             entrypoint -> entrypoint.register(api)));
+            newRuntime.api().gameplayXpService().bind(server);
+            newRuntime.api().abilityPipeline().bind(server);
+            newRuntime.api().passivePipeline().bind(server);
+            newRuntime.api().configs().bind(configDirectory.resolve("addons"));
+            newRuntime.api().markers().bind(worldRoot.resolve("data")
+                    .resolve("fabricmmo").resolve("addon-markers.properties"));
+            DatapackContentLoader.Report newDatapackContentReport = DatapackContentLoader.reload(
+                    server.getResourceManager(),
+                    newRuntime.api().gatheringContentRegistry(),
+                    newRuntime.api().entityXpContentRegistry(),
+                    newRuntime.api().brewingContentRegistry());
             MiningAbilityStateView miningAbilityStates = new MiningAbilityStateView(
                     server, newAbilityController, newMiningSettings);
-            newRuntime.api().abilityPipeline().registerStateView(
+            newRuntime.api().abilityPipeline().registerAbilityStateView(
                     CoreMiningAbilities.SUPER_BREAKER, miningAbilityStates);
-            newRuntime.api().abilityPipeline().registerStateView(
+            newRuntime.api().abilityPipeline().registerAbilityStateView(
                     CoreMiningAbilities.BLAST_MINING, miningAbilityStates);
             WoodcuttingAbilityStateView woodcuttingAbilityStates = new WoodcuttingAbilityStateView(
                     server, newWoodcuttingAbilityController, newWoodcuttingSettings);
-            newRuntime.api().abilityPipeline().registerStateView(
+            newRuntime.api().abilityPipeline().registerAbilityStateView(
                     CoreWoodcuttingAbilities.TREE_FELLER, woodcuttingAbilityStates);
             ExcavationAbilityStateView excavationAbilityStates = new ExcavationAbilityStateView(
                     server, newExcavationAbilityController, newExcavationSettings);
-            newRuntime.api().abilityPipeline().registerStateView(
+            newRuntime.api().abilityPipeline().registerAbilityStateView(
                     CoreExcavationAbilities.GIGA_DRILL_BREAKER, excavationAbilityStates);
             HerbalismAbilityStateView herbalismAbilityStates = new HerbalismAbilityStateView(
                     server, newHerbalismAbilityController, newHerbalismSettings);
-            newRuntime.api().abilityPipeline().registerStateView(
+            newRuntime.api().abilityPipeline().registerAbilityStateView(
                     CoreHerbalismAbilities.GREEN_TERRA, herbalismAbilityStates);
             SwordsAbilityStateView swordsAbilityStates = new SwordsAbilityStateView(
                     server, newSwordsAbilityController, newSwordsSettings);
-            newRuntime.api().abilityPipeline().registerStateView(
+            newRuntime.api().abilityPipeline().registerAbilityStateView(
                     CoreSwordsAbilities.SERRATED_STRIKES, swordsAbilityStates);
             AxesAbilityStateView axesAbilityStates = new AxesAbilityStateView(
                     server, newAxesAbilityController, newAxesSettings);
-            newRuntime.api().abilityPipeline().registerStateView(
+            newRuntime.api().abilityPipeline().registerAbilityStateView(
                     CoreAxesAbilities.SKULL_SPLITTER, axesAbilityStates);
             UnarmedAbilityStateView unarmedAbilityStates = new UnarmedAbilityStateView(
                     server, newUnarmedAbilityController, newUnarmedSettings);
-            newRuntime.api().abilityPipeline().registerStateView(
+            newRuntime.api().abilityPipeline().registerAbilityStateView(
                     CoreUnarmedAbilities.BERSERK, unarmedAbilityStates);
             SharedServerSystems.start(
                     server,
@@ -391,6 +414,10 @@ public final class FabricMmoFabricRuntime {
                     newSalvageSettings,
                     newSmeltingSettings);
             runtime = newRuntime;
+            gatheringContentResolver = new MinecraftGatheringContentResolver(newRuntime.api().gatheringContent());
+            entityXpContentResolver = new MinecraftEntityXpContentResolver(newRuntime.api().entityXpContent());
+            brewingContentResolver = new MinecraftBrewingContentResolver(newRuntime.api().brewingContent());
+            datapackContentReport = newDatapackContentReport;
             acrobaticsSettings = newAcrobaticsSettings;
             miningXpTable = newXpTable;
             miningDropSettings = newDropSettings;
@@ -440,8 +467,11 @@ public final class FabricMmoFabricRuntime {
             FabricMmoFabricRuntime.progressionSettings = progressionSettings;
             playerSessionSettings = new PlayerSessionSettingsService();
             LOGGER.info(
-                    "Started with {} registered skills; player data directory: {}; placed-block directory: {}; Mining ability directory: {}; Woodcutting ability directory: {}; Excavation ability directory: {}; Herbalism ability directory: {}; Swords ability directory: {}; Axes ability directory: {}; Unarmed ability directory: {}",
+                    "Started with {} registered skills, {} gathering integrations, {} entity XP integrations, and {} brewing integrations; player data directory: {}; placed-block directory: {}; Mining ability directory: {}; Woodcutting ability directory: {}; Excavation ability directory: {}; Herbalism ability directory: {}; Swords ability directory: {}; Axes ability directory: {}; Unarmed ability directory: {}",
                     runtime.api().skillRegistry().skills().size(),
+                    runtime.api().gatheringContent().definitions().size(),
+                    runtime.api().entityXpContent().definitions().size(),
+                    runtime.api().brewingContent().definitions().size(),
                     playerDataDirectory,
                     placedBlockDirectory,
                     miningAbilityDirectory,
@@ -540,6 +570,14 @@ public final class FabricMmoFabricRuntime {
         return runtime.api();
     }
 
+    public static synchronized void playerDisconnected(UUID playerId) {
+        if (runtime == null) {
+            return;
+        }
+        runtime.api().abilityPipeline().playerDisconnected(
+                Objects.requireNonNull(playerId, "playerId"));
+    }
+
 
     public static synchronized AcrobaticsSettings acrobaticsSettings() {
         if (acrobaticsSettings == null) {
@@ -591,6 +629,87 @@ public final class FabricMmoFabricRuntime {
         return miningDropSettings;
     }
 
+    public static synchronized void dataPacksReloaded(MinecraftServer server, boolean success) {
+        if (!success || runtime == null) return;
+        datapackContentReport = DatapackContentLoader.reload(
+                server.getResourceManager(),
+                runtime.api().gatheringContentRegistry(),
+                runtime.api().entityXpContentRegistry(),
+                runtime.api().brewingContentRegistry());
+        if (gatheringContentResolver != null) gatheringContentResolver.clearCache();
+        if (entityXpContentResolver != null) entityXpContentResolver.clearCache();
+    }
+
+    public static synchronized void tick(MinecraftServer server) {
+        if (runtime == null) return;
+        markerSaveTicks++;
+        if (markerSaveTicks >= 600) {
+            markerSaveTicks = 0;
+            runtime.api().markers().flushAsync();
+        }
+    }
+
+    public static synchronized DatapackContentLoader.Report datapackContentReport() {
+        return datapackContentReport == null
+                ? new DatapackContentLoader.Report(0, 0, 0, 0, 0, 0, 0)
+                : datapackContentReport;
+    }
+
+    public static synchronized Optional<GatheringContentDefinition> gatheringContentFor(
+            NamespacedId skillId, net.minecraft.block.BlockState state) {
+        if (gatheringContentResolver == null) {
+            return Optional.empty();
+        }
+        return gatheringContentResolver.resolve(skillId, state);
+    }
+
+    public static synchronized MinecraftGatheringContentResolver gatheringContentResolver() {
+        if (gatheringContentResolver == null) {
+            throw new IllegalStateException("FabricMMO gathering content registry is not active");
+        }
+        return gatheringContentResolver;
+    }
+
+    public static synchronized double combatBaseXp(net.minecraft.entity.LivingEntity entity) {
+        if (entityXpContentResolver != null) {
+            Optional<EntityXpContentDefinition> definition = entityXpContentResolver.resolve(
+                    EntityXpContentDefinition.Scope.COMBAT, entity.getType());
+            if (definition.isPresent()) return definition.orElseThrow().xp();
+        }
+        String path = net.minecraft.registry.Registries.ENTITY_TYPE.getId(entity.getType()).getPath();
+        return combatXpSettings().pveXp(
+                path,
+                entity instanceof net.minecraft.entity.passive.AnimalEntity,
+                entity instanceof net.minecraft.entity.mob.HostileEntity);
+    }
+
+    public static synchronized double tamingXp(net.minecraft.entity.EntityType<?> type) {
+        if (entityXpContentResolver != null) {
+            Optional<EntityXpContentDefinition> definition = entityXpContentResolver.resolve(
+                    EntityXpContentDefinition.Scope.TAMING, type);
+            if (definition.isPresent()) return definition.orElseThrow().xp();
+        }
+        String path = net.minecraft.registry.Registries.ENTITY_TYPE.getId(type).getPath();
+        return tamingXpTable().xp(path);
+    }
+
+    public static synchronized MinecraftBrewingContentResolver brewingContentResolver() {
+        if (brewingContentResolver == null) {
+            throw new IllegalStateException("FabricMMO brewing content registry is not active");
+        }
+        return brewingContentResolver;
+    }
+
+    public static synchronized int miningXpFor(net.minecraft.block.BlockState state) {
+        NamespacedId blockId = NamespacedId.parse(
+                net.minecraft.registry.Registries.BLOCK.getId(state.getBlock()).toString());
+        int configured = miningXpFor(blockId);
+        return gatheringContentResolver == null
+                ? configured
+                : gatheringContentResolver.xpFor(
+                        io.github.njw3995.fabricmmo.core.skill.CoreSkills.MINING, state, configured);
+    }
+
     public static synchronized int miningXpFor(NamespacedId blockId) {
         if (miningXpTable == null) {
             throw new IllegalStateException("FabricMMO Mining configuration is not active");
@@ -603,6 +722,16 @@ public final class FabricMmoFabricRuntime {
             throw new IllegalStateException("FabricMMO Woodcutting XP configuration is not active");
         }
         return woodcuttingXpTable;
+    }
+
+    public static synchronized int woodcuttingXpFor(net.minecraft.block.BlockState state) {
+        NamespacedId blockId = NamespacedId.parse(
+                net.minecraft.registry.Registries.BLOCK.getId(state.getBlock()).toString());
+        int configured = woodcuttingXpFor(blockId);
+        return gatheringContentResolver == null
+                ? configured
+                : gatheringContentResolver.xpFor(
+                        io.github.njw3995.fabricmmo.core.skill.CoreSkills.WOODCUTTING, state, configured);
     }
 
     public static synchronized int woodcuttingXpFor(NamespacedId blockId) {
@@ -684,6 +813,16 @@ public final class FabricMmoFabricRuntime {
             throw new IllegalStateException("FabricMMO Herbalism XP configuration is not active");
         }
         return herbalismXpTable;
+    }
+
+    public static synchronized int herbalismXpFor(net.minecraft.block.BlockState state) {
+        NamespacedId blockId = NamespacedId.parse(
+                net.minecraft.registry.Registries.BLOCK.getId(state.getBlock()).toString());
+        int configured = herbalismXpFor(blockId);
+        return gatheringContentResolver == null
+                ? configured
+                : gatheringContentResolver.xpFor(
+                        io.github.njw3995.fabricmmo.core.skill.CoreSkills.HERBALISM, state, configured);
     }
 
     public static synchronized int herbalismXpFor(NamespacedId blockId) {
@@ -1062,6 +1201,11 @@ public final class FabricMmoFabricRuntime {
             playerSessionSettings.clear();
         }
         playerSessionSettings = null;
+        gatheringContentResolver = null;
+        entityXpContentResolver = null;
+        brewingContentResolver = null;
+        datapackContentReport = null;
+        markerSaveTicks = 0;
 
         IOException failure = null;
         if (activeAbilityController != null) {
