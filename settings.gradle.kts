@@ -11,7 +11,6 @@ rootProject.name = "fabricmmo"
 include(
     "fabricmmo-api",
     "fabricmmo-core",
-    "fabricmmo-client",
     "parity-tests",
     "tools:upstream-diff"
 )

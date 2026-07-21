@@ -3,6 +3,28 @@ plugins {
     id("fabric-loom")
 }
 
+base {
+    archivesName.set("fabricmmo")
+}
+
+loom {
+    splitEnvironmentSourceSets()
+
+    mods {
+        register("fabricmmo") {
+            sourceSet(sourceSets["main"])
+            sourceSet(sourceSets["client"])
+        }
+    }
+
+    runs {
+        named("client") {
+            programArg("--username")
+            programArg("Player338")
+        }
+    }
+}
+
 dependencies {
     api(project(":fabricmmo-api"))
     include(project(":fabricmmo-api"))

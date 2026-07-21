@@ -7,12 +7,13 @@ Status: pre-alpha.
 ## Modules
 
 - `fabricmmo-api`: public addon API
-- `fabricmmo-core`: server-side progression and gameplay
-- `fabricmmo-client`: optional client features
+- `fabricmmo-core`: universal FabricMMO mod, including server-authoritative gameplay and optional client features
 - `parity-tests`: integration and upstream comparison tests
 - `tools/upstream-diff`: upstream change analysis
 
 The Cobblemon integration is maintained in the separate `fabricmmo-cobblemon` repository.
+
+FabricMMO builds one universal `fabricmmo-<version>.jar` for dedicated servers and clients. Client installation remains optional.
 
 ## Requirements
 
