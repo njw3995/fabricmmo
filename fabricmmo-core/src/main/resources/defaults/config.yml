@@ -49,12 +49,16 @@ Skills:
     Prevent_Hopper_Transfer_Bottles: false
     Level_Cap: 0
   Archery:
+    Enabled_For_PVP: true
+    Enabled_For_PVE: true
     Level_Cap: 0
   Axes:
     Enabled_For_PVP: true
     Enabled_For_PVE: true
     Level_Cap: 0
   Crossbows:
+    Enabled_For_PVP: true
+    Enabled_For_PVE: true
     Level_Cap: 0
   Excavation:
     Level_Cap: 0
@@ -116,6 +120,8 @@ Skills:
         Summon_Length: 240
         Per_Player_Limit: 1
   Tridents:
+    Enabled_For_PVP: true
+    Enabled_For_PVE: true
     Level_Cap: 0
   Unarmed:
     Enabled_For_PVP: true

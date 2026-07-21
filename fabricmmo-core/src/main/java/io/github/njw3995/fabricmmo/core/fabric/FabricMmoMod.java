@@ -18,6 +18,7 @@ import io.github.njw3995.fabricmmo.core.skill.fishing.FishingRuntimeHandler;
 import io.github.njw3995.fabricmmo.core.skill.mining.MiningAbilityHandler;
 import io.github.njw3995.fabricmmo.core.skill.mining.MiningBlastHandler;
 import io.github.njw3995.fabricmmo.core.skill.mining.MiningBlockBreakHandler;
+import io.github.njw3995.fabricmmo.core.skill.ranged.RangedCombatRuntimeHandler;
 import io.github.njw3995.fabricmmo.core.skill.swords.SwordsAbilityHandler;
 import io.github.njw3995.fabricmmo.core.skill.swords.SwordsRuntimeHandler;
 import io.github.njw3995.fabricmmo.core.skill.unarmed.UnarmedAbilityHandler;
@@ -66,6 +67,7 @@ public final class FabricMmoMod implements ModInitializer {
         ServerTickEvents.END_SERVER_TICK.register(SharedServerSystems::tick);
         ServerTickEvents.END_SERVER_TICK.register(SwordsRuntimeHandler::tick);
         ServerTickEvents.END_SERVER_TICK.register(TamingRuntimeHandler::tick);
+        ServerTickEvents.END_SERVER_TICK.register(RangedCombatRuntimeHandler::tick);
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
             if (SharedServerSystems.running()) {
                 SharedServerSystems.playerJoined(handler.player);
@@ -76,11 +78,13 @@ public final class FabricMmoMod implements ModInitializer {
             AcrobaticsRuntimeHandler.playerDisconnected(handler.player.getUuid());
             SwordsRuntimeHandler.playerDisconnected(handler.player.getUuid());
             TamingRuntimeHandler.playerDisconnected(server, handler.player.getUuid());
+            RangedCombatRuntimeHandler.playerDisconnected(handler.player.getUuid());
             SharedServerSystems.playerDisconnected(handler.player);
         });
         ServerPlayerEvents.AFTER_RESPAWN.register((oldPlayer, newPlayer, alive) -> {
             AcrobaticsRuntimeHandler.playerRespawned(newPlayer.getUuid());
             SwordsRuntimeHandler.playerRespawned(newPlayer.getUuid());
+            RangedCombatRuntimeHandler.playerRespawned(newPlayer.getUuid());
         });
         ServerLivingEntityEvents.ALLOW_DAMAGE.register((entity, source, amount) -> {
             if (!TamingRuntimeHandler.allowDamage(entity, source)) {

@@ -52,12 +52,8 @@ public final class SkillPanelCooldownCatalog {
     }
 
     private void registerUpstreamCoreEntries() {
-        registerLocale(CoreSkills.ARCHERY, id("explosive_shot"),
-                "Archery.SubSkill.ExplosiveShot.Name", Formatting.AQUA);
         registerLocale(CoreSkills.AXES, CoreAxesAbilities.SKULL_SPLITTER,
                 "Axes.SubSkill.SkullSplitter.Name", Formatting.AQUA);
-        registerLocale(CoreSkills.CROSSBOWS, id("super_shotgun"),
-                "Placeholder", Formatting.AQUA);
         registerLocale(CoreSkills.EXCAVATION, id("giga_drill_breaker"),
                 "Excavation.SubSkill.GigaDrillBreaker.Name", Formatting.AQUA);
         registerLocale(CoreSkills.HERBALISM, CoreHerbalismAbilities.GREEN_TERRA,
@@ -68,8 +64,6 @@ public final class SkillPanelCooldownCatalog {
                 "Mining.SubSkill.BlastMining.Name", Formatting.BLUE);
         registerLocale(CoreSkills.SWORDS, CoreSwordsAbilities.SERRATED_STRIKES,
                 "Swords.SubSkill.SerratedStrikes.Name", Formatting.AQUA);
-        registerLocale(CoreSkills.TRIDENTS, id("tridents_super_ability"),
-                "Placeholder", Formatting.AQUA);
         registerLocale(CoreSkills.UNARMED, CoreUnarmedAbilities.BERSERK,
                 "Unarmed.SubSkill.Berserk.Name", Formatting.AQUA);
         registerLocale(CoreSkills.WOODCUTTING, id("tree_feller"),

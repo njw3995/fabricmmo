@@ -23,6 +23,8 @@
     "PistonHandlerMixin",
     "PlayerEntityMixin",
     "ServerPlayNetworkHandlerMixin",
+    "PersistentProjectileEntityAccessor",
+    "PersistentProjectileEntityMixin",
     "ServerPlayerInteractionManagerMixin",
     "ServerPlayerEntityUiTraceMixin",
     "ServerCommandSourceUiTraceMixin",

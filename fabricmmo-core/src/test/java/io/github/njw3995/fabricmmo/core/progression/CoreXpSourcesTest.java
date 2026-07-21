@@ -114,6 +114,25 @@ class CoreXpSourcesTest {
     }
 
     @Test
+    void registersRangedCombatSources() {
+        DefaultSkillRegistry skills = new DefaultSkillRegistry();
+        CoreSkills.registerAll(skills);
+        DefaultXpSourceRegistry sources = new DefaultXpSourceRegistry(skills);
+
+        CoreXpSources.registerDefaults(sources);
+
+        assertTrue(sources.find(CoreXpSources.ARCHERY_COMBAT).isPresent());
+        assertTrue(sources.find(CoreXpSources.CROSSBOWS_COMBAT).isPresent());
+        assertTrue(sources.find(CoreXpSources.TRIDENTS_COMBAT).isPresent());
+        assertEquals(1, sources.sources().stream()
+                .filter(source -> source.skillId().equals(CoreSkills.ARCHERY)).count());
+        assertEquals(1, sources.sources().stream()
+                .filter(source -> source.skillId().equals(CoreSkills.CROSSBOWS)).count());
+        assertEquals(1, sources.sources().stream()
+                .filter(source -> source.skillId().equals(CoreSkills.TRIDENTS)).count());
+    }
+
+    @Test
     void registersSwordsCombatSource() {
         DefaultSkillRegistry skills = new DefaultSkillRegistry();
         CoreSkills.registerAll(skills);

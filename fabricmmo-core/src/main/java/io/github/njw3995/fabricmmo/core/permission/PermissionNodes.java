@@ -80,6 +80,30 @@ public final class PermissionNodes {
     public static final String FISHING_VANILLA_XP_BOOST =
             "mcmmo.ability.fishing.vanillaxpboost";
     public static final String FISHING_LUCKY = "mcmmo.perks.lucky.fishing";
+    public static final String ARCHERY = "mcmmo.skills.archery";
+    public static final String ARCHERY_COMMAND = "mcmmo.commands.archery";
+    public static final String ARCHERY_SKILL_SHOT = "mcmmo.ability.archery.skillshot";
+    public static final String ARCHERY_DAZE = "mcmmo.ability.archery.daze";
+    public static final String ARCHERY_ARROW_RETRIEVAL =
+            "mcmmo.ability.archery.arrowretrieval";
+    public static final String ARCHERY_LIMIT_BREAK =
+            "mcmmo.ability.archery.archerylimitbreak";
+    public static final String ARCHERY_LUCKY = "mcmmo.perks.lucky.archery";
+    public static final String CROSSBOWS = "mcmmo.skills.crossbows";
+    public static final String CROSSBOWS_COMMAND = "mcmmo.commands.crossbows";
+    public static final String CROSSBOWS_POWERED_SHOT =
+            "mcmmo.ability.crossbows.poweredshot";
+    public static final String CROSSBOWS_TRICK_SHOT =
+            "mcmmo.ability.crossbows.trickshot";
+    public static final String CROSSBOWS_LIMIT_BREAK =
+            "mcmmo.ability.crossbows.crossbowslimitbreak";
+    public static final String CROSSBOWS_LUCKY = "mcmmo.perks.lucky.crossbows";
+    public static final String TRIDENTS = "mcmmo.skills.tridents";
+    public static final String TRIDENTS_COMMAND = "mcmmo.commands.tridents";
+    public static final String TRIDENTS_IMPALE = "mcmmo.ability.tridents.impale";
+    public static final String TRIDENTS_LIMIT_BREAK =
+            "mcmmo.ability.tridents.tridentslimitbreak";
+    public static final String TRIDENTS_LUCKY = "mcmmo.perks.lucky.tridents";
     public static final String AXES = "mcmmo.skills.axes";
     public static final String AXES_COMMAND = "mcmmo.commands.axes";
     public static final String AXES_SKULL_SPLITTER = "mcmmo.ability.axes.skullsplitter";

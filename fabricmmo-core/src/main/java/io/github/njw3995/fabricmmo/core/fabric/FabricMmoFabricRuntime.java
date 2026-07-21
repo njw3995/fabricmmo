@@ -18,6 +18,7 @@ import io.github.njw3995.fabricmmo.core.player.PlayerSessionSettingsService;
 import io.github.njw3995.fabricmmo.core.runtime.FabricMmoServerRuntime;
 import io.github.njw3995.fabricmmo.core.skill.acrobatics.AcrobaticsRuntimeHandler;
 import io.github.njw3995.fabricmmo.core.skill.acrobatics.AcrobaticsSettings;
+import io.github.njw3995.fabricmmo.core.skill.archery.ArcherySettings;
 import io.github.njw3995.fabricmmo.core.skill.axes.AxesAbilityController;
 import io.github.njw3995.fabricmmo.core.skill.axes.AxesAbilityHandler;
 import io.github.njw3995.fabricmmo.core.skill.axes.AxesAbilityStateView;
@@ -28,6 +29,7 @@ import io.github.njw3995.fabricmmo.core.skill.axes.PropertiesAxesAbilityStore;
 import io.github.njw3995.fabricmmo.core.skill.alchemy.AlchemyPotionConfig;
 import io.github.njw3995.fabricmmo.core.skill.alchemy.AlchemyRuntimeHandler;
 import io.github.njw3995.fabricmmo.core.skill.alchemy.AlchemySettings;
+import io.github.njw3995.fabricmmo.core.skill.crossbows.CrossbowsSettings;
 import io.github.njw3995.fabricmmo.core.skill.excavation.CoreExcavationAbilities;
 import io.github.njw3995.fabricmmo.core.skill.excavation.ExcavationAbilityController;
 import io.github.njw3995.fabricmmo.core.skill.excavation.ExcavationAbilityHandler;
@@ -80,8 +82,10 @@ import io.github.njw3995.fabricmmo.core.skill.swords.PropertiesSwordsAbilityStor
 import io.github.njw3995.fabricmmo.core.skill.swords.SwordsAbilityController;
 import io.github.njw3995.fabricmmo.core.skill.swords.SwordsAbilityHandler;
 import io.github.njw3995.fabricmmo.core.skill.swords.SwordsAbilityStateView;
+import io.github.njw3995.fabricmmo.core.skill.ranged.RangedCombatRuntimeHandler;
 import io.github.njw3995.fabricmmo.core.skill.swords.SwordsRuntimeHandler;
 import io.github.njw3995.fabricmmo.core.skill.swords.SwordsSettings;
+import io.github.njw3995.fabricmmo.core.skill.tridents.TridentsSettings;
 import io.github.njw3995.fabricmmo.core.skill.unarmed.CoreUnarmedAbilities;
 import io.github.njw3995.fabricmmo.core.skill.unarmed.PropertiesUnarmedAbilityStore;
 import io.github.njw3995.fabricmmo.core.skill.unarmed.UnarmedAbilityController;
@@ -133,6 +137,9 @@ public final class FabricMmoFabricRuntime {
     private static FishingTreasureTable fishingTreasures;
     private static FishingAntiExploitTracker fishingAntiExploit;
     private static CombatXpSettings combatXpSettings;
+    private static ArcherySettings archerySettings;
+    private static CrossbowsSettings crossbowsSettings;
+    private static TridentsSettings tridentsSettings;
     private static MobHealthbarSettings mobHealthbarSettings;
     private static MacesSettings macesSettings;
     private static AxesSettings axesSettings;
@@ -229,6 +236,12 @@ public final class FabricMmoFabricRuntime {
                     newFishingSettings.exploitMoveRange(), newFishingSettings.overFishLimit());
             CombatXpSettings newCombatXpSettings = CombatXpSettings.load(experienceFile);
             MobHealthbarSettings newMobHealthbarSettings = MobHealthbarSettings.load(configFile);
+            ArcherySettings newArcherySettings = ArcherySettings.load(
+                    configFile, advancedFile, skillRanksFile, experienceFile);
+            CrossbowsSettings newCrossbowsSettings = CrossbowsSettings.load(
+                    configFile, advancedFile, skillRanksFile, experienceFile);
+            TridentsSettings newTridentsSettings = TridentsSettings.load(
+                    configFile, advancedFile, skillRanksFile);
             SwordsSettings newSwordsSettings = SwordsSettings.load(
                     configFile, advancedFile, skillRanksFile, soundsFile);
             AxesSettings newAxesSettings = AxesSettings.load(
@@ -331,6 +344,9 @@ public final class FabricMmoFabricRuntime {
                     newHerbalismDropSettings,
                     newFishingSettings,
                     newFishingTreasures,
+                    newArcherySettings,
+                    newCrossbowsSettings,
+                    newTridentsSettings,
                     newSwordsAbilityController,
                     newSwordsSettings,
                     newAxesAbilityController,
@@ -366,6 +382,9 @@ public final class FabricMmoFabricRuntime {
             fishingAntiExploit = newFishingAntiExploit;
             combatXpSettings = newCombatXpSettings;
             mobHealthbarSettings = newMobHealthbarSettings;
+            archerySettings = newArcherySettings;
+            crossbowsSettings = newCrossbowsSettings;
+            tridentsSettings = newTridentsSettings;
             swordsSettings = newSwordsSettings;
             swordsAbilityController = newSwordsAbilityController;
             axesSettings = newAxesSettings;
@@ -745,6 +764,27 @@ public final class FabricMmoFabricRuntime {
         return macesSettings;
     }
 
+    public static synchronized ArcherySettings archerySettings() {
+        if (archerySettings == null) {
+            throw new IllegalStateException("FabricMMO Archery settings are not active");
+        }
+        return archerySettings;
+    }
+
+    public static synchronized CrossbowsSettings crossbowsSettings() {
+        if (crossbowsSettings == null) {
+            throw new IllegalStateException("FabricMMO Crossbows settings are not active");
+        }
+        return crossbowsSettings;
+    }
+
+    public static synchronized TridentsSettings tridentsSettings() {
+        if (tridentsSettings == null) {
+            throw new IllegalStateException("FabricMMO Tridents settings are not active");
+        }
+        return tridentsSettings;
+    }
+
     public static synchronized SwordsSettings swordsSettings() {
         if (swordsSettings == null) {
             throw new IllegalStateException("FabricMMO Swords settings are not active");
@@ -894,6 +934,7 @@ public final class FabricMmoFabricRuntime {
         MacesRuntimeHandler.reset();
         MobHealthbarService.reset();
         AlchemyRuntimeHandler.reset();
+        RangedCombatRuntimeHandler.reset();
         runtime = null;
         acrobaticsSettings = null;
         miningXpTable = null;
@@ -920,6 +961,9 @@ public final class FabricMmoFabricRuntime {
         fishingAntiExploit = null;
         combatXpSettings = null;
         mobHealthbarSettings = null;
+        archerySettings = null;
+        crossbowsSettings = null;
+        tridentsSettings = null;
         swordsSettings = null;
         swordsAbilityController = null;
         axesSettings = null;
